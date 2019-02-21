@@ -29,10 +29,10 @@ def tetration(x, n):
 fig = pp.figure()
 ax = fig.add_subplot(1, 1, 1)
 with open('counter.txt') as count_file:
-	graph_id = int(count_file.readline())
-fig.canvas.set_window_title('graph_%x' % graph_id)
+	graph_id = int(count_file.readline().strip())
+fig.canvas.set_window_title('graph_{}'.format(graph_id))
 with open('counter.txt', 'w') as count_file:
-	count_file.write('{}'.format(graph_id + 1))
+	print('{}'.format(graph_id + 1), file = count_file)
 
 # choose a plot style
 try:
