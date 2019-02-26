@@ -22,29 +22,23 @@ def tetration(x, n):
 
 ################################################################################
 
-# print a list neatly
-def show_nice_list(items, columns = 2):
+# print a list neatly in columns
+def show_nice_list(items, columns = 3):
 
-	# pad the list
+	# pad the list and split it into equal-length rows
 	while len(items) % columns:
-		items.append(' ')
+		items.append('')
 	rows = int(len(items) / columns)
+	items = [items[i :: rows] for i in range(rows)]
 
-	# split the list
-	subitems = []
-	for i in range(rows):
-		subitems.append(items[i :: rows])
-
-	print([len(row[i]) for i in range(columns) for row in subitems])
-	# widths = [max(len(subitems[:][i])) for i in range(columns)]
-	# print(widths)
-
-	for item in subitems:
-		for i in item:
-			sys.stdout.write(i.ljust(25))
+	# find out the maximum width of all columns
+	# then use those maximum widths to justify all columns
+	widths = [max([len(row[i]) for row in items]) for i in range(columns)]
+	for row in items:
+		for r, width in zip(row, widths):
+			sys.stdout.write(r.rjust(width + 4))
 			sys.stdout.flush()
 		print()
-
 
 ################################################################################
 
@@ -63,35 +57,15 @@ with open('counter.txt', 'w') as count_file:
 # choose a plot style
 try:
 	pp.style.use(sys.argv[1])
-except IndexError:
-	print('Plot style not specified. Using \'classic\'.')
+except (IndexError, OSError):
+	print('\033[1;31;40mPlot style either not specified or invalid. Using \'classic\'.\033[0m')
 	pp.style.use('classic')
-	pp.style.use('bmh')
-except OSError:
-	print('Invalid plot style specified. Using \'classic\'.')
-	pp.style.use('classic')
-	pp.style.use('bmh')
-
-# display available styles
-show_nice_list(pp.style.available, 4)
-# styles = pp.style.available
-# while len(styles) % 3:
-# 	styles.append(' ')
-# left = int(len(styles) / 3)
-# right = 2 * left
-# for k in zip(styles[: left], styles[left : right], styles[right :]):
-# 	for i in k:
-# 		sys.stdout.write(i.ljust(25))
-# 		sys.stdout.flush()
-# 	print()
-
-# display a thick line for the coordinate axes
-ax.axhline(linewidth = 1.6, color = 'k')
-ax.axvline(linewidth = 1.6, color = 'k')
+print('available styles:')
+show_nice_list(pp.style.available)
 
 ################################################################################
 
-# the statements which actually plot the graphs
+# set up variables to plot graphs
 # t = np.linspace(0, 10 * np.pi, 98257)
 x1 = np.linspace(1, 150, 1e5)
 y1 = (np.sin(x1 ** 2) - x1) / (np.cos(x1) ** 2 - x1)
@@ -119,6 +93,8 @@ ax.plot(x1, y1, 'r-', label = r'$y=\dfrac{\sin\,x^2-x}{\cos^2x-x}$', linewidth =
 ################################################################################
 
 # miscellaneous settings
+ax.axhline(linewidth = 1.6, color = 'k')
+ax.axvline(linewidth = 1.6, color = 'k')
 ax.grid(True, linewidth = 0.4)
 ax.legend(loc = 'best')
 # ax.set_title('example')
@@ -138,4 +114,3 @@ ax.set_ylabel(r'$y$')
 # ax.set_yticklabels([r'${}$'.format(i) for i in ax.get_yticklabels()])
 # fig.gca().set_aspect('equal', adjustable = 'box')
 pp.show()
-# ax.set_yticks([r'${}$'.format(i) for i in ax.get_yticks()])
