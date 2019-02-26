@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import colorama
 import matplotlib.patches as mp
 import matplotlib.pyplot as pp
 import numpy as np
@@ -58,7 +59,9 @@ with open('counter.txt', 'w') as count_file:
 try:
 	pp.style.use(sys.argv[1])
 except (IndexError, OSError):
-	print('\033[1;31;40mPlot style either not specified or invalid. Using \'classic\'.\033[0m')
+	colorama.init(autoreset = True) # to allow coloured text on Windows
+	print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Plot style either not specified or invalid. Using \'classic\'.')
+	colorama.deinit()
 	pp.style.use('classic')
 print('available styles:')
 show_nice_list(pp.style.available)
@@ -103,8 +106,8 @@ ax.set_xlabel(r'$x$')
 # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
 # ax.set_xticklabels([r'$-4\pi$', r'$-3\pi$', r'$-2\pi$', r'$-\pi$', r'$0$', r'$\pi$', r'$2\pi$', r'$3\pi$', r'$4\pi$'])
 # ax.set_xticks([i * np.pi for i in range(-4, 5)])
-ax.set_xticklabels([r'${}\pi$'.format(i) for i in range(5, 51, 5)])
-ax.set_xticks([i * np.pi for i in range(5, 51, 5)])
+ax.set_xticklabels([r'$0$'] + [r'${}\pi$'.format(i) for i in range(5, 51, 5)])
+ax.set_xticks([i * np.pi for i in range(0, 51, 5)])
 # ax.set_xticks([4, 6])
 # ax.set_xticklabels(['invention of\ncamera', 'invention of\nphoto editing'])
 ax.set_ylabel(r'$y$')
