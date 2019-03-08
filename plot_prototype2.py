@@ -86,19 +86,19 @@ def configure(fig, ax):
 	fig.canvas.draw()
 
 	# use the following lines if you want to customise labels for ticks
-	horz_labels = [r'${}\pi$'.format(i) for i in np.arange(-4, 5, 1)]
-	horz_labels[3 : 6] = [r'$-\pi$', r'$0$', r'$\pi$']
-	ax.set_xticklabels(horz_labels)
-	ax.set_xticks([i * np.pi for i in np.arange(-4, 5, 1)])
-	vert_labels = [r'${}$'.format(round(i, 2)) for i in np.arange(-2, 2.1, 0.5)]
-	ax.set_yticklabels(vert_labels)
-	ax.set_yticks([i for i in np.arange(-2, 2.1, 0.5)])
+	# horz_labels = [r'${}\pi$'.format(i) for i in np.arange(-4, 5, 1)]
+	# horz_labels[3 : 6] = [r'$-\pi$', r'$0$', r'$\pi$']
+	# ax.set_xticklabels(horz_labels)
+	# ax.set_xticks([i * np.pi for i in np.arange(-4, 5, 1)])
+	# vert_labels = [r'${}$'.format(round(i, 2)) for i in np.arange(-2, 2.1, 0.5)]
+	# ax.set_yticklabels(vert_labels)
+	# ax.set_yticks([i for i in np.arange(-2, 2.1, 0.5)])
 
 	# use the following lines if you want tick labels to be chosen automatically
-	# horz_labels = [item.get_text() for item in ax.get_xticklabels()]
-	# vert_labels = [item.get_text() for item in ax.get_yticklabels()]
-	# ax.set_xticklabels([r'${}$'.format(i) for i in horz_labels])
-	# ax.set_yticklabels([r'${}$'.format(i) for i in vert_labels])
+	horz_labels = [item.get_text() for item in ax.get_xticklabels()]
+	vert_labels = [item.get_text() for item in ax.get_yticklabels()]
+	ax.set_xticklabels([r'${}$'.format(i) for i in horz_labels])
+	ax.set_yticklabels([r'${}$'.format(i) for i in vert_labels])
 
 	ax.set_xlabel(r'$x$')
 	ax.set_ylabel(r'$y$')
@@ -110,9 +110,10 @@ try:
 	pp.style.use(sys.argv[1])
 except (IndexError, OSError):
 	colorama.init(autoreset = True)
-	print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Plot style either not specified or invalid. Using \'classic\'.')
+	print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Plot style either not specified or invalid. Using \'classic\' and \'seaborn-poster\'.')
 	colorama.deinit()
 	pp.style.use('classic')
+	pp.style.use('seaborn-poster')
 print('available styles:')
 show_nice_list(pp.style.available)
 
