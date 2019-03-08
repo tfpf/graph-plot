@@ -6,6 +6,38 @@ import matplotlib.pyplot as pp
 import numpy as np
 import sys
 
+with pp.xkcd():
+	# Based on "The Data So Far" from XKCD by Randall Munroe
+	# http://xkcd.com/373/
+
+	fig = pp.figure()
+	ax = fig.add_axes((0.1, 0.2, 0.8, 0.7))
+	x1 = np.linspace(0, 10, 100000)
+	y1 = 0.1 * np.random.randn(100000) + 8
+	y1[40000 : 60000] = 0
+	ax.plot(x1, y1, 'r-', label = r'trends of supernatural miracles', linewidth = 0.8)
+	# ax.bar([0, 1], [0, 100], 0.25)
+	ax.spines['right'].set_color('none')
+	ax.spines['top'].set_color('none')
+	ax.xaxis.set_ticks_position('bottom')
+	ax.set_xticks([4, 6])
+	# ax.set_xlim([-0.5, 1.5])
+	# ax.set_ylim([0, 110])
+	ax.set_xticklabels(['invention of\nthe camera', 'invention of image\nediting software'])
+	pp.yticks([])
+	# pp.xlabel('time')
+	pp.legend()
+	pp.ylabel('frequency of miracles')
+
+	# pp.title("CLAIMS OF SUPERNATURAL POWERS")
+
+	# fig.text(
+	# 	0.5, 0.05,
+	# 	'"The Data So Far" from xkcd by Randall Munroe',
+	# 	ha='center')
+
+pp.show()
+
 ################################################################################
 
 # tetration: this should compute x ^^ n
@@ -37,7 +69,7 @@ def show_nice_list(items, columns = 3):
 	widths = [max([len(row[i]) for row in items]) for i in range(columns)]
 	for row in items:
 		for r, width in zip(row, widths):
-			sys.stdout.write(r.rjust(width + 4))
+			sys.stdout.write(r.rjust(width + 1))
 			sys.stdout.flush()
 		print()
 
@@ -57,7 +89,8 @@ with open('counter.txt', 'w') as count_file:
 
 # choose a plot style
 try:
-	pp.style.use(sys.argv[1])
+	# pp.style.use(sys.argv[1])
+	pass
 except (IndexError, OSError):
 	colorama.init(autoreset = True) # to allow coloured text on Windows
 	print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Plot style either not specified or invalid. Using \'classic\'.')
@@ -70,12 +103,13 @@ show_nice_list(pp.style.available)
 
 # set up variables to plot graphs
 # t = np.linspace(0, 10 * np.pi, 98257)
-x1 = np.linspace(1, 150, 1e5)
-y1 = (np.sin(x1 ** 2) - x1) / (np.cos(x1) ** 2 - x1)
-ax.plot(x1, y1, 'r-', label = r'$y=\dfrac{\sin\,x^2-x}{\cos^2x-x}$', linewidth = 0.8)
-# x2 = np.linspace(2, 10, 1e5)
-# y2 = x2 - 4
-# ax.plot(x2, y2, 'b-', label = r'$y=x-4$', linewidth = 0.8)
+x1 = np.linspace(0, 10, 100000)
+y1 = 0.1 * np.random.randn(100000) + 8
+y1[40000 : 60000] = 0
+ax.plot(x1, y1, 'r-', label = r'trends of supernatural miracles', linewidth = 0.8)
+# x2 = np.linspace(0, 10, 1e5)
+# y2 = x2
+# ax.plot(x2, y2, 'b-', label = r'$y=x$', linewidth = 0.8)
 # x3 = np.linspace(0.2, 10, 1e5)
 # y3 = 1 / x3
 # ax.plot(x3, y3, 'g-', label = r'$y=\dfrac{1}{x}$', linewidth = 0.8)
@@ -96,24 +130,28 @@ ax.plot(x1, y1, 'r-', label = r'$y=\dfrac{\sin\,x^2-x}{\cos^2x-x}$', linewidth =
 ################################################################################
 
 # miscellaneous settings
+pp.xkcd()
 ax.axhline(linewidth = 1.6, color = 'k')
 ax.axvline(linewidth = 1.6, color = 'k')
 ax.grid(True, linewidth = 0.4)
-ax.legend(loc = 'best')
+ax.legend(loc = 'best', fancybox = True, shadow = True)
 # ax.set_title('example')
-ax.set_xlabel(r'$x$')
-# ax.set_xlim(-2, 2)
+ax.set_xlabel('frequency of miracles')
+# ax.set_xlim(-6 * np.pi, 6 * np.pi)
 # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
-# ax.set_xticklabels([r'$-4\pi$', r'$-3\pi$', r'$-2\pi$', r'$-\pi$', r'$0$', r'$\pi$', r'$2\pi$', r'$3\pi$', r'$4\pi$'])
-# ax.set_xticks([i * np.pi for i in range(-4, 5)])
-ax.set_xticklabels([r'$0$'] + [r'${}\pi$'.format(i) for i in range(5, 51, 5)])
-ax.set_xticks([i * np.pi for i in range(0, 51, 5)])
-# ax.set_xticks([4, 6])
-# ax.set_xticklabels(['invention of\ncamera', 'invention of\nphoto editing'])
-ax.set_ylabel(r'$y$')
-# ax.set_ylim(-4, 4)
+ax.set_xticks([4, 6])
+ax.set_xticklabels(['invention of\nthe camera', 'invention of image\nediting software'])
+# ax.set_xticks([i for i in np.arange(-4, 5, 1)])
+# ax.set_xticklabels([r'${}$'.format(i) for i in np.arange(-4, 5, 1)])
+# ax.set_xticklabels([r'${}\pi$'.format(i) for i in range(-6, -1)] + [r'$-\pi$', r'$0$', r'$\pi$'] + [r'${}\pi$'.format(i) for i in range(2, 7)])
+# ax.set_xticks([i * np.pi for i in range(-6, 7)])
+ax.set_ylabel('time')
+# ax.set_ylim(-2, 8)
 # ax.set_yticklabels([r'$\dfrac{0.3989}{\sigma}$', r'$\dfrac{0.2420}{\sigma}$', r'$\dfrac{0.0540}{\sigma}$', r'$\dfrac{0.0044}{\sigma}$'])
 # ax.set_yticks(np.array([0.3989, 0.2420, 0.0540, 0.0044]) / t)
+ax.set_yticks([])
 # ax.set_yticklabels([r'${}$'.format(i) for i in ax.get_yticklabels()])
+# ax.set_yticks([i for i in np.arange(-0.2, 1.3, 0.2)])
+# ax.set_yticklabels([r'${}$'.format(round(i, 2)) for i in np.arange(-0.2, 1.3, 0.2)])
 # fig.gca().set_aspect('equal', adjustable = 'box')
 pp.show()
