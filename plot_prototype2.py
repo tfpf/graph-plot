@@ -82,22 +82,22 @@ def configure(fig, ax):
 	# ax.set_title('example')
 
 	# ax.set_xlim(-6 * np.pi, 6 * np.pi)
-	ax.set_ylim(-2, 2)
+	ax.set_ylim(-2, 8)
 	fig.canvas.draw()
 
 	# use the following lines if you want to customise labels for ticks
-	# horz_labels = [r'${}\pi$'.format(i) for i in np.arange(-4, 5, 1)]
-	# horz_labels[3 : 6] = [r'$-\pi$', r'$0$', r'$\pi$']
-	# ax.set_xticklabels(horz_labels)
-	# ax.set_xticks([i * np.pi for i in np.arange(-4, 5, 1)])
+	horz_labels = [r'${}\pi$'.format(i) for i in np.arange(-4, 5, 1)]
+	horz_labels[3 : 6] = [r'$-\pi$', r'$0$', r'$\pi$']
+	ax.set_xticklabels(horz_labels)
+	ax.set_xticks([i * np.pi for i in np.arange(-4, 5, 1)])
 	# vert_labels = [r'${}$'.format(round(i, 2)) for i in np.arange(-2, 2.1, 0.5)]
 	# ax.set_yticklabels(vert_labels)
 	# ax.set_yticks([i for i in np.arange(-2, 2.1, 0.5)])
 
 	# use the following lines if you want tick labels to be chosen automatically
-	horz_labels = [item.get_text() for item in ax.get_xticklabels()]
+	# horz_labels = [item.get_text() for item in ax.get_xticklabels()]
+	# ax.set_xticklabels([r'${}$'.format(i) for i in horz_labels])
 	vert_labels = [item.get_text() for item in ax.get_yticklabels()]
-	ax.set_xticklabels([r'${}$'.format(i) for i in horz_labels])
 	ax.set_yticklabels([r'${}$'.format(i) for i in vert_labels])
 
 	ax.set_xlabel(r'$x$')
@@ -132,8 +132,8 @@ with open('counter.txt', 'w') as count_file:
 
 # t = np.linspace(0, 10 * np.pi, 98257)
 x1 = np.linspace(-4 * np.pi, 4 * np.pi, 100000)
-y1 = np.cos(x1)
-ax.plot(x1, y1, 'r-', label = r'$y=\cos\,x$', linewidth = 0.8)
+y1 = np.sqrt(np.tan(x1))
+ax.plot(x1, y1, 'r-', label = r'$y=\sqrt{\tan\,x}$', linewidth = 0.8)
 # x2 = np.linspace(0, 10, 1e5)
 # y2 = x2
 # ax.plot(x2, y2, 'b-', label = r'$y=x$', linewidth = 0.8)
