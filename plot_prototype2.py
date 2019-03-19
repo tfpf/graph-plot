@@ -65,6 +65,13 @@ def annotate(ax):
 def configure(fig, ax):
 	'''
 	Some miscellaneous settings to make the plot beautiful.
+	By default, the 'classic' plot style is used.
+	In this style, the font is the default serif font used by LaTeX.
+	But only if the string is written as a LaTeX string.
+	That is why the 'xticklabels' and 'yticklabels' have been set using r'${}$'.
+	The result is that on zooming or panning, the ticks will not modify to suit the new zoom level.
+	This script is meant for publication-quality graphing, not for analysis.
+	Hence, I assume that it is okay to mess with the labels like this.
 
 	Args:
 		fig: the figure which contains the graph plot
