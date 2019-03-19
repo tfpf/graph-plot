@@ -31,12 +31,12 @@ def show_nice_list(items, columns = 3):
 
 	# calculate the required width of all columns
 	# width of a certain column is maximum of widths of strings in that column
-	widths = [max([len(row[i]) for row in items]) for i in range(columns)]
+	widths = [max([len(str(row[i])) for row in items]) for i in range(columns)]
 
 	# use the above-calculated widths to right-justify each column
 	for row in items:
 		for r, width in zip(row, widths):
-			sys.stdout.write(r.rjust(width + 1))
+			sys.stdout.write(str(r).rjust(width + 1))
 			sys.stdout.flush()
 		print()
 
