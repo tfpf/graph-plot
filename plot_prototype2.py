@@ -53,12 +53,12 @@ def annotate(ax):
 		None
 	'''
 
-	ax.annotate(r'$i^3$', xy = (0, -1), xytext = (0.05, -1.05))
-	ax.add_patch(mp.Circle((0, -1), 0.03))
-	ax.annotate(r'$i$', xy = (0, 1), xytext = (0.05, 0.95))
-	ax.add_patch(mp.Circle((0, 1), 0.03))
-	ax.annotate(r'$(10, 2)$', xy = (10, 2), xytext = (10.1, 2.3))
-	ax.annotate(r'$(10, 10)$', xy = (10, 10), xytext = (10.1, 10.3))
+	ax.annotate(r'$(7.42,0.91)$', xy = (7.42, 0.91), xytext = (7.03, 1.16))
+	ax.add_patch(mp.Circle((7.42, 0.91), 0.05))
+	ax.annotate(r'$(7.42,0.42)$', xy = (7.42, 0.42), xytext = (7.53, 0.33))
+	ax.add_patch(mp.Circle((7.42, 0.42), 0.05))
+	ax.annotate(r'$(5.25,0)$', xy = (5.25, 0), xytext = (4.7, -0.4))
+	ax.add_patch(mp.Circle((5.25, 0), 0.05))
 
 ################################################################################
 
@@ -81,8 +81,8 @@ def configure(fig, ax):
 	ax.legend(loc = 'best', fancybox = True, shadow = True)
 	# ax.set_title('example')
 
-	# ax.set_xlim(-6 * np.pi, 6 * np.pi)
-	ax.set_ylim(-2, 8)
+	ax.set_xlim(-4 * np.pi, 4 * np.pi)
+	ax.set_ylim(-4, 4)
 	fig.canvas.draw()
 
 	# use the following lines if you want to customise labels for ticks
@@ -101,7 +101,7 @@ def configure(fig, ax):
 	ax.set_yticklabels([r'${}$'.format(i) for i in vert_labels])
 
 	ax.set_xlabel(r'$x$')
-	ax.set_ylabel(r'$y$')
+	ax.set_ylabel(r'$y$', rotation = 90)
 
 ################################################################################
 
@@ -126,21 +126,21 @@ with open('counter.txt') as count_file:
 fig.canvas.set_window_title('graph_{}'.format(graph_id))
 with open('counter.txt', 'w') as count_file:
 	print('{}'.format(graph_id + 1), file = count_file)
-# fig.gca().set_aspect('equal', adjustable = 'box')
+fig.gca().set_aspect('equal', adjustable = 'box')
 
 ################################################################################
 
 # t = np.linspace(0, 10 * np.pi, 98257)
 x1 = np.linspace(-4 * np.pi, 4 * np.pi, 100000)
-y1 = np.sqrt(np.tan(x1))
-ax.plot(x1, y1, 'r-', label = r'$y=\sqrt{\tan\,x}$', linewidth = 0.8)
-# x2 = np.linspace(0, 10, 1e5)
-# y2 = x2
-# ax.plot(x2, y2, 'b-', label = r'$y=x$', linewidth = 0.8)
-# x3 = np.linspace(0.2, 10, 1e5)
-# y3 = 1 / x3
-# ax.plot(x3, y3, 'g-', label = r'$y=\dfrac{1}{x}$', linewidth = 0.8)
-# annotate(ax)
+y1 = np.sin(x1)
+ax.plot(x1, y1, 'r-', label = r'$y=\sin\,x$', linewidth = 0.8)
+x2 = np.linspace(-4 * np.pi, 4 * np.pi, 100000)
+y2 = np.cos(x2)
+ax.plot(x2, y2, 'b-', label = r'$y=\cos\,x$', linewidth = 0.8)
+x3 = np.linspace(5.25, 7.42, 100000)
+y3 = 0.42 * x3 - 2.21
+ax.plot(x3, y3, 'g-', label = r'$\mathrm{tangent}$', linewidth = 0.8)
+annotate(ax)
 configure(fig, ax)
 
 pp.show()
