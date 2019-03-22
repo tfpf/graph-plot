@@ -44,7 +44,7 @@ def show_nice_list(items, columns = 3):
 
 def annotate(ax):
 	'''
-	Add annotations and patches to a graph plot.
+	Add annotations and point markers to a graph plot.
 
 	Args:
 		ax: Axes object
@@ -53,25 +53,20 @@ def annotate(ax):
 		None
 	'''
 
-	ax.annotate(r'$(7.42,0.91)$', xy = (7.42, 0.91), xytext = (7.03, 1.16))
-	ax.add_patch(mp.Circle((7.42, 0.91), 0.05))
-	ax.annotate(r'$(7.42,0.42)$', xy = (7.42, 0.42), xytext = (7.53, 0.33))
-	ax.add_patch(mp.Circle((7.42, 0.42), 0.05))
-	ax.annotate(r'$(5.25,0)$', xy = (5.25, 0), xytext = (4.7, -0.4))
-	ax.add_patch(mp.Circle((5.25, 0), 0.05))
+	ax.annotate(r'$\left(6.21, -0.07\right)$', xy = (6.21, -0.07), xytext = (6.26, -0.17))
+	ax.plot([6.21], [-0.07], marker = '.', color = 'r')
 
 ################################################################################
 
 def configure(fig, ax):
 	'''
 	Some miscellaneous settings to make the plot beautiful.
-	By default, the 'classic' plot style is used.
-	In this style, the font is the default serif font used by LaTeX.
-	But only if the string is written as a LaTeX string.
+	By default, the 'classic' and 'seaborn-poster' plot styles are used.
+	'seaborn-poster' increases the font size, making everything readable.
+	'classic' causes a beautiful serif font to be used (but only if a string is written as a LaTeX string).
 	That is why the 'xticklabels' and 'yticklabels' have been set using r'${}$'.
 	The result is that on zooming or panning, the ticks will not modify to suit the new zoom level.
-	This script is meant for publication-quality graphing, not for analysis.
-	Hence, I assume that it is okay to mess with the labels like this.
+	This is okay, because this script is meant for publication-quality graphing, not for analysis.
 
 	Args:
 		fig: the figure which contains the graph plot
@@ -89,7 +84,7 @@ def configure(fig, ax):
 	# ax.set_title('example')
 
 	ax.set_xlim(-4 * np.pi, 4 * np.pi)
-	ax.set_ylim(-4, 4)
+	ax.set_ylim(-3, 3)
 	fig.canvas.draw()
 
 	# use the following lines if you want to customise labels for ticks
@@ -133,7 +128,7 @@ with open('counter.txt') as count_file:
 fig.canvas.set_window_title('graph_{}'.format(graph_id))
 with open('counter.txt', 'w') as count_file:
 	print('{}'.format(graph_id + 1), file = count_file)
-fig.gca().set_aspect('equal', adjustable = 'box')
+# fig.gca().set_aspect('equal', adjustable = 'box')
 
 ################################################################################
 
@@ -141,12 +136,12 @@ fig.gca().set_aspect('equal', adjustable = 'box')
 x1 = np.linspace(-4 * np.pi, 4 * np.pi, 100000)
 y1 = np.sin(x1)
 ax.plot(x1, y1, 'r-', label = r'$y=\sin\,x$', linewidth = 0.8)
-x2 = np.linspace(-4 * np.pi, 4 * np.pi, 100000)
-y2 = np.cos(x2)
-ax.plot(x2, y2, 'b-', label = r'$y=\cos\,x$', linewidth = 0.8)
-x3 = np.linspace(5.25, 7.42, 100000)
-y3 = 0.42 * x3 - 2.21
-ax.plot(x3, y3, 'g-', label = r'$\mathrm{tangent}$', linewidth = 0.8)
+# x2 = np.linspace(0, 1.2, 100000)
+# y2 = x2
+# ax.plot(x2, y2, 'b-', label = r'$y=x$', linewidth = 0.8)
+# x3 = np.linspace(5.25, 7.42, 100000)
+# y3 = 0.42 * x3 - 2.21
+# ax.plot(x3, y3, 'g-', label = r'$\mathrm{tangent}$', linewidth = 0.8)
 annotate(ax)
 configure(fig, ax)
 
