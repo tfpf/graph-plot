@@ -36,7 +36,8 @@ def show_nice_list(items, columns = 3):
 	# use the above-calculated widths to right-justify each column
 	for row in items:
 		for r, width in zip(row, widths):
-			sys.stdout.write(str(r).rjust(width + 1))
+			# sys.stdout.write(str(r).rjust(width + 1))
+			sys.stdout.write(str(r).center(width + 2, ' '))
 			sys.stdout.flush()
 		print()
 
@@ -53,8 +54,10 @@ def annotate(ax):
 		None
 	'''
 
-	ax.annotate(r'$\left(6.21, -0.07\right)$', xy = (6.21, -0.07), xytext = (6.26, -0.17))
-	ax.plot([6.21], [-0.07], marker = '.', color = 'r')
+	ax.annotate(r'$\left(e,\dfrac{1}{e}\right)$', xy = (np.e, 1 / np.e), xytext = (np.e, 1 / np.e + 0.2))
+	ax.plot([np.e], [1 / np.e], marker = '.', color = 'r')
+	ax.annotate(r'$\left(-e,-\dfrac{1}{e}\right)$', xy = (-np.e, -1 / np.e), xytext = (-np.e - 0.3, -1 / np.e - 0.3))
+	ax.plot([-np.e], [-1 / np.e], marker = '.', color = 'r')
 
 ################################################################################
 
@@ -81,17 +84,19 @@ def configure(fig, ax):
 	ax.grid(True, linewidth = 0.4)
 
 	ax.legend(loc = 'best', fancybox = True, shadow = True)
-	# ax.set_title('example')
+	# ax.set_title(r'$\mathrm{Probability\;Density\;Function}$')
 
-	ax.set_xlim(-4 * np.pi, 4 * np.pi)
-	ax.set_ylim(-3, 3)
+	# ax.set_xlim(-2 * np.pi, 2 * np.pi)
+	# ax.set_ylim(-1, 2)
 	fig.canvas.draw()
 
 	# use the following lines if you want to customise labels for ticks
-	horz_labels = [r'${}\pi$'.format(i) for i in np.arange(-4, 5, 1)]
-	horz_labels[3 : 6] = [r'$-\pi$', r'$0$', r'$\pi$']
-	ax.set_xticklabels(horz_labels)
-	ax.set_xticks([i * np.pi for i in np.arange(-4, 5, 1)])
+	# horz_labels = [r'${}\pi$'.format(i) for i in np.arange(-2, 3, 1)]
+	# horz_labels[1 : 4] = [r'$-\pi$', r'$0$', r'$\pi$']
+	# ax.set_xticklabels(horz_labels)
+	# ax.set_xticks([i * np.pi for i in np.arange(-2, 3, 1)])
+	# ax.set_xticklabels([r'$0$', r'$\dfrac{\pi}{8}$', r'$\dfrac{\pi}{4}$', r'$\dfrac{3\pi}{8}$', r'$\dfrac{\pi}{2}$', r'$\dfrac{5\pi}{8}$', r'$\dfrac{3\pi}{4}$', r'$\dfrac{7\pi}{8}$', r'$\pi$'])
+	# ax.set_xticks([i * np.pi / 8 for i in np.arange(0, 9, 1)])
 	# vert_labels = [r'${}$'.format(round(i, 2)) for i in np.arange(-2, 2.1, 0.5)]
 	# ax.set_yticklabels(vert_labels)
 	# ax.set_yticks([i for i in np.arange(-2, 2.1, 0.5)])
@@ -99,8 +104,8 @@ def configure(fig, ax):
 	# use the following lines if you want tick labels to be chosen automatically
 	# horz_labels = [item.get_text() for item in ax.get_xticklabels()]
 	# ax.set_xticklabels([r'${}$'.format(i) for i in horz_labels])
-	vert_labels = [item.get_text() for item in ax.get_yticklabels()]
-	ax.set_yticklabels([r'${}$'.format(i) for i in vert_labels])
+	# vert_labels = [item.get_text() for item in ax.get_yticklabels()]
+	# ax.set_yticklabels([r'${}$'.format(i) for i in vert_labels])
 
 	ax.set_xlabel(r'$x$')
 	ax.set_ylabel(r'$y$', rotation = 90)
@@ -132,17 +137,17 @@ with open('counter.txt', 'w') as count_file:
 
 ################################################################################
 
-# t = np.linspace(0, 10 * np.pi, 98257)
-x1 = np.linspace(-4 * np.pi, 4 * np.pi, 100000)
-y1 = np.sin(x1)
-ax.plot(x1, y1, 'r-', label = r'$y=\sin\,x$', linewidth = 0.8)
-# x2 = np.linspace(0, 1.2, 100000)
-# y2 = x2
-# ax.plot(x2, y2, 'b-', label = r'$y=x$', linewidth = 0.8)
-# x3 = np.linspace(5.25, 7.42, 100000)
-# y3 = 0.42 * x3 - 2.21
-# ax.plot(x3, y3, 'g-', label = r'$\mathrm{tangent}$', linewidth = 0.8)
-annotate(ax)
+# t = np.linspace(-np.pi, np.pi, 100000)
+x1 = np.linspace(-8, 1, 100000)
+y1 = x1 ** 2 * np.exp(x1)
+ax.plot(x1, y1, 'r-', label = r'$y=x^2e^x$', linewidth = 0.8)
+# x2 = np.linspace(0, np.sqrt(2), 100000)
+# y2 = np.sqrt(2) - x2
+# ax.plot(x2, y2, 'k-', label = r'$\mathrm{tangent}$', linewidth = 0.8)
+# x3 = np.linspace(0, np.sqrt(1 / 2), 100000)
+# y3 = x3
+# ax.plot(x3, y3, 'k-', label = r'', linewidth = 0.8)
+# annotate(ax)
 configure(fig, ax)
 
 pp.show()
