@@ -33,10 +33,9 @@ def show_nice_list(items, columns = 3):
 	# width of a certain column is maximum of widths of strings in that column
 	widths = [max([len(str(row[i])) for row in items]) for i in range(columns)]
 
-	# use the above-calculated widths to right-justify each column
+	# use the above-calculated widths to centre each column
 	for row in items:
 		for r, width in zip(row, widths):
-			# sys.stdout.write(str(r).rjust(width + 1))
 			sys.stdout.write(str(r).center(width + 2, ' '))
 			sys.stdout.flush()
 		print()
@@ -86,15 +85,15 @@ def configure(fig, ax):
 	ax.legend(loc = 'best', fancybox = True, shadow = True)
 	# ax.set_title(r'$\mathrm{Probability\;Density\;Function}$')
 
-	# ax.set_xlim(-2 * np.pi, 2 * np.pi)
+	ax.set_xlim(0, 2 * np.pi)
 	# ax.set_ylim(-1, 2)
 	fig.canvas.draw()
 
 	# use the following lines if you want to customise labels for ticks
-	# horz_labels = [r'${}\pi$'.format(i) for i in np.arange(-2, 3, 1)]
-	# horz_labels[1 : 4] = [r'$-\pi$', r'$0$', r'$\pi$']
-	# ax.set_xticklabels(horz_labels)
-	# ax.set_xticks([i * np.pi for i in np.arange(-2, 3, 1)])
+	horz_labels = [r'${}\pi$'.format(i) for i in np.arange(0, 7, 1)]
+	horz_labels[0 : 2] = [r'$0$', r'$\pi$']
+	ax.set_xticklabels(horz_labels)
+	ax.set_xticks([i * np.pi for i in np.arange(0, 7, 1)])
 	# ax.set_xticklabels([r'$0$', r'$\dfrac{\pi}{8}$', r'$\dfrac{\pi}{4}$', r'$\dfrac{3\pi}{8}$', r'$\dfrac{\pi}{2}$', r'$\dfrac{5\pi}{8}$', r'$\dfrac{3\pi}{4}$', r'$\dfrac{7\pi}{8}$', r'$\pi$'])
 	# ax.set_xticks([i * np.pi / 8 for i in np.arange(0, 9, 1)])
 	# vert_labels = [r'${}$'.format(round(i, 2)) for i in np.arange(-2, 2.1, 0.5)]
@@ -104,8 +103,8 @@ def configure(fig, ax):
 	# use the following lines if you want tick labels to be chosen automatically
 	# horz_labels = [item.get_text() for item in ax.get_xticklabels()]
 	# ax.set_xticklabels([r'${}$'.format(i) for i in horz_labels])
-	# vert_labels = [item.get_text() for item in ax.get_yticklabels()]
-	# ax.set_yticklabels([r'${}$'.format(i) for i in vert_labels])
+	vert_labels = [item.get_text() for item in ax.get_yticklabels()]
+	ax.set_yticklabels([r'${}$'.format(i) for i in vert_labels])
 
 	ax.set_xlabel(r'$x$')
 	ax.set_ylabel(r'$y$', rotation = 90)
@@ -138,9 +137,9 @@ with open('counter.txt', 'w') as count_file:
 ################################################################################
 
 # t = np.linspace(-np.pi, np.pi, 100000)
-x1 = np.linspace(-8, 1, 100000)
-y1 = x1 ** 2 * np.exp(x1)
-ax.plot(x1, y1, 'r-', label = r'$y=x^2e^x$', linewidth = 0.8)
+x1 = np.linspace(0, 6 * np.pi, 100000)
+y1 = x1 ** np.sin(x1)
+ax.plot(x1, y1, 'r-', label = r'$y=x^{\sin\,x}$', linewidth = 0.8)
 # x2 = np.linspace(0, np.sqrt(2), 100000)
 # y2 = np.sqrt(2) - x2
 # ax.plot(x2, y2, 'k-', label = r'$\mathrm{tangent}$', linewidth = 0.8)
