@@ -83,7 +83,7 @@ def configure(fig, ax):
 	ax.axvline(linewidth = 1.6, color = 'k')
 	ax.grid(True, linewidth = 0.4)
 
-	ax.legend(loc = 'best', fancybox = True, shadow = True)
+	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
 	ax.set_title('Example', **title_font)
 
 	ax.set_xlim(-2 * np.pi, 6 * np.pi)
