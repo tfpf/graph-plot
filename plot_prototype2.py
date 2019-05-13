@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import colorama
+import matplotlib
 import matplotlib.patches as mp
 import matplotlib.pyplot as pp
 import numpy as np
@@ -83,33 +84,34 @@ def configure(fig, ax):
 	ax.grid(True, linewidth = 0.4)
 
 	ax.legend(loc = 'best', fancybox = True, shadow = True)
-	# ax.set_title(r'$\mathrm{Probability\;Density\;Function}$')
+	ax.set_title('Example', **title_font)
 
-	ax.set_xlim(0, 2 * np.pi)
-	# ax.set_ylim(-1, 2)
+	ax.set_xlim(-2 * np.pi, 6 * np.pi)
+	ax.set_ylim(-4, 4)
 	fig.canvas.draw()
 
 	# use the following lines if you want to customise labels for ticks
-	horz_labels = [r'${}\pi$'.format(i) for i in np.arange(0, 7, 1)]
-	horz_labels[0 : 2] = [r'$0$', r'$\pi$']
+	horz_labels = [r'${}\pi$'.format(i) for i in np.arange(-2, 7, 1)]
+	horz_labels[1 : 4] = [r'$-\pi$', r'$0$', r'$\pi$']
 	ax.set_xticklabels(horz_labels)
-	ax.set_xticks([i * np.pi for i in np.arange(0, 7, 1)])
-	# ax.set_xticklabels([r'$0$', r'$\dfrac{\pi}{8}$', r'$\dfrac{\pi}{4}$', r'$\dfrac{3\pi}{8}$', r'$\dfrac{\pi}{2}$', r'$\dfrac{5\pi}{8}$', r'$\dfrac{3\pi}{4}$', r'$\dfrac{7\pi}{8}$', r'$\pi$'])
-	# ax.set_xticks([i * np.pi / 8 for i in np.arange(0, 9, 1)])
-	# vert_labels = [r'${}$'.format(round(i, 2)) for i in np.arange(-2, 2.1, 0.5)]
-	# ax.set_yticklabels(vert_labels)
-	# ax.set_yticks([i for i in np.arange(-2, 2.1, 0.5)])
+	ax.set_xticks([i * np.pi for i in np.arange(-2, 7, 1)])
 
 	# use the following lines if you want tick labels to be chosen automatically
 	# horz_labels = [item.get_text() for item in ax.get_xticklabels()]
 	# ax.set_xticklabels([r'${}$'.format(i) for i in horz_labels])
-	vert_labels = [item.get_text() for item in ax.get_yticklabels()]
-	ax.set_yticklabels([r'${}$'.format(i) for i in vert_labels])
+	ax.set_yticklabels([r'${}$'.format(t.get_text()) for t in ax.get_yticklabels()])
 
 	ax.set_xlabel(r'$x$')
 	ax.set_ylabel(r'$y$', rotation = 90)
 
 ################################################################################
+
+# choose a font
+title_font = {'fontname' : 'DejaVu Serif'}
+colorama.init(autoreset = True)
+print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}List of available fonts can be found here.')
+colorama.deinit()
+print(matplotlib.get_cachedir())
 
 # choose a plot style
 try:
@@ -137,12 +139,12 @@ with open('counter.txt', 'w') as count_file:
 ################################################################################
 
 # t = np.linspace(-np.pi, np.pi, 100000)
-x1 = np.linspace(0, 6 * np.pi, 100000)
-y1 = x1 ** np.sin(x1)
-ax.plot(x1, y1, 'r-', label = r'$y=x^{\sin\,x}$', linewidth = 0.8)
-# x2 = np.linspace(0, np.sqrt(2), 100000)
-# y2 = np.sqrt(2) - x2
-# ax.plot(x2, y2, 'k-', label = r'$\mathrm{tangent}$', linewidth = 0.8)
+x1 = np.linspace(-2 * np.pi, 6 * np.pi, 100000)
+y1 = np.exp(-x1 / 4) * np.sin(2 * x1)
+ax.plot(x1, y1, 'r-', label = r'$y=e^{-\frac{x}{4}}\,\sin\,2x$', linewidth = 0.8)
+# x2 = np.linspace(-4 * np.pi, 4 * np.pi, 100000)
+# y2 = 1 + np.cos(x2)
+# ax.plot(x2, y2, 'b-', label = r'$y=1+\cos\,x$', linewidth = 0.8)
 # x3 = np.linspace(0, np.sqrt(1 / 2), 100000)
 # y3 = x3
 # ax.plot(x3, y3, 'k-', label = r'', linewidth = 0.8)
