@@ -151,8 +151,8 @@ def configure(fig, ax):
 	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
 	# ax.set_title('Example', **title_font)
 
-	ax.set_xlim(-4 * np.pi, 4 * np.pi)
-	ax.set_ylim(-3, 3)
+	# ax.set_xlim(-4 * np.pi, 4 * np.pi)
+	# ax.set_ylim(-3, 3)
 	fig.canvas.draw() # automatically sets tick labels based on the last two lines
 	
 	# use the following lines if you want the automatically chosen tick labels
@@ -161,9 +161,7 @@ def configure(fig, ax):
 
 	# use the following lines if you want to customise tick labels
 	# these will override the automatically chosen tick labels lines above
-	labels, ticks = graph_ticks(-4, 4, 1 / 2)
-	ax.set_xticklabels(labels)
-	ax.set_xticks(ticks)
+	labels, ticks = graph_ticks(-6, 6, 1 / 2); ax.set_xticklabels(labels); ax.set_xticks(ticks)
 	
 	# label the axes
 	ax.set_xlabel(r'$x$')
@@ -199,13 +197,13 @@ if __name__ == '__main__':
 	fig.canvas.set_window_title('graph_{}'.format(graph_id))
 	with open('counter.txt', 'w') as count_file:
 		print('{}'.format(graph_id + 1), file = count_file)
-	fig.gca().set_aspect('equal', adjustable = 'box')
+	# fig.gca().set_aspect('equal', adjustable = 'box')
 
 	########################################
 
-	x1 = np.linspace(-4 * np.pi, 4 * np.pi, 100000)
-	y1 = np.cos(x1)
-	ax.plot(x1, y1, 'r-', label = r'$y=\cos\,x$', linewidth = 0.8)
+	x1 = np.linspace(-6 * np.pi, 6 * np.pi, 100000)
+	y1 = np.sin(x1) / x1
+	ax.plot(x1, y1, 'r-', label = r'$y=\dfrac{\sin\,x}{x}$', linewidth = 0.8)
 	# x2 = np.linspace(-100, 100, 100000)
 	# y2 = x2 - 2
 	# ax.plot(x2, y2, 'b--', label = r'$y=x-2$', linewidth = 0.8)
