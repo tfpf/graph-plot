@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import colorama
-import matplotlib
 import matplotlib.patches as mp
 import matplotlib.pyplot as pp
 import numpy as np
@@ -54,10 +53,12 @@ def annotate(ax):
 		None
 	'''
 
-	ax.annotate(r'$\left(e,\dfrac{1}{e}\right)$', xy = (np.e, 1 / np.e), xytext = (np.e, 1 / np.e + 0.2))
-	ax.plot([np.e], [1 / np.e], marker = '.', color = 'r')
-	ax.annotate(r'$\left(-e,-\dfrac{1}{e}\right)$', xy = (-np.e, -1 / np.e), xytext = (-np.e - 0.3, -1 / np.e - 0.3))
-	ax.plot([-np.e], [-1 / np.e], marker = '.', color = 'r')
+	ax.annotate(r'$\left(-0.77,0.59\right)$', xy = (-0.766665, 0.5878), xytext = (-3.4 - 0.766665, 0.17 + 0.5878))
+	ax.plot([-0.766665], [0.5878], marker = '.', color = 'k')
+	ax.annotate(r'$\left(2,4\right)$', xy = (2, 4), xytext = (2.02, 3.6))
+	ax.plot([2], [4], marker = '.', color = 'k')
+	ax.annotate(r'$\left(4,16\right)$', xy = (4, 16), xytext = (4.1, 15.8))
+	ax.plot([4], [16], marker = '.', color = 'k')
 
 ################################################################################
 
@@ -84,25 +85,27 @@ def configure(fig, ax):
 	ax.grid(True, linewidth = 0.4)
 
 	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
-	ax.set_title('Example', **title_font)
+	# ax.set_title('Example', **title_font)
 
-	ax.set_xlim(-2 * np.pi, 6 * np.pi)
-	ax.set_ylim(-4, 4)
+	ax.set_xlim(-np.pi, np.pi)
+	ax.set_ylim(-np.pi, np.pi)
 	fig.canvas.draw()
 
 	# use the following lines if you want to customise labels for ticks
-	horz_labels = [r'${}\pi$'.format(i) for i in np.arange(-2, 7, 1)]
-	horz_labels[1 : 4] = [r'$-\pi$', r'$0$', r'$\pi$']
-	ax.set_xticklabels(horz_labels)
-	ax.set_xticks([i * np.pi for i in np.arange(-2, 7, 1)])
+	# horz_labels = [r'${}$'.format(i) for i in np.arange(-10, 11, 2)]
+	# horz_labels[3 : 6] = [r'$-\pi$', r'$0$', r'$\pi$']
+	# ax.set_xticklabels(horz_labels)
+	ax.set_xticklabels([r'$-\pi$', r'$-\frac{3\pi}{4}$', r'$-\frac{\pi}{2}$', r'$-\frac{\pi}{4}$', r'$0$', r'$\frac{\pi}{4}$', r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$'])
+	ax.set_xticks([i * np.pi / 4 for i in np.arange(-4, 5, 1)])
+	ax.set_yticklabels([r'$-\pi$', r'$-\frac{3\pi}{4}$', r'$-\frac{\pi}{2}$', r'$-\frac{\pi}{4}$', r'$0$', r'$\frac{\pi}{4}$', r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$'])
+	ax.set_yticks([i * np.pi / 4 for i in np.arange(-4, 5, 1)])
 
 	# use the following lines if you want tick labels to be chosen automatically
-	# horz_labels = [item.get_text() for item in ax.get_xticklabels()]
-	# ax.set_xticklabels([r'${}$'.format(i) for i in horz_labels])
-	ax.set_yticklabels([r'${}$'.format(t.get_text()) for t in ax.get_yticklabels()])
+	# ax.set_xticklabels([r'${}$'.format(t.get_text()) for t in ax.get_xticklabels()])
+	# ax.set_yticklabels([r'${}$'.format(t.get_text()) for t in ax.get_yticklabels()])
 
-	ax.set_xlabel(r'$x$')
-	ax.set_ylabel(r'$y$', rotation = 90)
+	ax.set_xlabel(r'$\omega$')
+	ax.set_ylabel(r'$Y(\omega)$', rotation = 90)
 
 ################################################################################
 
@@ -134,20 +137,19 @@ with open('counter.txt') as count_file:
 fig.canvas.set_window_title('graph_{}'.format(graph_id))
 with open('counter.txt', 'w') as count_file:
 	print('{}'.format(graph_id + 1), file = count_file)
-# fig.gca().set_aspect('equal', adjustable = 'box')
+fig.gca().set_aspect('equal', adjustable = 'box')
 
 ################################################################################
 
-# t = np.linspace(-np.pi, np.pi, 100000)
-x1 = np.linspace(-2 * np.pi, 6 * np.pi, 100000)
-y1 = np.exp(-x1 / 4) * np.sin(2 * x1)
-ax.plot(x1, y1, 'r-', label = r'$y=e^{-\frac{x}{4}}\,\sin\,2x$', linewidth = 0.8)
-# x2 = np.linspace(-4 * np.pi, 4 * np.pi, 100000)
-# y2 = 1 + np.cos(x2)
-# ax.plot(x2, y2, 'b-', label = r'$y=1+\cos\,x$', linewidth = 0.8)
-# x3 = np.linspace(0, np.sqrt(1 / 2), 100000)
-# y3 = x3
-# ax.plot(x3, y3, 'k-', label = r'', linewidth = 0.8)
+x1 = np.linspace(-np.pi, np.pi, 100000)
+y1 = np.angle(np.exp(-1j * x1) * np.cos(x1))
+ax.plot(x1, y1, 'r-', label = r'$Y(\omega)=\mathrm{arg}(e^{-j\omega}\,\cos\,\omega)$', linewidth = 0.8)
+# x2 = np.linspace(-100, 100, 100000)
+# y2 = x2 - 2
+# ax.plot(x2, y2, 'b--', label = r'$y=x-2$', linewidth = 0.8)
+# x3 = np.linspace(0, 100, 100000)
+# y3 = 1 / x3
+# ax.plot(x3, y3, 'g-', label = r'$y=\dfrac{1}{x}$', linewidth = 0.8)
 # annotate(ax)
 configure(fig, ax)
 
