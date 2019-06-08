@@ -83,27 +83,32 @@ def graph_ticks(first, last, step):
 		if num == 0:
 			labels.append(r'$0$')
 			continue
+			
+		# build a string which has to be appended to 'label'
+		builder = r'$'
 		
-		# denominator must be written if it is not 1
+		# for negative tick values, write a minus sign outside the fraction
+		if num < 0:
+			builder += r'-'
+			num = -num # now I don't have to worry about the sign
+		
+		# '\frac{}{}' construct of LaTeX has to be used if denominator is not 1
 		if den != 1:
-			if num == -1:
-				labels.append(r'$-\frac{{\pi}}{{{}}}$'.format(den))
-			elif num == 1:
-				labels.append(r'$\frac{{\pi}}{{{}}}$'.format(den))
-			else:
-				if num < 0:
-					labels.append(r'$-\frac{{{}\pi}}{{{}}}$'.format(-num, den))
-				else:
-					labels.append(r'$\frac{{{}\pi}}{{{}}}$'.format(num, den))
-			continue
+			builder += r'\frac{'
 		
-		# denominator is not written if it is 1
-		if num == -1:
-			labels.append(r'$-\pi$')
-		elif num == 1:
-			labels.append(r'$\pi$')
+		# if the coefficient is 1, it is not conventionally written
+		if num == 1:
+			builder += r'\pi'
 		else:
-			labels.append(r'${}\pi$'.format(num))
+			builder += r'{}\pi'.format(num)
+		
+		# complete the '\frac{}{}' construct (if applicable)
+		if den != 1:
+			builder += r'}}{{{}}}$'.format(den)
+		else:
+			builder += r'$'
+		
+		labels.append(builder)
 		
 	return labels, np.pi * lattice
 
@@ -151,8 +156,8 @@ def configure(fig, ax):
 	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
 	# ax.set_title('Example', **title_font)
 
-	# ax.set_xlim(-4 * np.pi, 4 * np.pi)
-	# ax.set_ylim(-3, 3)
+	ax.set_xlim(-2 * np.pi, 2 * np.pi)
+	ax.set_ylim(-3, 3)
 	fig.canvas.draw() # automatically sets tick labels based on the last two lines
 	
 	# use the following lines if you want the automatically chosen tick labels
@@ -161,7 +166,7 @@ def configure(fig, ax):
 
 	# use the following lines if you want to customise tick labels
 	# these will override the automatically chosen tick labels lines above
-	labels, ticks = graph_ticks(-6, 6, 1 / 2); ax.set_xticklabels(labels); ax.set_xticks(ticks)
+	labels, ticks = graph_ticks(-2, 2, 1 / 4); ax.set_xticklabels(labels); ax.set_xticks(ticks)
 	
 	# label the axes
 	ax.set_xlabel(r'$x$')
@@ -202,8 +207,8 @@ if __name__ == '__main__':
 	########################################
 
 	x1 = np.linspace(-6 * np.pi, 6 * np.pi, 100000)
-	y1 = np.sin(x1) / x1
-	ax.plot(x1, y1, 'r-', label = r'$y=\dfrac{\sin\,x}{x}$', linewidth = 0.8)
+	y1 = np.cos(x1) / x1
+	ax.plot(x1, y1, 'r-', label = r'$y=\dfrac{\cos\,x}{x}$', linewidth = 0.8)
 	# x2 = np.linspace(-100, 100, 100000)
 	# y2 = x2 - 2
 	# ax.plot(x2, y2, 'b--', label = r'$y=x-2$', linewidth = 0.8)
