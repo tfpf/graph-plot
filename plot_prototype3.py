@@ -4,7 +4,7 @@ import colorama
 import fractions
 import matplotlib
 import matplotlib.patches as mp
-import matplotlib.pyplot as pp
+import matplotlib.pyplot as plt
 import numpy as np
 import sys
 	
@@ -125,12 +125,17 @@ def mark_points(ax):
 		None
 	'''
 
-	ax.plot(1, 1, 'k.')
-	ax.text(1.1, 1.1, r'$\left(1,1\right)$')
+	ax.plot(np.cos(0.9), np.sin(0.9), 'k.'); ax.text(np.cos(0.9) + 0.04, np.sin(0.9), r'$\left(\cos\,\theta,\sin\,\theta\right)$')
+	ax.plot(np.cos(0.9), np.sin(0.9), 'k.'); ax.text(np.cos(0.9) + 0.04, np.sin(0.9), r'$\left(\cos\,\theta,\sin\,\theta\right)$')
+	ax.text(np.cos(0.9) / 2 - 0.07, np.sin(0.9) + 0.01, r'$\cos\,\theta$')
+	ax.text(np.cos(0.9) + 0.03, np.sin(0.9) / 2 - 0.04, r'$\sin\,\theta$')
+	ax.text(0.08, 0.03, r'$\theta$')
+	ax.text(1.11, 0.4, r'$\tan\,\theta$')
+	ax.text(0.34, 1.02, r'$\cot\,\theta$')
 
 ################################################################################
 
-def configure(fig, ax):
+def configure(fig, ax, xtrigonometric = False, x1 = None, x2 = None, xstep = None, ytrigonometric = False, y1 = None, y2 = None, ystep = None):
 	'''
 	Some miscellaneous settings to make the plot beautiful.
 	By default, the 'classic' and 'seaborn-poster' plot styles are used.
@@ -139,83 +144,150 @@ def configure(fig, ax):
 	That is why the 'xticklabels' and 'yticklabels' have been set using r'${}$'.
 	This leads to a problem. On zooming or panning, the ticks will not modify to suit the new zoom level.
 	This is okay, because this script is meant for publication-quality graphing, not for analysis.
-	If you want to, you can avoid this problem by commenting the 'xticklabels' and 'yticklabels' lines.
+	If the 'xtrigonometric' argument is 'True', vertical grid lines will be drawn from 'np.pi * x1' to 'np.pi * x2'.
+	Distance between consecutive grid lines will be 'np.pi * xstep'.
+	Else, they will be drawn from 'x1' to 'x2' at steps of 'xstep'.
+	Ditto for 'ytrigonometric', 'y1', 'y2' and 'ystep'.
 
 	Args:
 		fig: the figure which contains the graph plot
 		ax: Axes object
+		xtrigonometric: boolean, whether the horizontal axis should be marked at multiples of pi
+		x1: leftmost x-coordinate to be shown
+		x2: rightmost x-coordinate to be shown
+		xstep: gap between vertical grid lines
+		xtrigonometric: boolean, whether the vertical axis should be marked at multiples of pi
+		y1: bottommost y-coordinate to be shown
+		y2: topmost y-coordinate to be shown
+		ystep: gap between horizontal grid lines
 
 	Returns:
 		None
 	'''
-
-	ax.axhline(linewidth = 1.6, color = 'k')
-	ax.axvline(linewidth = 1.6, color = 'k')
-	ax.grid(True, linewidth = 0.4)
-
-	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
-	# ax.set_title('Example', **title_font)
-
-	ax.set_xlim(-2 * np.pi, 2 * np.pi)
-	ax.set_ylim(-3, 3)
-	fig.canvas.draw() # automatically sets tick labels based on the last two lines
 	
-	# use the following lines if you want the automatically chosen tick labels
-	ax.set_xticklabels([r'${}$'.format(t.get_text()) for t in ax.get_xticklabels()])
-	ax.set_yticklabels([r'${}$'.format(t.get_text()) for t in ax.get_yticklabels()])
-
-	# use the following lines if you want to customise tick labels
-	# these will override the automatically chosen tick labels lines above
-	labels, ticks = graph_ticks(-2, 2, 1 / 4); ax.set_xticklabels(labels); ax.set_xticks(ticks)
+	# graph description
+	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
+	ax.set_title('Example', **font_spec)
 	
 	# label the axes
 	ax.set_xlabel(r'$x$')
 	ax.set_ylabel(r'$y$', rotation = 90)
+	
+	# enable grid
+	ax.axhline(linewidth = 1.6, color = 'k')
+	ax.axvline(linewidth = 1.6, color = 'k')
+	ax.grid(True, linewidth = 0.4)
+	
+	# placing vertical grid lines at rational multiples of pi
+	if xtrigonometric:
+		if x1 is None or x2 is None or xstep is None:
+			raise ValueError('xtrigonometric has been set to True. x1, x2 and xstep must not be None.')
+		
+		# obtain lists of ticks and labels to set up vertical grid lines
+		# markings on the horizontal axis correspond to vertical grid lines
+		horizontal_labels, horizontal_ticks = graph_ticks(x1, x2, xstep)
+		ax.set_xlim(np.pi * x1, np.pi * x2)
+		ax.set_xticklabels(horizontal_labels)
+		ax.set_xticks(horizontal_ticks)
+		
+	# placing vertical grid lines normally
+	else:
+		
+		# this is the non-trigonometric case
+		# if you don't provide x1 and x2, they will be chosen automatically
+		if x1 and x2:
+			ax.set_xlim(x1, x2)
+			if xstep:
+				ax.set_xticks(np.arange(x1, x2 + xstep, xstep))
+		
+		# draw the graph with the xticks obtained above
+		# if xticks were not obtained above, they will have been chosen automatically
+		fig.canvas.draw()
+		
+		# this line changes the font used for the ticks to a math mode font
+		ax.set_xticklabels([r'${}$'.format(t.get_text()) for t in ax.get_xticklabels()])
+	
+	# placing horizontal grid lines at rational multiples of pi
+	if ytrigonometric:
+		if y1 is None or y2 is None or ystep is None:
+			raise ValueError('ytrigonometric has been set to True. y1, y2 and ystep must not be None.')
+			
+		# obtain lists of ticks and labels to set up horizontal grid lines
+		# markings on the vertical axis correspond to horizontal grid lines
+		vertical_labels, vertical_ticks = graph_ticks(y1, y2, ystep)
+		ax.set_ylim(np.pi * y1, np.pi * y2)
+		ax.set_yticklabels(vertical_labels)
+		ax.set_yticks(vertical_ticks)
+	
+	# placing horizontal grid lines normally
+	else:
+	
+		# this is the non-trigonometric case
+		# if you don't provide y1 and y2, they will be chosen automatically
+		if y1 and y2:
+			ax.set_ylim(y1, y2)
+			if ystep:
+				ax.set_yticks(np.arange(y1, y2 + ystep, ystep))
+		
+		# draw the graph with the yticks obtained above
+		# if yticks were not obtained above, they will have been chosen automatically
+		fig.canvas.draw()
+		
+		# this line changes the font used for the ticks to a math mode font
+		ax.set_yticklabels([r'${}$'.format(t.get_text()) for t in ax.get_yticklabels()])
 
 ################################################################################
 
 if __name__ == '__main__':
 
 	# choose a font
-	title_font = {'fontname' : 'DejaVu Serif'}
 	colorama.init(autoreset = True)
 	print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Available fonts can be found in the following directory.')
 	print(matplotlib.get_cachedir())
+	font_spec = {'fontname' : 'DejaVu Serif'}
 	print()
 	
 	# choose a plot style
 	try:
-		pp.style.use(sys.argv[1])
+		plt.style.use(sys.argv[1])
 	except (IndexError, OSError):
 		print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Plot style either not specified or invalid. Using \'classic\' and \'seaborn-poster\'.\nHere is a list of the available styles.')
 		colorama.deinit()
-		pp.style.use('classic')
-		pp.style.use('seaborn-poster')
-	show_nice_list(pp.style.available)
+		plt.style.use('classic')
+		plt.style.use('seaborn-poster')
+	show_nice_list(plt.style.available)
+	print()
 
 	# set up a window to display the graph
 	# window title is a number obtained from 'counter.txt'
-	fig = pp.figure()
+	fig = plt.figure()
 	ax = fig.add_subplot(1, 1, 1)
 	with open('counter.txt') as count_file:
 		graph_id = int(count_file.readline().strip())
 	fig.canvas.set_window_title('graph_{}'.format(graph_id))
 	with open('counter.txt', 'w') as count_file:
 		print('{}'.format(graph_id + 1), file = count_file)
-	# fig.gca().set_aspect('equal', adjustable = 'box')
+	fig.gca().set_aspect('equal', adjustable = 'box')
 
 	########################################
 
-	x1 = np.linspace(-6 * np.pi, 6 * np.pi, 100000)
-	y1 = np.cos(x1) / x1
-	ax.plot(x1, y1, 'r-', label = r'$y=\dfrac{\cos\,x}{x}$', linewidth = 0.8)
-	# x2 = np.linspace(-100, 100, 100000)
-	# y2 = x2 - 2
-	# ax.plot(x2, y2, 'b--', label = r'$y=x-2$', linewidth = 0.8)
-	# x3 = np.linspace(0, 100, 100000)
-	# y3 = 1 / x3
-	# ax.plot(x3, y3, 'g-', label = r'$y=\dfrac{1}{x}$', linewidth = 0.8)
+	# t = np.linspace(-np.pi, np.pi, 100000)
+	x1 = np.linspace(-20, 20, 100000)
+	y1 = np.angle(1 + np.exp(-1j * x1))
+	ax.plot(x1, y1, 'r-', label = r'$y=\arg(1+e^{-j\omega})}$', linewidth = 0.8)
+	# x2 = np.linspace(-20, 20, 100000)
+	# y2 = np.exp(0.09726 * x2)
+	# ax.plot(x2, y2, 'b-', label = r'$y=e^{kx}$', linewidth = 0.8)
+	# x3 = np.linspace(-20, 20, 100000)
+	# y3 = np.exp(0.07 * x3)
+	# ax.plot(x3, y3, 'g-', label = r'$y=e^{0.07x}$', linewidth = 0.8)
+	# x4 = np.linspace(-20, 20, 100000)
+	# y4 = np.exp(-x4)
+	# ax.plot(x4, y4, 'm-', label = r'$y=e^{-x}$', linewidth = 0.8)
+	# x5 = np.linspace(-1, 1, 100000)
+	# y5 = [f(20, x) for x in x2]
+	# ax.plot(x5, y5, 'c-', label = r'$y=f_{20}(x)$', linewidth = 0.8)
 	# mark_points(ax)
-	configure(fig, ax)
+	configure(fig, ax, xtrigonometric = True, x1 = -1, x2 = 1, xstep = 1 / 4, ytrigonometric = True, y1 = -1, y2 = 1, ystep = 1 / 4)
 
-	pp.show()
+	plt.show()
