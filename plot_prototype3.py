@@ -305,15 +305,15 @@ if __name__ == '__main__':
 	# ax.plot(x5, y5, 'c-', label = r'$y=f_{20}(x)$', linewidth = 0.8)
 	# mark_points(ax)
 	configure(fig,
-              ax,
-              keep_aspect_ratio = False,
-              xtrigonometric = True,
-              x1 = -2,
-              x2 = 2,
-              xstep = 1 / 2,
-              ytrigonometric = False,
-              y1 = -3,
-              y2 = 3,
-              ystep = 1)
+	          ax,
+	          keep_aspect_ratio = False,
+	          xtrigonometric = True,
+	          x1 = -2,
+	          x2 = 2,
+	          xstep = 1 / 2,
+	          ytrigonometric = False,
+	          y1 = -3,
+	          y2 = 3,
+	          ystep = 1)
 
 	plt.show()
