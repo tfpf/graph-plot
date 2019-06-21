@@ -135,7 +135,18 @@ def mark_points(ax):
 
 ################################################################################
 
-def configure(fig, ax, xtrigonometric = False, x1 = None, x2 = None, xstep = None, ytrigonometric = False, y1 = None, y2 = None, ystep = None):
+def configure(fig,
+              ax,
+              keep_aspect_ratio = False,
+              xtrigonometric = False,
+              x1 = None,
+              x2 = None,
+              xstep = None,
+              ytrigonometric = False,
+              y1 = None,
+              y2 = None,
+              ystep = None
+             ):
 	'''
 	Some miscellaneous settings to make the plot beautiful.
 	By default, the 'classic' and 'seaborn-poster' plot styles are used.
@@ -152,6 +163,7 @@ def configure(fig, ax, xtrigonometric = False, x1 = None, x2 = None, xstep = Non
 	Args:
 		fig: the figure which contains the graph plot
 		ax: Axes object
+		keep_aspect_ratio: boolean, whether both axes are to have an identical scale
 		xtrigonometric: boolean, whether the horizontal axis should be marked at multiples of pi
 		x1: leftmost x-coordinate to be shown
 		x2: rightmost x-coordinate to be shown
@@ -165,9 +177,13 @@ def configure(fig, ax, xtrigonometric = False, x1 = None, x2 = None, xstep = Non
 		None
 	'''
 	
+	# same scale along both coordinate axes
+	if keep_aspect_ratio:
+		fig.gca().set_aspect('equal', adjustable = 'box')
+	
 	# graph description
 	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
-	ax.set_title('Example', **font_spec)
+	# ax.set_title('Example', **font_spec)
 	
 	# label the axes
 	ax.set_xlabel(r'$x$')
@@ -250,6 +266,7 @@ if __name__ == '__main__':
 	# choose a plot style
 	try:
 		plt.style.use(sys.argv[1])
+		print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Here is a list of all available plot styles.')
 	except (IndexError, OSError):
 		print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Plot style either not specified or invalid. Using \'classic\' and \'seaborn-poster\'.\nHere is a list of the available styles.')
 		colorama.deinit()
@@ -267,20 +284,19 @@ if __name__ == '__main__':
 	fig.canvas.set_window_title('graph_{}'.format(graph_id))
 	with open('counter.txt', 'w') as count_file:
 		print('{}'.format(graph_id + 1), file = count_file)
-	fig.gca().set_aspect('equal', adjustable = 'box')
 
 	########################################
 
-	# t = np.linspace(-np.pi, np.pi, 100000)
+	# t = np.concatenate([np.linspace(-20, -1, 100000), np.linspace(-1, 0, 100000), np.linspace(0, 20, 100000)])
 	x1 = np.linspace(-20, 20, 100000)
-	y1 = np.angle(1 + np.exp(-1j * x1))
-	ax.plot(x1, y1, 'r-', label = r'$y=\arg(1+e^{-j\omega})}$', linewidth = 0.8)
-	# x2 = np.linspace(-20, 20, 100000)
-	# y2 = np.exp(0.09726 * x2)
-	# ax.plot(x2, y2, 'b-', label = r'$y=e^{kx}$', linewidth = 0.8)
-	# x3 = np.linspace(-20, 20, 100000)
-	# y3 = np.exp(0.07 * x3)
-	# ax.plot(x3, y3, 'g-', label = r'$y=e^{0.07x}$', linewidth = 0.8)
+	y1 = np.sin(np.sin(x1))
+	ax.plot(x1, y1, 'r-', label = r'$y=\sin\,\sin\,x$', linewidth = 0.8)
+	# x2 = [2.5, 2.5]
+	# y2 = [-100, 100]
+	# ax.plot(x2, y2, 'b--', label = r'$x=\dfrac{5}{2}$', linewidth = 0.8)
+	# x3 = [33 / 8, 33 / 8]
+	# y3 = [-100, 100]
+	# ax.plot(x3, y3, 'g--', label = r'$x=\dfrac{33}{8}$', linewidth = 0.8)
 	# x4 = np.linspace(-20, 20, 100000)
 	# y4 = np.exp(-x4)
 	# ax.plot(x4, y4, 'm-', label = r'$y=e^{-x}$', linewidth = 0.8)
@@ -288,6 +304,16 @@ if __name__ == '__main__':
 	# y5 = [f(20, x) for x in x2]
 	# ax.plot(x5, y5, 'c-', label = r'$y=f_{20}(x)$', linewidth = 0.8)
 	# mark_points(ax)
-	configure(fig, ax, xtrigonometric = True, x1 = -1, x2 = 1, xstep = 1 / 4, ytrigonometric = True, y1 = -1, y2 = 1, ystep = 1 / 4)
+	configure(fig,
+              ax,
+              keep_aspect_ratio = False,
+              xtrigonometric = True,
+              x1 = -2,
+              x2 = 2,
+              xstep = 1 / 2,
+              ytrigonometric = False,
+              y1 = -3,
+              y2 = 3,
+              ystep = 1)
 
 	plt.show()
