@@ -3,7 +3,6 @@
 import colorama
 import fractions
 import matplotlib
-import matplotlib.patches as mp
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
@@ -15,7 +14,7 @@ def show_nice_list(items, columns = 3):
 	Display a list in neat columns.
 
 	Args:
-		items: list of strings
+		items: list of objects
 		columns: number of columns to arrange 'items' in
 
 	Returns:
@@ -37,9 +36,8 @@ def show_nice_list(items, columns = 3):
 
 	# use the above-calculated widths to centre each column
 	for row in items:
-		for r, width in zip(row, widths):
-			sys.stdout.write(str(r).center(width + 2, ' '))
-			sys.stdout.flush()
+		for r, w in zip(row, widths):
+			print(str(r).center(w + 2, ' '), end = '', flush = True)
 		print()
 
 ################################################################################
@@ -85,30 +83,37 @@ def graph_ticks(first, last, step):
 			continue
 			
 		# build a string which has to be appended to 'label'
-		builder = r'$'
+		# to do this, create a list of the different pieces of the string
+		# then join them
+		# this is the fastest way to build a string
+		# https://waymoot.org/home/python_string/
+		builder = ['$']
 		
 		# for negative tick values, write a minus sign outside the fraction
 		if num < 0:
-			builder += r'-'
+			builder.append('-')
 			num = -num # now I don't have to worry about the sign
 		
 		# '\frac{}{}' construct of LaTeX has to be used if denominator is not 1
 		if den != 1:
-			builder += r'\frac{'
+			builder.append(r'\frac{')
 		
 		# if the coefficient is 1, it is not conventionally written
 		if num == 1:
-			builder += r'\pi'
+			builder.append(r'\pi')
 		else:
-			builder += r'{}\pi'.format(num)
+			builder.append(fr'{num}\pi')
 		
 		# complete the '\frac{}{}' construct (if applicable)
 		if den != 1:
-			builder += r'}}{{{}}}$'.format(den)
+			builder.append(fr'}}{{{den}}}$')
 		else:
-			builder += r'$'
+			builder.append('$')
 		
-		labels.append(builder)
+		# now all pieces of the string are in place
+		# create the LaTeX-formatted string by joining the pieces
+		# append thusly created string to the list of labels
+		labels.append(''.join(builder))
 		
 	return labels, np.pi * lattice
 
@@ -145,8 +150,7 @@ def configure(fig,
               ytrigonometric = False,
               y1 = None,
               y2 = None,
-              ystep = None
-             ):
+              ystep = None):
 	'''
 	Some miscellaneous settings to make the plot beautiful.
 	By default, the 'classic' and 'seaborn-poster' plot styles are used.
@@ -159,6 +163,12 @@ def configure(fig,
 	Distance between consecutive grid lines will be 'np.pi * xstep'.
 	Else, they will be drawn from 'x1' to 'x2' at steps of 'xstep'.
 	Ditto for 'ytrigonometric', 'y1', 'y2' and 'ystep'.
+	Important! 'ax.set_*lim' must be called only after calling 'ax.set_*ticks'.
+	Else, one extra tick may appear because of floating-point representation.
+	For instance, the result of
+		np.arange(-2, 2 + 1 / 3, 1 / 3)
+	includes the rightmost point, 2.33, in the output!
+		
 
 	Args:
 		fig: the figure which contains the graph plot
@@ -202,26 +212,26 @@ def configure(fig,
 		# obtain lists of ticks and labels to set up vertical grid lines
 		# markings on the horizontal axis correspond to vertical grid lines
 		horizontal_labels, horizontal_ticks = graph_ticks(x1, x2, xstep)
-		ax.set_xlim(np.pi * x1, np.pi * x2)
 		ax.set_xticklabels(horizontal_labels)
 		ax.set_xticks(horizontal_ticks)
+		ax.set_xlim(np.pi * x1, np.pi * x2)
 		
 	# placing vertical grid lines normally
 	else:
 		
 		# this is the non-trigonometric case
 		# if you don't provide x1 and x2, they will be chosen automatically
+		if x1 and x2 and xstep:
+			ax.set_xticks(np.arange(x1, x2 + xstep, xstep))
 		if x1 and x2:
 			ax.set_xlim(x1, x2)
-			if xstep:
-				ax.set_xticks(np.arange(x1, x2 + xstep, xstep))
 		
 		# draw the graph with the xticks obtained above
 		# if xticks were not obtained above, they will have been chosen automatically
 		fig.canvas.draw()
 		
 		# this line changes the font used for the ticks to a math mode font
-		ax.set_xticklabels([r'${}$'.format(t.get_text()) for t in ax.get_xticklabels()])
+		ax.set_xticklabels([fr'${t.get_text()}$' for t in ax.get_xticklabels()])
 	
 	# placing horizontal grid lines at rational multiples of pi
 	if ytrigonometric:
@@ -231,26 +241,26 @@ def configure(fig,
 		# obtain lists of ticks and labels to set up horizontal grid lines
 		# markings on the vertical axis correspond to horizontal grid lines
 		vertical_labels, vertical_ticks = graph_ticks(y1, y2, ystep)
-		ax.set_ylim(np.pi * y1, np.pi * y2)
 		ax.set_yticklabels(vertical_labels)
 		ax.set_yticks(vertical_ticks)
+		ax.set_ylim(np.pi * y1, np.pi * y2)
 	
 	# placing horizontal grid lines normally
 	else:
 	
 		# this is the non-trigonometric case
 		# if you don't provide y1 and y2, they will be chosen automatically
+		if y1 and y2 and ystep:
+			ax.set_yticks(np.arange(y1, y2 + ystep, ystep))
 		if y1 and y2:
 			ax.set_ylim(y1, y2)
-			if ystep:
-				ax.set_yticks(np.arange(y1, y2 + ystep, ystep))
 		
 		# draw the graph with the yticks obtained above
 		# if yticks were not obtained above, they will have been chosen automatically
 		fig.canvas.draw()
 		
 		# this line changes the font used for the ticks to a math mode font
-		ax.set_yticklabels([r'${}$'.format(t.get_text()) for t in ax.get_yticklabels()])
+		ax.set_yticklabels([fr'${t.get_text()}$' for t in ax.get_yticklabels()])
 
 ################################################################################
 
@@ -281,19 +291,19 @@ if __name__ == '__main__':
 	ax = fig.add_subplot(1, 1, 1)
 	with open('counter.txt') as count_file:
 		graph_id = int(count_file.readline().strip())
-	fig.canvas.set_window_title('graph_{}'.format(graph_id))
+	fig.canvas.set_window_title(f'graph_{graph_id}')
 	with open('counter.txt', 'w') as count_file:
-		print('{}'.format(graph_id + 1), file = count_file)
+		print(f'{graph_id + 1}', file = count_file)
 
 	########################################
 
 	# t = np.concatenate([np.linspace(-20, -1, 100000), np.linspace(-1, 0, 100000), np.linspace(0, 20, 100000)])
-	x1 = np.linspace(-20, 20, 100000)
-	y1 = np.sin(np.sin(x1))
-	ax.plot(x1, y1, 'r-', label = r'$y=\sin\,\sin\,x$', linewidth = 0.8)
-	# x2 = [2.5, 2.5]
-	# y2 = [-100, 100]
-	# ax.plot(x2, y2, 'b--', label = r'$x=\dfrac{5}{2}$', linewidth = 0.8)
+	x1 = np.linspace(-16, 16, 100000)
+	y1 = np.cos(x1)
+	ax.plot(x1, y1, 'r-', label = r'$y=\cos\,x$', linewidth = 0.8)
+	# x2 = np.linspace(-20, 20, 100000)
+	# y2 = np.sin(9 * x1) * np.cos(7 * x1)
+	# ax.plot(x2, y2, 'b-', label = r'$y=\sin\,9x\,\cos\,7x$', linewidth = 0.8)
 	# x3 = [33 / 8, 33 / 8]
 	# y3 = [-100, 100]
 	# ax.plot(x3, y3, 'g--', label = r'$x=\dfrac{33}{8}$', linewidth = 0.8)
@@ -310,10 +320,10 @@ if __name__ == '__main__':
 	          xtrigonometric = True,
 	          x1 = -2,
 	          x2 = 2,
-	          xstep = 1 / 2,
+	          xstep = 1 / 3,
 	          ytrigonometric = False,
-	          y1 = -3,
-	          y2 = 3,
-	          ystep = 1)
+	          y1 = -1,
+	          y2 = 1,
+	          ystep = 1 / 6)
 
 	plt.show()
