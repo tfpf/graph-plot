@@ -6,6 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import time
 	
 ################################################################################
 
@@ -130,13 +131,8 @@ def mark_points(ax):
 		None
 	'''
 
-	ax.plot(np.cos(0.9), np.sin(0.9), 'k.'); ax.text(np.cos(0.9) + 0.04, np.sin(0.9), r'$\left(\cos\,\theta,\sin\,\theta\right)$')
-	ax.plot(np.cos(0.9), np.sin(0.9), 'k.'); ax.text(np.cos(0.9) + 0.04, np.sin(0.9), r'$\left(\cos\,\theta,\sin\,\theta\right)$')
-	ax.text(np.cos(0.9) / 2 - 0.07, np.sin(0.9) + 0.01, r'$\cos\,\theta$')
-	ax.text(np.cos(0.9) + 0.03, np.sin(0.9) / 2 - 0.04, r'$\sin\,\theta$')
-	ax.text(0.08, 0.03, r'$\theta$')
-	ax.text(1.11, 0.4, r'$\tan\,\theta$')
-	ax.text(0.34, 1.02, r'$\cot\,\theta$')
+	ax.plot(1 / np.e, np.exp(-1 / np.e), 'r.'); ax.text(1 / np.e - 0.2, np.exp(-1 / np.e) + 0.15, r'$\left(e^{-1},e^{-\frac{1}{e}}\right)$')
+	ax.plot(np.exp(-1 / np.e), 1 / np.e, 'k.'); ax.text(np.exp(-1 / np.e) + 0.1, 1 / np.e - 0.1, r'$\left(e^{-\frac{1}{e}},e^{-1}\right)$')
 
 ################################################################################
 
@@ -286,14 +282,10 @@ if __name__ == '__main__':
 	print()
 
 	# set up a window to display the graph
-	# window title is a number obtained from 'counter.txt'
+	# window title number is Unix time
 	fig = plt.figure()
 	ax = fig.add_subplot(1, 1, 1)
-	with open('counter.txt') as count_file:
-		graph_id = int(count_file.readline().strip())
-	fig.canvas.set_window_title(f'graph_{graph_id}')
-	with open('counter.txt', 'w') as count_file:
-		print(f'{graph_id + 1}', file = count_file)
+	fig.canvas.set_window_title(f'graph_{int(time.time())}')
 
 	########################################
 
@@ -301,29 +293,32 @@ if __name__ == '__main__':
 	x1 = np.linspace(-16, 16, 100000)
 	y1 = np.cos(x1)
 	ax.plot(x1, y1, 'r-', label = r'$y=\cos\,x$', linewidth = 0.8)
-	# x2 = np.linspace(-20, 20, 100000)
-	# y2 = np.sin(9 * x1) * np.cos(7 * x1)
-	# ax.plot(x2, y2, 'b-', label = r'$y=\sin\,9x\,\cos\,7x$', linewidth = 0.8)
-	# x3 = [33 / 8, 33 / 8]
-	# y3 = [-100, 100]
-	# ax.plot(x3, y3, 'g--', label = r'$x=\dfrac{33}{8}$', linewidth = 0.8)
-	# x4 = np.linspace(-20, 20, 100000)
-	# y4 = np.exp(-x4)
-	# ax.plot(x4, y4, 'm-', label = r'$y=e^{-x}$', linewidth = 0.8)
-	# x5 = np.linspace(-1, 1, 100000)
-	# y5 = [f(20, x) for x in x2]
-	# ax.plot(x5, y5, 'c-', label = r'$y=f_{20}(x)$', linewidth = 0.8)
+	# x2 = np.linspace(0, 1 / np.e, 100000)
+	# y2 = x2 ** x2
+	# ax.plot(y2, x2, 'b-', label = r'$y=e^{W_{-1}(\ln\,x)}$', linewidth = 0.8)
+	# x3 = np.linspace(1 / np.e, 16, 100000)
+	# y3 = x3 ** x3
+	# ax.plot(y3, x3, 'g-', label = r'$y=e^{W_0(\ln\,x)}$', linewidth = 0.8)
+	# x4 = np.array([2.773, 2.773])
+	# y4 = [-100, 100]
+	# ax.plot(x4, y4, 'g-', label = r'', linewidth = 0.8)
+	# x5 = np.array([6.439, 6.439])
+	# y5 = [-100, 100]
+	# ax.plot(x5, y5, 'g-', label = r'', linewidth = 0.8)
+	# x6 = np.array([9.317, 9.317])
+	# y6 = [-100, 100]
+	# ax.plot(x6, y6, 'g-', label = r'', linewidth = 0.8)
 	# mark_points(ax)
 	configure(fig,
 	          ax,
-	          keep_aspect_ratio = False,
+	          keep_aspect_ratio = True,
 	          xtrigonometric = True,
-	          x1 = -2,
-	          x2 = 2,
-	          xstep = 1 / 3,
+	          x1 = -4,
+	          x2 = 4,
+	          xstep = 1 / 2,
 	          ytrigonometric = False,
-	          y1 = -1,
-	          y2 = 1,
-	          ystep = 1 / 6)
+	          y1 = -4,
+	          y2 = 4,
+	          ystep = 1)
 
 	plt.show()
