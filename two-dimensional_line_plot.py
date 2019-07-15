@@ -174,7 +174,7 @@ def configure(fig,
 		x1: leftmost x-coordinate to be shown
 		x2: rightmost x-coordinate to be shown
 		xstep: gap between vertical grid lines
-		xtrigonometric: boolean, whether the vertical axis should be marked at multiples of pi
+		ytrigonometric: boolean, whether the vertical axis should be marked at multiples of pi
 		y1: bottommost y-coordinate to be shown
 		y2: topmost y-coordinate to be shown
 		ystep: gap between horizontal grid lines
@@ -260,6 +260,26 @@ def configure(fig,
 
 ################################################################################
 
+def remove_vertical_lines_at_discontinuities(y):
+	'''
+	At a point of jump discontinuity, a vertical lines is drawn.
+	This vertical lines joins the two points around the point of discontinuity.
+	Traditionally, in maths, these vertical lines are not drawn.
+	Hence, they need to be removed.
+	'''
+	
+	# if the difference between two consecutive points is large, the function is discontinuous there
+	# differentiating 'y' gives an array whose length is less than the length of 'y' by 1
+	# hence, I concatenate a zero to the front of derivative array
+	# points where its elements are large are the points where 'y' is discontinuous
+	points_of_discontinuity = np.concatenate([[0], np.diff(y)]) > 0.5
+	
+	# at the above points, change the value to 'np.nan'
+	# this removes the vertical line
+	y[points_of_discontinuity] = np.nan
+
+################################################################################
+
 if __name__ == '__main__':
 
 	# choose a font
@@ -290,12 +310,12 @@ if __name__ == '__main__':
 	########################################
 
 	# t = np.concatenate([np.linspace(-20, -1, 100000), np.linspace(-1, 0, 100000), np.linspace(0, 20, 100000)])
-	x1 = np.linspace(-16, 16, 100000)
-	y1 = np.cos(x1)
-	ax.plot(x1, y1, 'r-', label = r'$y=\cos\,x$', linewidth = 0.8)
-	# x2 = np.linspace(0, 1 / np.e, 100000)
-	# y2 = x2 ** x2
-	# ax.plot(y2, x2, 'b-', label = r'$y=e^{W_{-1}(\ln\,x)}$', linewidth = 0.8)
+	x1 = np.linspace(-16, 100, 100000)
+	y1 = np.tan(x1); remove_vertical_lines_at_discontinuities(y1)
+	ax.plot(x1, y1, 'r-', label = r'$y=\tan\,x$', linewidth = 0.8)
+	# x2 = np.linspace(-16, 16, 100000)
+	# y2 = np.exp(-x1 * np.log(x1))
+	# ax.plot(x2, y2, 'b-', label = r'$y=\sin^2x$', linewidth = 0.8)
 	# x3 = np.linspace(1 / np.e, 16, 100000)
 	# y3 = x3 ** x3
 	# ax.plot(y3, x3, 'g-', label = r'$y=e^{W_0(\ln\,x)}$', linewidth = 0.8)
@@ -313,9 +333,9 @@ if __name__ == '__main__':
 	          ax,
 	          keep_aspect_ratio = True,
 	          xtrigonometric = True,
-	          x1 = -4,
+	          x1 = -1,
 	          x2 = 4,
-	          xstep = 1 / 2,
+	          xstep = 0.5,
 	          ytrigonometric = False,
 	          y1 = -4,
 	          y2 = 4,
