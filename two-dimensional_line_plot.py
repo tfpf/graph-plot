@@ -43,6 +43,83 @@ def show_nice_list(items, columns = 3):
 
 ################################################################################
 
+def remove_vertical_lines_at_discontinuities(y):
+	'''
+	At a point of jump discontinuity, a vertical lines is drawn.
+	This vertical lines joins the two points around the point of discontinuity.
+	Traditionally, in maths, these vertical lines are not drawn.
+	Hence, they need to be removed from the plot.
+
+	Args:
+		y: NumPy array
+	
+	Returns:
+		None
+	'''
+	
+	# if the difference between two consecutive points is large, the function is discontinuous there
+	# differentiating 'y' gives an array whose length is less than the length of 'y' by 1
+	# hence, I concatenate a zero to the front of derivative array
+	# points where its elements are large are the points where 'y' is discontinuous
+	points_of_discontinuity = np.concatenate([[0], np.diff(y)]) > 0.5
+	
+	# at the above points, change the value to 'np.nan'
+	# this removes the vertical line
+	y[points_of_discontinuity] = np.nan
+
+################################################################################
+
+def mark_points(ax):
+	'''
+	Add markers to show points of interest.
+
+	Args:
+		ax: Axes object
+
+	Returns:
+		None
+	'''
+
+	ax.plot(-0.85, 0.39, 'k.'); ax.text(-0.85, 1.39, r'$\left(-0.85,0.39\right)$')
+	ax.plot(0, 1, 'k.'); ax.text(0.05, 1.8, r'$\left(0,1\right)$')
+	ax.plot(2, 9, 'k.'); ax.text(1.95, 7.5, r'$\left(2,9\right)$')
+	ax.plot(3.22, 34.41, 'k.'); ax.text(3.22, 32.41, r'$\left(3.22,34.41\right)$')
+
+################################################################################
+
+def configure(fig, ax, keep_aspect_ratio = False):
+	'''
+	Spice up the plot.
+
+	Args:
+		fig: figure which contains the graph plot
+		ax: Axes object
+		keep_aspect_ratio: boolean, whether both axes are to have an identical scale
+
+	Returns:
+		None
+	'''
+	
+	# same scale along both coordinate axes
+	if keep_aspect_ratio:
+		fig.gca().set_aspect('equal', adjustable = 'box')
+	
+	# graph description
+	# without the 'numpoints' argument, two points are shown in the legend for 'ax.stem', etc.
+	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
+	# ax.set_title('Example', **font_spec)
+	
+	# label the axes
+	ax.set_xlabel(r'$x$')
+	ax.set_ylabel(r'$y$', rotation = 90)
+	
+	# enable grid
+	ax.axhline(linewidth = 1.6, color = 'k')
+	ax.axvline(linewidth = 1.6, color = 'k')
+	ax.grid(True, linewidth = 0.4)
+
+################################################################################
+
 def graph_ticks(first, last, step):
 	'''
 	Create a list of tick values and labels at intervals of 'step * np.pi'.
@@ -50,7 +127,7 @@ def graph_ticks(first, last, step):
 		graph_ticks(-1, 5, 2) should create [r'$-\pi$', r'$\pi$', r'$3\pi$', r'$5\pi$']
 		graph_ticks(-2, 2, 1) should create [r'$-2\pi$', r'$-\pi$', r'$0$', r'$\pi$', r'$2\pi$']
 		graph_ticks(-1, -1 / 4, 1 / 4) should create [r'$-\pi$', r'$-\frac{3\pi}{4}$', r'$-\frac{\pi}{2}$', r'$-\frac{\pi}{4}$']
-	Simply put, I want a list of LaTeX-formatted labels to describe the graph plot grid lines at some multiples of pi.
+	Simply put, I want a list of LaTeX-formatted strings for numbers going from one rational multiple of pi to another.
 	Obviously, in addition to labels, a list of the values should also be created.
 	I'll try to write the function as clearly as possible.
 	
@@ -120,163 +197,69 @@ def graph_ticks(first, last, step):
 
 ################################################################################
 
-def mark_points(ax):
+def set_axis(fig, label_get_function, label_set_function, tick_set_function, lim_set_function,
+             trigonometric = False,
+             first         = None,
+             last          = None,
+             step          = None):
 	'''
-	Add markers to show points of interest.
+	Some miscellaneous settings to make the plot look pretty.
+	This function is supposed to be called twice: once to configure the x-axis, and once to configure the y-axis.
+	If 'trigonometric' is True, ticks are drawn from 'first * np.pi' to 'last * np.pi' at steps of 'step * np.pi'.
+	Else, they are drawn from 'first' to 'last' at steps of 'step'.
+	Because of finite floating-point representation, an extra point may find its way into the list of ticks.	
+		b + c in np.arange(a, b + c, c) == True
+	Here, 'b' should not have been in the generated list, but the above can happen because of floating-point maths.
+	This extra point 'b + c' is removed by simply not displaying it: by setting the limits on the axes from 'a' to 'b'.
+	Hence, the limits must be set only after the ticks have been set.
 
 	Args:
-		ax: Axes object
+		fig: figure which contains the graph plot
+		label_get_function: function to get axis tick labels (either 'ax.get_xticklabels' or 'ax.get_yticklabels')
+		label_set_function: function to set axis tick labels (either 'ax.set_xticklabels' or 'ax.set_yticklabels')
+		tick_set_function: function to set axis ticks (either 'ax.set_xticks' or 'ax.set_yticks')
+		lim_set_function: function to set axis limits (either 'ax.set_xlim' or 'ax.set_ylim')
+		trigonometric: boolean, whether the axis should be ticked at multiples of pi
+		first: grid start point
+		last: grid end point
+		step: grid gap
 
 	Returns:
 		None
 	'''
-
-	ax.plot(1 / np.e, np.exp(-1 / np.e), 'r.'); ax.text(1 / np.e - 0.2, np.exp(-1 / np.e) + 0.15, r'$\left(e^{-1},e^{-\frac{1}{e}}\right)$')
-	ax.plot(np.exp(-1 / np.e), 1 / np.e, 'k.'); ax.text(np.exp(-1 / np.e) + 0.1, 1 / np.e - 0.1, r'$\left(e^{-\frac{1}{e}},e^{-1}\right)$')
-
-################################################################################
-
-def configure(fig,
-              ax,
-              keep_aspect_ratio = False,
-              xtrigonometric = False,
-              x1 = None,
-              x2 = None,
-              xstep = None,
-              ytrigonometric = False,
-              y1 = None,
-              y2 = None,
-              ystep = None):
-	'''
-	Some miscellaneous settings to make the plot beautiful.
-	By default, the 'classic' and 'seaborn-poster' plot styles are used.
-	'seaborn-poster' increases the font size, making everything readable.
-	'classic' causes a beautiful serif font to be used (but only if a string is written as a LaTeX string).
-	That is why the 'xticklabels' and 'yticklabels' have been set using r'${}$'.
-	This leads to a problem. On zooming or panning, the ticks will not modify to suit the new zoom level.
-	This is okay, because this script is meant for publication-quality graphing, not for analysis.
-	If the 'xtrigonometric' argument is 'True', vertical grid lines will be drawn from 'np.pi * x1' to 'np.pi * x2'.
-	Distance between consecutive grid lines will be 'np.pi * xstep'.
-	Else, they will be drawn from 'x1' to 'x2' at steps of 'xstep'.
-	Ditto for 'ytrigonometric', 'y1', 'y2' and 'ystep'.
-	Important! 'ax.set_*lim' must be called only after calling 'ax.set_*ticks'.
-	Else, one extra tick may appear because of floating-point representation.
-	For instance, the result of
-		np.arange(-2, 2 + 1 / 3, 1 / 3)
-	includes the rightmost point, 2.33, in the output!
-		
-
-	Args:
-		fig: the figure which contains the graph plot
-		ax: Axes object
-		keep_aspect_ratio: boolean, whether both axes are to have an identical scale
-		xtrigonometric: boolean, whether the horizontal axis should be marked at multiples of pi
-		x1: leftmost x-coordinate to be shown
-		x2: rightmost x-coordinate to be shown
-		xstep: gap between vertical grid lines
-		ytrigonometric: boolean, whether the vertical axis should be marked at multiples of pi
-		y1: bottommost y-coordinate to be shown
-		y2: topmost y-coordinate to be shown
-		ystep: gap between horizontal grid lines
-
-	Returns:
-		None
-	'''
-	
-	# same scale along both coordinate axes
-	if keep_aspect_ratio:
-		fig.gca().set_aspect('equal', adjustable = 'box')
-	
-	# graph description
-	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
-	# ax.set_title('Example', **font_spec)
-	
-	# label the axes
-	ax.set_xlabel(r'$x$')
-	ax.set_ylabel(r'$y$', rotation = 90)
-	
-	# enable grid
-	ax.axhline(linewidth = 1.6, color = 'k')
-	ax.axvline(linewidth = 1.6, color = 'k')
-	ax.grid(True, linewidth = 0.4)
 	
 	# placing vertical grid lines at rational multiples of pi
-	if xtrigonometric:
-		if x1 is None or x2 is None or xstep is None:
-			raise ValueError('xtrigonometric has been set to True. x1, x2 and xstep must not be None.')
+	if trigonometric:
+
+		if first is None or last is None or step is None:
+			raise ValueError('Argument \'trigonometric\' has been set to True--arguments \'first\', \'last\' and \'step\' must not be None.')
 		
-		# obtain lists of ticks and labels to set up vertical grid lines
-		# markings on the horizontal axis correspond to vertical grid lines
-		horizontal_labels, horizontal_ticks = graph_ticks(x1, x2, xstep)
-		ax.set_xticklabels(horizontal_labels)
-		ax.set_xticks(horizontal_ticks)
-		ax.set_xlim(np.pi * x1, np.pi * x2)
+		# obtain lists of ticks and labels to set up grid lines
+		labels, ticks = graph_ticks(first, last, step)
+		label_set_function(labels)
+		tick_set_function(ticks)
+		lim_set_function(np.pi * first, np.pi * last)
 		
-	# placing vertical grid lines normally
+	# placing grid lines normally
 	else:
 		
 		# this is the non-trigonometric case
-		# if you don't provide x1 and x2, they will be chosen automatically
-		if x1 and x2 and xstep:
-			ax.set_xticks(np.arange(x1, x2 + xstep, xstep))
-		if x1 and x2:
-			ax.set_xlim(x1, x2)
+		# if you don't provide 'first' and 'last', they will be chosen automatically
+		if first and last and step:
+			tick_set_function(np.arange(first, last + step, step))
+		if first and last:
+			lim_set_function(first, last)
 		
-		# draw the graph with the xticks obtained above
-		# if xticks were not obtained above, they will have been chosen automatically
+		# draw the graph with the ticks obtained above
+		# if ticks were not obtained above, they will have been chosen automatically
 		fig.canvas.draw()
 		
 		# this line changes the font used for the ticks to a math mode font
-		ax.set_xticklabels([fr'${t.get_text()}$' for t in ax.get_xticklabels()])
-	
-	# placing horizontal grid lines at rational multiples of pi
-	if ytrigonometric:
-		if y1 is None or y2 is None or ystep is None:
-			raise ValueError('ytrigonometric has been set to True. y1, y2 and ystep must not be None.')
-			
-		# obtain lists of ticks and labels to set up horizontal grid lines
-		# markings on the vertical axis correspond to horizontal grid lines
-		vertical_labels, vertical_ticks = graph_ticks(y1, y2, ystep)
-		ax.set_yticklabels(vertical_labels)
-		ax.set_yticks(vertical_ticks)
-		ax.set_ylim(np.pi * y1, np.pi * y2)
-	
-	# placing horizontal grid lines normally
-	else:
-	
-		# this is the non-trigonometric case
-		# if you don't provide y1 and y2, they will be chosen automatically
-		if y1 and y2 and ystep:
-			ax.set_yticks(np.arange(y1, y2 + ystep, ystep))
-		if y1 and y2:
-			ax.set_ylim(y1, y2)
-		
-		# draw the graph with the yticks obtained above
-		# if yticks were not obtained above, they will have been chosen automatically
-		fig.canvas.draw()
-		
-		# this line changes the font used for the ticks to a math mode font
-		ax.set_yticklabels([fr'${t.get_text()}$' for t in ax.get_yticklabels()])
-
-################################################################################
-
-def remove_vertical_lines_at_discontinuities(y):
-	'''
-	At a point of jump discontinuity, a vertical lines is drawn.
-	This vertical lines joins the two points around the point of discontinuity.
-	Traditionally, in maths, these vertical lines are not drawn.
-	Hence, they need to be removed.
-	'''
-	
-	# if the difference between two consecutive points is large, the function is discontinuous there
-	# differentiating 'y' gives an array whose length is less than the length of 'y' by 1
-	# hence, I concatenate a zero to the front of derivative array
-	# points where its elements are large are the points where 'y' is discontinuous
-	points_of_discontinuity = np.concatenate([[0], np.diff(y)]) > 0.5
-	
-	# at the above points, change the value to 'np.nan'
-	# this removes the vertical line
-	y[points_of_discontinuity] = np.nan
+		# math mode font is a beatiful serif font if you use the 'classic' plot style
+		# this line also fixes the ticks, so that the ticks will not be redrawn when you zoom or pan the graph
+		# I assume that this is okay, because the purpose of this script is to plot a nice-looking graph
+		# minute analysis is not the purpose here
+		label_set_function([fr'${t.get_text()}$' for t in label_get_function()])
 
 ################################################################################
 
@@ -310,12 +293,12 @@ if __name__ == '__main__':
 	########################################
 
 	# t = np.concatenate([np.linspace(-20, -1, 100000), np.linspace(-1, 0, 100000), np.linspace(0, 20, 100000)])
-	x1 = np.linspace(-16, 100, 100000)
-	y1 = np.tan(x1); remove_vertical_lines_at_discontinuities(y1)
-	ax.plot(x1, y1, 'r-', label = r'$y=\tan\,x$', linewidth = 0.8)
+	x1 = np.linspace(-16, 16, 100000)
+	y1 = np.cos(x1)
+	ax.plot(x1, y1, 'r-', label = r'$y=\cos\,x$', linewidth = 0.8)
 	# x2 = np.linspace(-16, 16, 100000)
-	# y2 = np.exp(-x1 * np.log(x1))
-	# ax.plot(x2, y2, 'b-', label = r'$y=\sin^2x$', linewidth = 0.8)
+	# y2 = 3 ** x2
+	# ax.plot(x2, y2, 'b-', label = r'$y=3^x$', linewidth = 0.8)
 	# x3 = np.linspace(1 / np.e, 16, 100000)
 	# y3 = x3 ** x3
 	# ax.plot(y3, x3, 'g-', label = r'$y=e^{W_0(\ln\,x)}$', linewidth = 0.8)
@@ -329,16 +312,16 @@ if __name__ == '__main__':
 	# y6 = [-100, 100]
 	# ax.plot(x6, y6, 'g-', label = r'', linewidth = 0.8)
 	# mark_points(ax)
-	configure(fig,
-	          ax,
-	          keep_aspect_ratio = True,
-	          xtrigonometric = True,
-	          x1 = -1,
-	          x2 = 4,
-	          xstep = 0.5,
-	          ytrigonometric = False,
-	          y1 = -4,
-	          y2 = 4,
-	          ystep = 1)
+	configure(fig, ax, keep_aspect_ratio = True)
+	set_axis(fig, ax.get_xticklabels, ax.set_xticklabels, ax.set_xticks, ax.set_xlim,
+	         trigonometric = True,
+	         first         = -4,
+	         last          = 4,
+	         step          = 0.5) # x-axis setup
+	set_axis(fig, ax.get_yticklabels, ax.set_yticklabels, ax.set_yticks, ax.set_ylim,
+	         trigonometric = False,
+	         first         = -4,
+	         last          = 4,
+	         step          = 1) # y-axis setup
 
 	plt.show()
