@@ -86,7 +86,7 @@ def mark_points(ax):
 
 ################################################################################
 
-def configure(fig, ax, keep_aspect_ratio = False):
+def configure(fig, ax, font_spec, keep_aspect_ratio = False):
 	'''
 	Spice up the plot.
 
@@ -106,7 +106,7 @@ def configure(fig, ax, keep_aspect_ratio = False):
 	# graph description
 	# without the 'numpoints' argument, two points are shown in the legend for 'ax.stem', etc.
 	ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
-	# ax.set_title('Example', **font_spec)
+	ax.set_title('Example', **font_spec)
 	
 	# label the axes
 	ax.set_xlabel(r'$x$')
@@ -319,7 +319,7 @@ def main():
 	# y6 = [-100, 100]
 	# ax.plot(x6, y6, 'g-', label = r'', linewidth = 0.8)
 	# mark_points(ax)
-	configure(fig, ax, keep_aspect_ratio = True)
+	configure(fig, ax, font_spec, keep_aspect_ratio = True)
 	set_axis(fig, ax, axis          = 'x',
 	                  trigonometric = True,
 	                  first         = -2,
