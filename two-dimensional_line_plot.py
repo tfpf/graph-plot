@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import colorama
 import fractions
 import matplotlib
 import matplotlib.pyplot as plt
@@ -197,11 +196,11 @@ def graph_ticks(first, last, step):
 
 ################################################################################
 
-def set_axis(fig, label_get_function, label_set_function, tick_set_function, lim_set_function,
-             trigonometric = False,
-             first         = None,
-             last          = None,
-             step          = None):
+def set_axis(fig, ax, axis          = 'x',
+                      trigonometric = False,
+                      first         = None,
+                      last          = None,
+                      step          = None):
 	'''
 	Some miscellaneous settings to make the plot look pretty.
 	This function is supposed to be called twice: once to configure the x-axis, and once to configure the y-axis.
@@ -209,16 +208,14 @@ def set_axis(fig, label_get_function, label_set_function, tick_set_function, lim
 	Else, they are drawn from 'first' to 'last' at steps of 'step'.
 	Because of finite floating-point representation, an extra point may find its way into the list of ticks.	
 		b + c in np.arange(a, b + c, c) == True
-	Here, 'b' should not have been in the generated list, but the above can happen because of floating-point maths.
+	Here, 'b + c' should not have been in the generated list, but the above can happen because of floating-point maths.
 	This extra point 'b + c' is removed by simply not displaying it: by setting the limits on the axes from 'a' to 'b'.
 	Hence, the limits must be set only after the ticks have been set.
+	Take note of this happening in the non-trigonometric case below.
 
 	Args:
 		fig: figure which contains the graph plot
-		label_get_function: function to get axis tick labels (either 'ax.get_xticklabels' or 'ax.get_yticklabels')
-		label_set_function: function to set axis tick labels (either 'ax.set_xticklabels' or 'ax.set_yticklabels')
-		tick_set_function: function to set axis ticks (either 'ax.set_xticks' or 'ax.set_yticks')
-		lim_set_function: function to set axis limits (either 'ax.set_xlim' or 'ax.set_ylim')
+		ax: Axes object
 		trigonometric: boolean, whether the axis should be ticked at multiples of pi
 		first: grid start point
 		last: grid end point
@@ -227,7 +224,19 @@ def set_axis(fig, label_get_function, label_set_function, tick_set_function, lim
 	Returns:
 		None
 	'''
-	
+
+	# use the 'axis' argument to decide which axis has to be set up
+	if axis == 'x':
+		limits_set_function = ax.set_xlim
+		labels_get_function = ax.get_xticklabels
+		labels_set_function = ax.set_xticklabels
+		ticks_set_function = ax.set_xticks
+	elif axis == 'y':
+		limits_set_function = ax.set_ylim
+		labels_get_function = ax.get_yticklabels
+		labels_set_function = ax.set_yticklabels
+		ticks_set_function = ax.set_yticks
+
 	# placing vertical grid lines at rational multiples of pi
 	if trigonometric:
 
@@ -236,9 +245,9 @@ def set_axis(fig, label_get_function, label_set_function, tick_set_function, lim
 		
 		# obtain lists of ticks and labels to set up grid lines
 		labels, ticks = graph_ticks(first, last, step)
-		label_set_function(labels)
-		tick_set_function(ticks)
-		lim_set_function(np.pi * first, np.pi * last)
+		ticks_set_function(ticks)
+		labels_set_function(labels)
+		limits_set_function(np.pi * first, np.pi * last)
 		
 	# placing grid lines normally
 	else:
@@ -246,9 +255,9 @@ def set_axis(fig, label_get_function, label_set_function, tick_set_function, lim
 		# this is the non-trigonometric case
 		# if you don't provide 'first' and 'last', they will be chosen automatically
 		if first and last and step:
-			tick_set_function(np.arange(first, last + step, step))
+			ticks_set_function(np.arange(first, last + step, step))
 		if first and last:
-			lim_set_function(first, last)
+			limits_set_function(first, last) # removes extra point which may appear because of floating-point arithmetic
 		
 		# draw the graph with the ticks obtained above
 		# if ticks were not obtained above, they will have been chosen automatically
@@ -259,15 +268,14 @@ def set_axis(fig, label_get_function, label_set_function, tick_set_function, lim
 		# this line also fixes the ticks, so that the ticks will not be redrawn when you zoom or pan the graph
 		# I assume that this is okay, because the purpose of this script is to plot a nice-looking graph
 		# minute analysis is not the purpose here
-		label_set_function([fr'${t.get_text()}$' for t in label_get_function()])
+		labels_set_function([fr'${t.get_text()}$' for t in labels_get_function()])
 
 ################################################################################
 
-if __name__ == '__main__':
+def main():
 
 	# choose a font
-	colorama.init(autoreset = True)
-	print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Available fonts can be found in the following directory.')
+	print('\033[1;31mAvailable fonts can be found in the following directory.\033[0m')
 	print(matplotlib.get_cachedir())
 	font_spec = {'fontname' : 'DejaVu Serif'}
 	print()
@@ -275,10 +283,9 @@ if __name__ == '__main__':
 	# choose a plot style
 	try:
 		plt.style.use(sys.argv[1])
-		print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Here is a list of all available plot styles.')
+		print('\033[1;31mHere is a list of all available plot styles.\033[0m')
 	except (IndexError, OSError):
-		print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}Plot style either not specified or invalid. Using \'classic\' and \'seaborn-poster\'.\nHere is a list of the available styles.')
-		colorama.deinit()
+		print('\033[1;31mPlot style either not specified or invalid. Using \'classic\' and \'seaborn-poster\'.\nHere is a list of the available styles.\033[0m')
 		plt.style.use('classic')
 		plt.style.use('seaborn-poster')
 	show_nice_list(plt.style.available)
@@ -313,15 +320,20 @@ if __name__ == '__main__':
 	# ax.plot(x6, y6, 'g-', label = r'', linewidth = 0.8)
 	# mark_points(ax)
 	configure(fig, ax, keep_aspect_ratio = True)
-	set_axis(fig, ax.get_xticklabels, ax.set_xticklabels, ax.set_xticks, ax.set_xlim,
-	         trigonometric = True,
-	         first         = -4,
-	         last          = 4,
-	         step          = 0.5) # x-axis setup
-	set_axis(fig, ax.get_yticklabels, ax.set_yticklabels, ax.set_yticks, ax.set_ylim,
-	         trigonometric = False,
-	         first         = -4,
-	         last          = 4,
-	         step          = 1) # y-axis setup
+	set_axis(fig, ax, axis          = 'x',
+	                  trigonometric = True,
+	                  first         = -2,
+	                  last          = 2,
+	                  step          = 0.25)
+	set_axis(fig, ax, axis          = 'y',
+	                  trigonometric = False,
+	                  first         = -4,
+	                  last          = 4,
+	                  step          = 0.5)
 
 	plt.show()
+
+################################################################################
+
+if __name__ == '__main__':
+	main()
