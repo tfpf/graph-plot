@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
 import fractions
 import matplotlib
 import matplotlib.pyplot as plt
@@ -16,8 +15,8 @@ def show_nice_list(items, columns = 3):
 Display a list in neat centred columns.
 
 Args:
-	items: list of strings
-	columns: number of columns to arrange 'items' in
+	items: list, containing items with a valid '__str__' method
+	columns: int, number of columns to arrange 'items' in
 
 Returns:
 	None
@@ -51,11 +50,11 @@ At a point of jump discontinuity, a vertical line is drawn automatically. This \
 vertical line joins the two points around the point of discontinuity. \
 Traditionally, in maths, these vertical lines are not drawn. Hence, they need \
 to be removed from the plot.
-to be removed from the 
-to be removed from the Args:
-to be removed from the 	y: NumPy array
-to be removed from the 
-to be removed from the Returns:
+ 
+Args:
+	y: np.array, array of values of the discontinuous function
+
+Returns:
 	None
 '''
 	
@@ -86,12 +85,12 @@ Remember to either escape the backslash or simply use raw strings. I have done \
 the latter.)
 	
 Args:
-	first: first grid line (grid lines should start at 'first * np.pi')
-	last: last grid line (grid lines should end at 'last * np.pi')
-	step: grid gap (distance between consecutive grid lines is 'step * np.pi')
+	first: float, first grid line (grid lines start at 'first * np.pi')
+	last: float, last grid line (grid lines end at 'last * np.pi')
+	step: float, grid gap (distance between consecutive grid lines is 'step * np.pi')
 	
 Returns:
-	2-tuple containing list of labels and list of values indicated by the labels
+	tuple, containing list of labels and list of values indicated by the labels
 '''
 	
 	# list of coefficients of pi
@@ -156,7 +155,7 @@ class CustomPlot:
 A class to easily plot two- and three-dimensional line graphs.
 
 Args:
-	dim: str, dimension of the plot (either '2d' or '3d')
+	dim: str, dimension of the plot ('2d' or '3d')
 	keep_aspect_ratio: boolean, whether scales on the axes should be same
 
 Attributes:
@@ -169,17 +168,32 @@ matplotlib.axes._subplots.AxesSubplot (for '3d' graph), axes for the graph plot
 Methods:
 	__init__: set up 'fig' to plot the graph
 	plot: check whether the plot is '2d' or '3d', then pass all arguments \
-to plt.plot
+to 'plt.plot'
 	configure: spice up the plot to make it more complete
 	axis_fix: modify the ticks and labels on the axes so they look nice
 '''
-	
-	def __init__(self, dim, keep_aspect_ratio = False):
-		'''Assign member variables.'''
+
+	########################################
+
+	def __init__(self, dim = '2d', keep_aspect_ratio = False):
+		'''
+Assign essential class attributes.
+
+Args:
+	dim: str, dimension of the plot (either '2d' or '3d')
+	keep_aspect_ratio: boolean, whether scales on the axes should be same
+
+Returns:
+	None
+'''
 
 		self.dim = dim
 		self.keep_aspect_ratio = keep_aspect_ratio
+
+		# figure containing the plot
 		self.fig = plt.figure()
+
+		# depending on the dimensionality, create an object for the axes
 		if dim == '2d':
 			self.ax = self.fig.add_subplot(1, 1, 1)
 		else:
@@ -192,11 +206,21 @@ to plt.plot
 	########################################
 
 	def plot(self, *args, **kwargs):
-		'''Plot stuff.'''
+		'''
+Plot a curve. These arguments get passed as they are to 'plt.plot'. In case of \
+a '2d' plot, the third item in 'args' is ignored.
 
-		# if this is a two-dimensional plot, ignore the 'z' argument
+Args:
+	*args: tuple, 3 np.array objects, corresponding to three coordinate axes
+	**kwargs: dict, remaining arguments meant for 'plt.plot'
+
+Returns:
+	None
+'''
+
 		# 'args' contains 'x', 'y' and 'z'
 		# kwargs contains style information and the label
+		# if this is a '2d' plot, ignore the 'z' argument
 		if self.dim == '2d':
 			plt.plot(*args[: -1], **kwargs)
 		else:
@@ -205,21 +229,33 @@ to plt.plot
 	########################################
 
 	def configure(self):
-		'''Spice.'''
+		'''
+Spice up the graph plot.
+
+Args:
+	no arguments
+
+Returns:
+	None
+'''
 
 		# whether the scale should be the same on the coordinate axes
 		if self.keep_aspect_ratio:
-			fig.gca().set_aspect('equal', adjustable = 'box')
+			self.fig.gca().set_aspect('equal', adjustable = 'box')
 
+		# set legend and axis labels
 		self.ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
 		self.ax.set_xlabel(r'$x$')
 		self.ax.set_ylabel(r'$y$')
 		if self.dim == '3d':
 			self.ax.set_zlabel(r'$z$')
 
+		# if this is a '2d' plot, draw thick coordinate axes
 		if self.dim == '2d':
 			self.ax.axhline(linewidth = 1.2, color = 'k')
 			self.ax.axvline(linewidth = 1.2, color = 'k')
+
+		# enable grid
 		self.ax.grid(True, linewidth = 0.8)
 
 	########################################
@@ -229,8 +265,21 @@ to plt.plot
 	                   first         = None,
 	                   last          = None,
 	                   step          = None):
-		'''Set axis.'''
+		'''
+Modify the labels and ticks on one of the axes of coordinates.
 
+Args:
+	axis: str, which axis to modify ('x', 'y' or 'z')
+	trigonometric: bool, whether axis ticks are at rational multiples of pi
+	first: float, grid start point
+	last: float, grid end point
+	step: float, grid gap
+
+Returns:
+	None
+'''
+
+		# use the 'axis' argument to decide which axis is to be modified
 		if axis == 'x':
 			limits_set_function = self.ax.set_xlim
 			labels_get_function = self.ax.get_xticklabels
@@ -241,7 +290,7 @@ to plt.plot
 			labels_get_function = self.ax.get_yticklabels
 			labels_set_function = self.ax.set_yticklabels
 			ticks_set_function = self.ax.set_yticks
-		elif axis == 'z' and self.dim == '3d':
+		elif axis == 'z' and self.dim == '3d': # to modify this axis, the plot must be '3d'
 			limits_set_function = self.ax.set_zlim
 			labels_get_function = self.ax.get_zticklabels
 			labels_set_function = self.ax.set_zticklabels
@@ -251,15 +300,16 @@ to plt.plot
 
 		# placing vertical grid lines at rational multiples of pi
 		if trigonometric:
-	
+
+			# this case requires all three following arguments
 			if first is None or last is None or step is None:
 				raise ValueError('Argument \'trigonometric\' has been set to True--arguments \'first\', \'last\' and \'step\' must not be None.')
-			
+
 			# obtain lists of ticks and labels to set up grid lines
 			labels, ticks = graph_ticks(first, last, step)
 			ticks_set_function(ticks)
 			labels_set_function(labels)
-			limits_set_function(np.pi * first, np.pi * last)
+			limits_set_function(np.pi * first, np.pi * last) # removes extra point which may appear because of finite floating-point precision
 			
 		# placing grid lines normally
 		else:
@@ -269,19 +319,19 @@ to plt.plot
 			if first and last and step:
 				ticks_set_function(np.arange(first, last + step, step))
 			if first and last:
-				limits_set_function(first, last) # removes extra point which may appear because of floating-point arithmetic
+				limits_set_function(first, last) # removes extra point which may appear because of finite floating-point precision
 			
 			# draw the graph with the ticks obtained above
 			# if ticks were not obtained above, they will have been chosen automatically
+			# without this line, 'labels_get_function' will not return anything useful
 			self.fig.canvas.draw()
 			
-			# this line changes the font used for the ticks to a math mode font
-			# math mode font is a beatiful serif font if you use the 'classic' plot style
-			# this line also fixes the ticks, so that the ticks will not be redrawn when you zoom or pan the graph
+			# this line changes the font used for the ticks to Computer Modern (if the 'classic' plot style is being used)
+			# this line also changes the ticks from integers to strings
+			# as a result, it fixes the ticks, so that the ticks will not be redrawn when you zoom or pan the graph
 			# I assume that this is okay, because the purpose of this script is to plot a nice-looking graph
 			# minute analysis is not the purpose here
 			labels_set_function([fr'${t.get_text()}$' for t in labels_get_function()])
-
 
 ################################################################################
 
@@ -290,30 +340,33 @@ def main():
 	# read command line argument
 	# check whether this should be a two- or three-dimensional plot
 	try:
-		dim = sys.argv[1]
-		assert dim in {'2d', '3d'}
+		dimension = sys.argv[1]
+		assert dimension in {'2d', '3d'}
 	except (IndexError, AssertionError):
-		print('\033[1;31mProjection either invalid or not specified. Using default \'2d\'.\033[0m')
-		dim = '2d'
+		dimension = '2d'
 
 	# set the plot style
 	# I use 'classic' because it causes LaTeX-formatted strings to be rendered in Computer Modern
 	# Computer Modern is prettier than the default font (at least on Linux)
 	# for two-dimensional plots, I like to also use 'seaborn-poster', which increases the font size
 	# in three-dimensional plots, this increased font size overlaps with surrounding text
-	# hence, I use only use 'classic'
-	if dim == '2d':
+	# hence, for three-dimensional plots, I use only use 'classic'
+	if dimension == '2d':
 		plt.style.use(['classic', 'seaborn-poster'])
 	else:
 		plt.style.use('classic')
 
 	# instantiate the class to take care of all the objects required
-	grapher = CustomPlot(dim, keep_aspect_ratio = False)
+	grapher = CustomPlot(dim = dimension, keep_aspect_ratio = True)
+
+	########################################
 
 	x1 = np.linspace(-16, 16, 100000)
 	y1 = np.cos(x1)
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$R$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\cos\,x$')
+
+	########################################
 
 	grapher.configure()
 	grapher.axis_fix(axis          = 'x',
