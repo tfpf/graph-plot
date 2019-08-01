@@ -288,7 +288,8 @@ Returns:
 			self.ax.axvline(linewidth = 1.2, color = 'k')
 
 		# enable grid
-		self.ax.grid(True, linewidth = 0.8)
+		self.ax.grid(b = True, which = 'major', linewidth = 0.8)
+		self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
 		self.ax.minorticks_on()
 
 	########################################
@@ -390,33 +391,33 @@ def main():
 		plt.style.use('classic')
 
 	# instantiate the class to take care of all the objects required
-	grapher = CustomPlot(dim = dimension, keep_aspect_ratio = False)
+	grapher = CustomPlot(dim = dimension, keep_aspect_ratio = True)
 
 	########################################
 
-	x1 = np.linspace(-16, 16, 100000)
-	y1 = np.sin(np.sin(2 * x1))
+	x1 = np.linspace(-32, 32, 100000)
+	y1 = np.exp(-(x1 ** (-2)))
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\sin\,\sin\,2x$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=e^{-x^{-2}}$')
 
-	x2 = np.linspace(-16, 16, 100000)
-	y2 = np.cos(x1)
-	z2 = np.sin(x1)
-	grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=\cos\,x$')
+	# x2 = np.linspace(-16, 16, 100000)
+	# y2 = np.cos(x1)
+	# z2 = np.sin(x1)
+	# grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=\cos\,x$')
 
 	########################################
 
 	grapher.configure()
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
-	                 first         = -4,
-	                 last          = 4,
-	                 step          = 0.5)
+	                 trigonometric = False,
+	                 first         = -2,
+	                 last          = 2,
+	                 step          = 0.2)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -4,
-	                 last          = 4,
-	                 step          = 1)
+	                 first         = -0.6,
+	                 last          = 1.4,
+	                 step          = 0.2)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
 	                 first         = None,
