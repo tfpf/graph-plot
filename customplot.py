@@ -167,6 +167,8 @@ matplotlib.axes._subplots.AxesSubplot (for '3d' graph), axes for the graph plot
 
 Methods:
 	__init__: set up 'fig' to plot the graph
+	__repr__: define representation of object
+	__str__: define string form of object
 	plot: check whether the plot is '2d' or '3d', then pass all arguments \
 to 'plt.plot'
 	configure: spice up the plot to make it more complete
@@ -222,13 +224,13 @@ Returns:
 
 	def __str__(self):
 		'''\
-Stringified form of the class object.
+String form of the class object.
 
 Args:
 	no arguments
 
 Returns:
-	str, the stringified form of the object
+	str, the string form of the object
 '''
 
 		return f'CustomPlot(dim = \'{self.dim}\', keep_aspect_ratio = {self.keep_aspect_ratio})'
