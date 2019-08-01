@@ -11,7 +11,7 @@ import time
 ################################################################################
 
 def show_nice_list(items, columns = 3):
-	'''
+	'''\
 Display a list in neat centred columns.
 
 Args:
@@ -45,7 +45,7 @@ Returns:
 ################################################################################
 
 def remove_vertical_lines_at_discontinuities(y):
-	'''
+	'''\
 At a point of jump discontinuity, a vertical line is drawn automatically. This \
 vertical line joins the two points around the point of discontinuity. \
 Traditionally, in maths, these vertical lines are not drawn. Hence, they need \
@@ -71,7 +71,7 @@ Returns:
 ################################################################################
 
 def graph_ticks(first, last, step):
-	'''
+	'''\
 Create a list of tick values and labels at intervals of 'step * np.pi'.	I think\
  it is best explained with examples.
 	graph_ticks(-1, 5, 2) == ['$-\\pi$', '$\\pi$', '$3\\pi$', '$5\\pi$']
@@ -151,7 +151,7 @@ Returns:
 ################################################################################
 
 class CustomPlot:
-	'''
+	'''\
 A class to easily plot two- and three-dimensional line graphs.
 
 Args:
@@ -176,7 +176,7 @@ to 'plt.plot'
 	########################################
 
 	def __init__(self, dim = '2d', keep_aspect_ratio = False):
-		'''
+		'''\
 Assign essential class attributes.
 
 Args:
@@ -205,8 +205,38 @@ Returns:
 		
 	########################################
 
+	def __repr__(self):
+		'''\
+Representation of the class object.
+
+Args:
+	no arguments
+
+Returns:
+	str, the representation of the object
+'''
+
+		return f'CustomPlot(dim = \'{self.dim}\', keep_aspect_ratio = {self.keep_aspect_ratio})'
+	
+	########################################
+
+	def __str__(self):
+		'''\
+Stringified form of the class object.
+
+Args:
+	no arguments
+
+Returns:
+	str, the stringified form of the object
+'''
+
+		return f'CustomPlot(dim = \'{self.dim}\', keep_aspect_ratio = {self.keep_aspect_ratio})'
+
+	########################################
+
 	def plot(self, *args, **kwargs):
-		'''
+		'''\
 Plot a curve. These arguments get passed as they are to 'plt.plot'. In case of \
 a '2d' plot, the third item in 'args' is ignored.
 
@@ -229,7 +259,7 @@ Returns:
 	########################################
 
 	def configure(self):
-		'''
+		'''\
 Spice up the graph plot.
 
 Args:
@@ -257,6 +287,7 @@ Returns:
 
 		# enable grid
 		self.ax.grid(True, linewidth = 0.8)
+		self.ax.minorticks_on()
 
 	########################################
 
@@ -265,7 +296,7 @@ Returns:
 	                   first         = None,
 	                   last          = None,
 	                   step          = None):
-		'''
+		'''\
 Modify the labels and ticks on one of the axes of coordinates.
 
 Args:
@@ -357,14 +388,19 @@ def main():
 		plt.style.use('classic')
 
 	# instantiate the class to take care of all the objects required
-	grapher = CustomPlot(dim = dimension, keep_aspect_ratio = True)
+	grapher = CustomPlot(dim = dimension, keep_aspect_ratio = False)
 
 	########################################
 
 	x1 = np.linspace(-16, 16, 100000)
-	y1 = np.cos(x1)
+	y1 = np.sin(np.sin(2 * x1))
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\cos\,x$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\sin\,\sin\,2x$')
+
+	x2 = np.linspace(-16, 16, 100000)
+	y2 = np.cos(x1)
+	z2 = np.sin(x1)
+	grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=\cos\,x$')
 
 	########################################
 
