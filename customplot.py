@@ -166,11 +166,11 @@ Attributes:
 matplotlib.axes._subplots.AxesSubplot (for '3d' graph), axes for the graph plot
 
 Methods:
-	__init__: set up 'fig' to plot the graph
+	__init__: set up a window to plot the graph
 	__repr__: define representation of object
 	__str__: define string form of object
 	plot: check whether the plot is '2d' or '3d', then pass all arguments \
-to 'plt.plot'
+to the plotting function
 	configure: spice up the plot to make it more complete
 	axis_fix: modify the ticks and labels on the axes so they look nice
 '''
@@ -239,12 +239,12 @@ Returns:
 
 	def plot(self, *args, **kwargs):
 		'''\
-Plot a curve. These arguments get passed as they are to 'plt.plot'. In case of \
-a '2d' plot, the third item in 'args' is ignored.
+Plot a curve. These arguments get passed as they are to the function which \
+actually plots. In case of a '2d' plot, the third item in 'args' is ignored.
 
 Args:
 	*args: tuple, 3 np.array objects, corresponding to three coordinate axes
-	**kwargs: dict, remaining arguments meant for 'plt.plot'
+	**kwargs: dict, remaining arguments meant for plotting
 
 Returns:
 	None
@@ -254,9 +254,9 @@ Returns:
 		# kwargs contains style information and the label
 		# if this is a '2d' plot, ignore the 'z' argument
 		if self.dim == '2d':
-			plt.plot(*args[: -1], **kwargs)
+			self.ax.plot(*args[: -1], **kwargs)
 		else:
-			plt.plot(*args, **kwargs)
+			self.ax.plot(*args, **kwargs)
 	
 	########################################
 
@@ -273,7 +273,7 @@ Returns:
 
 		# whether the scale should be the same on the coordinate axes
 		if self.keep_aspect_ratio:
-			self.fig.gca().set_aspect('equal', adjustable = 'box')
+			self.ax.set_aspect('equal', adjustable = 'box')
 
 		# set legend and axis labels
 		self.ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
@@ -396,9 +396,9 @@ def main():
 	########################################
 
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = np.exp(-(x1 ** (-2)))
+	y1 = x1
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=e^{-x^{-2}}$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=x$')
 
 	# x2 = np.linspace(-16, 16, 100000)
 	# y2 = np.cos(x1)
@@ -409,15 +409,15 @@ def main():
 
 	grapher.configure()
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
-	                 first         = -2,
-	                 last          = 2,
-	                 step          = 0.2)
+	                 trigonometric = True,
+	                 first         = -6,
+	                 last          = 6,
+	                 step          = 0.5)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -0.6,
-	                 last          = 1.4,
-	                 step          = 0.2)
+	                 first         = -10,
+	                 last          = 10,
+	                 step          = 2)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
 	                 first         = None,
