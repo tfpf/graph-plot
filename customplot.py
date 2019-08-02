@@ -251,7 +251,7 @@ Returns:
 '''
 
 		# 'args' contains 'x', 'y' and 'z'
-		# kwargs contains style information and the label
+		# 'kwargs' contains style information and the label
 		# if this is a '2d' plot, ignore the 'z' argument
 		if self.dim == '2d':
 			self.ax.plot(*args[: -1], **kwargs)
@@ -384,7 +384,7 @@ def main():
 	# Computer Modern is prettier than the default font (at least on Linux)
 	# for two-dimensional plots, I like to also use 'seaborn-poster', which increases the font size
 	# in three-dimensional plots, this increased font size overlaps with surrounding text
-	# hence, for three-dimensional plots, I use only use 'classic'
+	# hence, for three-dimensional plots, I use only 'classic'
 	if dimension == '2d':
 		plt.style.use(['classic', 'seaborn-poster'])
 	else:
