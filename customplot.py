@@ -156,11 +156,11 @@ A class to easily plot two- and three-dimensional line graphs.
 
 Args:
 	dim: str, dimension of the plot ('2d' or '3d')
-	keep_aspect_ratio: boolean, whether scales on the axes should be same
+	aspect_ratio: float, ratio of scales on axes
 
 Attributes:
 	dim: str, dimension of the plot (either '2d' or '3d')
-	keep_aspect_ratio: bool, whether scales on the axes should be same
+	aspect_ratio: float, ratio of scales on axes
 	fig: matplotlib.figure.Figure, in which the graph will be plotted
 	ax: matplotlib.axes._subplots.AxesSubplot (for '2d' graph) or \
 matplotlib.axes._subplots.AxesSubplot (for '3d' graph), axes for the graph plot
@@ -177,20 +177,20 @@ to the plotting function
 
 	########################################
 
-	def __init__(self, dim = '2d', keep_aspect_ratio = False):
+	def __init__(self, dim = '2d', aspect_ratio = 0):
 		'''\
 Assign essential class attributes.
 
 Args:
 	dim: str, dimension of the plot (either '2d' or '3d')
-	keep_aspect_ratio: boolean, whether scales on the axes should be same
+	aspect_ratio: float, ratio of scales on axes
 
 Returns:
 	None
 '''
 
 		self.dim = dim
-		self.keep_aspect_ratio = keep_aspect_ratio
+		self.aspect_ratio = aspect_ratio
 
 		# figure containing the plot
 		self.fig = plt.figure()
@@ -218,7 +218,7 @@ Returns:
 	str, the representation of the object
 '''
 
-		return f'CustomPlot(dim = \'{self.dim}\', keep_aspect_ratio = {self.keep_aspect_ratio})'
+		return f'CustomPlot(dim = \'{self.dim}\', aspect_ratio = {self.aspect_ratio})'
 	
 	########################################
 
@@ -233,7 +233,7 @@ Returns:
 	str, the string form of the object
 '''
 
-		return f'CustomPlot(dim = \'{self.dim}\', keep_aspect_ratio = {self.keep_aspect_ratio})'
+		return f'CustomPlot(dim = \'{self.dim}\', aspect_ratio = {self.aspect_ratio})'
 
 	########################################
 
@@ -272,8 +272,9 @@ Returns:
 '''
 
 		# whether the scale should be the same on the coordinate axes
-		if self.keep_aspect_ratio:
-			self.ax.set_aspect('equal', adjustable = 'box')
+		# currently, because of a library bug, this works only in '2d'
+		if self.aspect_ratio and self.dim == '2d':
+			self.ax.set_aspect(aspect = self.aspect_ratio, adjustable = 'box')
 
 		# set legend and axis labels
 		self.ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
@@ -289,8 +290,9 @@ Returns:
 
 		# enable grid
 		self.ax.grid(b = True, which = 'major', linewidth = 0.8)
-		self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
-		self.ax.minorticks_on()
+		if self.dim == '2d': # takes too much memory in '3d'
+			self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
+			self.ax.minorticks_on()
 
 	########################################
 
@@ -391,14 +393,14 @@ def main():
 		plt.style.use('classic')
 
 	# instantiate the class to take care of all the objects required
-	grapher = CustomPlot(dim = dimension, keep_aspect_ratio = True)
+	grapher = CustomPlot(dim = dimension, aspect_ratio = 1)
 
 	########################################
 
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = x1
+	y1 = (x1 + 1 / x1) ** x1
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=x$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\left(x+\dfrac{1}{x}\right)^x$')
 
 	# x2 = np.linspace(-16, 16, 100000)
 	# y2 = np.cos(x1)
@@ -409,15 +411,15 @@ def main():
 
 	grapher.configure()
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
-	                 first         = -6,
-	                 last          = 6,
-	                 step          = 0.5)
+	                 trigonometric = False,
+	                 first         = -1,
+	                 last          = 8,
+	                 step          = 1)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -10,
-	                 last          = 10,
-	                 step          = 2)
+	                 first         = -1,
+	                 last          = 15,
+	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
 	                 first         = None,
