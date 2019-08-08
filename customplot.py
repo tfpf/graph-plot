@@ -46,11 +46,11 @@ Returns:
 
 def remove_vertical_lines_at_discontinuities(y):
 	'''\
-At a point of jump discontinuity, a vertical line is drawn automatically. This \
-vertical line joins the two points around the point of discontinuity. \
-Traditionally, in maths, these vertical lines are not drawn. Hence, they need \
-to be removed from the plot.
- 
+At a point of jump discontinuity, a vertical line is drawn automatically. This
+vertical line joins the two points around the point of discontinuity.
+Traditionally, in maths, these vertical lines are not drawn. Hence, they need to
+be removed from the plot.
+
 Args:
 	y: np.array, array of values of the discontinuous function
 
@@ -72,17 +72,16 @@ Returns:
 
 def graph_ticks(first, last, step):
 	'''\
-Create a list of tick values and labels at intervals of 'step * np.pi'.	I think\
- it is best explained with examples.
+Create a list of tick values and labels at intervals of 'step * np.pi'.	I think
+it is best explained with examples.
 	graph_ticks(-1, 5, 2) == ['$-\\pi$', '$\\pi$', '$3\\pi$', '$5\\pi$']
 	graph_ticks(-2, 2, 1) == ['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$']
 	graph_ticks(-1, -1 / 4, 1 / 4) == ['$-\\pi$', '$-\\frac{3\\pi}{4}$', '$-\\frac{\\pi}{2}$', '$-\\frac{\pi}{4}$']
-Simply put, I want a list of LaTeX-formatted strings for numbers going from one\
- rational multiple of pi to another. Obviously, in addition to labels, a list \
-of the values should also be created. I'll try to write the function as clearly\
- as possible. (Note that LaTeX uses the backslash to indicate keywords! \
-Remember to either escape the backslash or simply use raw strings. I have done \
-the latter.)
+Simply put, I want a list of LaTeX-formatted strings for numbers going from one
+rational multiple of pi to another. Obviously, in addition to labels, a list of
+the values should also be created. I'll try to write the function as clearly as
+possible. (Note that LaTeX uses the backslash to indicate keywords! Remember to
+either escape the backslash or simply use raw strings. I have done the latter.)
 	
 Args:
 	first: float, first grid line (grid lines start at 'first * np.pi')
@@ -162,15 +161,16 @@ Attributes:
 	dim: str, dimension of the plot (either '2d' or '3d')
 	aspect_ratio: float, ratio of scales on axes
 	fig: matplotlib.figure.Figure, in which the graph will be plotted
-	ax: matplotlib.axes._subplots.AxesSubplot (for '2d' graph) or \
-matplotlib.axes._subplots.AxesSubplot (for '3d' graph), axes for the graph plot
+	ax: matplotlib.axes._subplots.AxesSubplot (for '2d' graph) or
+		matplotlib.axes._subplots.Axes3DSubplot (for '3d' graph), axes
+		for the graph plot
 
 Methods:
 	__init__: set up a window to plot the graph
 	__repr__: define representation of object
 	__str__: define string form of object
-	plot: check whether the plot is '2d' or '3d', then pass all arguments \
-to the plotting function
+	plot: check whether the plot is '2d' or '3d', then pass all arguments to
+		the actual plotting function
 	configure: spice up the plot to make it more complete
 	axis_fix: modify the ticks and labels on the axes so they look nice
 '''
@@ -189,6 +189,18 @@ Returns:
 	None
 '''
 
+		# check the 'dim' argument and set the plot style
+		# I use 'classic' because it causes LaTeX-formatted strings to be rendered in Computer Modern
+		# Computer Modern is prettier than the default font (at least on Linux)
+		# for two-dimensional plots, I like to also use 'seaborn-poster', which increases the font size
+		# in three-dimensional plots, this increased font size overlaps with surrounding text
+		# hence, for three-dimensional plots, I use only 'classic'
+		if dim == '2d':
+			plt.style.use(['classic', 'seaborn-poster'])
+		elif dim == '3d':
+			plt.style.use('classic')
+		else:
+			raise ValueError('Member \'dim\' of class \'CustomPlot\' must be either \'2d\' or \'3d\'.')
 		self.dim = dim
 		self.aspect_ratio = aspect_ratio
 
@@ -239,12 +251,12 @@ Returns:
 
 	def plot(self, *args, **kwargs):
 		'''\
-Plot a curve. These arguments get passed as they are to the function which \
+Plot a curve. These arguments get passed as they are to the function which
 actually plots. In case of a '2d' plot, the third item in 'args' is ignored.
 
 Args:
-	*args: tuple, 3 np.array objects, corresponding to three coordinate axes
-	**kwargs: dict, remaining arguments meant for plotting
+	args: tuple of 3 np.array objects, corresponding to three coordinate axes
+	kwargs: dict, remaining arguments meant for plotting
 
 Returns:
 	None
@@ -257,7 +269,30 @@ Returns:
 			self.ax.plot(*args[: -1], **kwargs)
 		else:
 			self.ax.plot(*args, **kwargs)
-	
+
+	########################################
+
+	def text(self, *args, **kwargs):
+		'''\
+Show text on the graph. The arguments are simply passed to the actual 'text'
+method. This is meant to be used after the above 'plot' method has been used to
+plot a single point.
+
+Args:
+	args: tuple of 3 floats (coordinates of the text), 1 string (text string)
+	kwargs: dict, remaining arguments meant for placing text
+
+Returns:
+	None
+'''
+
+		# same as in 'plot' method
+		# third coordinate ignored for '3d' plot
+		if self.dim == '2d':
+			self.ax.text(*args[: -1], **kwargs)
+		else:
+			self.ax.text(*args, **kwargs)
+
 	########################################
 
 	def configure(self):
@@ -326,7 +361,7 @@ Returns:
 			labels_get_function = self.ax.get_yticklabels
 			labels_set_function = self.ax.set_yticklabels
 			ticks_set_function = self.ax.set_yticks
-		elif axis == 'z' and self.dim == '3d': # to modify this axis, the plot must be '3d'
+		elif axis == 'z' and self.dim == '3d': # to modify 'z' axis, the plot must be '3d'
 			limits_set_function = self.ax.set_zlim
 			labels_get_function = self.ax.get_zticklabels
 			labels_set_function = self.ax.set_zticklabels
@@ -375,22 +410,10 @@ def main():
 
 	# read command line argument
 	# check whether this should be a two- or three-dimensional plot
-	try:
-		dimension = sys.argv[1]
-		assert dimension in {'2d', '3d'}
-	except (IndexError, AssertionError):
+	if len(sys.argv) < 2:
 		dimension = '2d'
-
-	# set the plot style
-	# I use 'classic' because it causes LaTeX-formatted strings to be rendered in Computer Modern
-	# Computer Modern is prettier than the default font (at least on Linux)
-	# for two-dimensional plots, I like to also use 'seaborn-poster', which increases the font size
-	# in three-dimensional plots, this increased font size overlaps with surrounding text
-	# hence, for three-dimensional plots, I use only 'classic'
-	if dimension == '2d':
-		plt.style.use(['classic', 'seaborn-poster'])
 	else:
-		plt.style.use('classic')
+		dimension = sys.argv[1]
 
 	# instantiate the class to take care of all the objects required
 	grapher = CustomPlot(dim = dimension, aspect_ratio = 1)
@@ -398,27 +421,32 @@ def main():
 	########################################
 
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = (x1 + 1 / x1) ** x1
+	y1 = 1 / np.sin(x1); remove_vertical_lines_at_discontinuities(y1)
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\left(x+\dfrac{1}{x}\right)^x$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\csc\,x$')
 
-	# x2 = np.linspace(-16, 16, 100000)
-	# y2 = np.cos(x1)
-	# z2 = np.sin(x1)
-	# grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=\cos\,x$')
+	x2 = np.linspace(-32, 32, 100000)
+	y2 = x2
+	z2 = np.sin(x1)
+	grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=x$')
+
+	########################################
+
+	grapher.plot([1], [1], [1], color = 'black', marker = '.', markersize = 10)
+	grapher.text(0.7, 0.5, 1, s = r'$\left(1,1\right)$')
 
 	########################################
 
 	grapher.configure()
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
-	                 first         = -1,
-	                 last          = 8,
-	                 step          = 1)
+	                 trigonometric = True,
+	                 first         = -4,
+	                 last          = 4,
+	                 step          = 1 / 2)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -1,
-	                 last          = 15,
+	                 first         = -8,
+	                 last          = 8,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
