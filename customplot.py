@@ -15,7 +15,7 @@ def show_nice_list(items, columns = 3):
 Display a list in neat centred columns.
 
 Args:
-	items: list, containing items with a valid '__str__' method
+	items: list, containing objects with an '__str__' method defined
 	columns: int, number of columns to arrange 'items' in
 
 Returns:
@@ -65,7 +65,7 @@ Returns:
 	points_of_discontinuity = np.concatenate([[0], np.diff(y)]) > 0.5
 	
 	# at the above points, change the value to 'np.nan'
-	# this removes the vertical line
+	# this removes the vertical lines
 	y[points_of_discontinuity] = np.nan
 
 ################################################################################
@@ -98,20 +98,22 @@ Returns:
 	# multiplying this by 'np.pi' will give the ticks (i.e. locations of grid lines)
 	lattice = np.arange(first, last + step, step)
 	
-	# create a new list to store the labels
+	# create a new list to store the label strings
 	labels = []
 	
-	# represent each number in 'lattice' as a rational number
-	for j in lattice:
-		value = fractions.Fraction(j).limit_denominator()
+	# represent each number in 'lattice' as a LaTeX-formatted string
+	for number in lattice:
+
+		# obtain the numerator and denominator
+		value = fractions.Fraction(number).limit_denominator()
 		num = value.numerator
 		den = value.denominator
-		
+
 		# get the zero out of the way first
 		if num == 0:
 			labels.append(r'$0$')
 			continue
-			
+
 		# build a string which has to be appended to 'label'
 		# to do this, create a list of the different pieces of the string
 		# then join them
@@ -151,7 +153,7 @@ Returns:
 
 class CustomPlot:
 	'''\
-A class to easily plot two- and three-dimensional line graphs.
+A class to easily plot two- and three-dimensional curves.
 
 Args:
 	dim: str, dimension of the plot ('2d' or '3d')
@@ -170,9 +172,12 @@ Methods:
 	__repr__: define representation of object
 	__str__: define string form of object
 	plot: check whether the plot is '2d' or '3d', then pass all arguments to
-		the actual plotting function
+		the actual plotting function, i.e. 'ax.plot'
 	configure: spice up the plot to make it more complete
 	axis_fix: modify the ticks and labels on the axes so they look nice
+	text: place a text string on the graph (just like 'plot', the arguments
+		are just passed to the actual text-placing function, i.e.
+		'ax.text')
 '''
 
 	########################################
@@ -279,7 +284,7 @@ method. This is meant to be used after the above 'plot' method has been used to
 plot a single point.
 
 Args:
-	args: tuple of 3 floats (coordinates of the text), 1 string (text string)
+	args: tuple of 3 single-item (float) lists (coordinates of the text), 1 string (text string)
 	kwargs: dict, remaining arguments meant for placing text
 
 Returns:
@@ -287,7 +292,7 @@ Returns:
 '''
 
 		# same as in 'plot' method
-		# third coordinate ignored for '3d' plot
+		# third argument ignored for '2d' plot
 		if self.dim == '2d':
 			self.ax.text(*args[: -1], **kwargs)
 		else:
@@ -295,9 +300,25 @@ Returns:
 
 	########################################
 
+	def fill_between(self, *args, **kwargs):
+		'''\
+Fill an area with a colour. Can be used to show regions on the graph. Arguments
+are directly passed to the actual 'fill_between' method. Obviously, this makes
+sense only for '2d' plots.
+
+Args:
+	args: tuple of 3 np.array objects (indicating the 2 curves to fill between)
+	kwargs: dict, remaining arguments meant for filling
+'''
+
+		if self.dim == '2d':
+			self.ax.fill_between(*args, **kwargs)
+
+	########################################
+
 	def configure(self):
 		'''\
-Spice up the graph plot.
+Spice up the graph plot. Add a legend, axis labels and grid lines.
 
 Args:
 	no arguments
@@ -420,34 +441,44 @@ def main():
 
 	########################################
 
+	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = 1 / np.sin(x1); remove_vertical_lines_at_discontinuities(y1)
+	y1 = np.exp(-x1)
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\csc\,x$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=e^{-x}$')
 
 	x2 = np.linspace(-32, 32, 100000)
-	y2 = x2
+	y2 = np.exp(-x1 ** 2)
 	z2 = np.sin(x1)
-	grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=x$')
+	grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=e^{-x^2}$')
+
+	# x3 = np.linspace(-32, 32, 100000)
+	# y3 = -x3
+	# z3 = np.sin(x3)
+	# grapher.plot(x3, y3, z3, color = 'green', linestyle = '--', linewidth = 0.8, label = r'$y=-x$')
 
 	########################################
 
-	grapher.plot([1], [1], [1], color = 'black', marker = '.', markersize = 10)
-	grapher.text(0.7, 0.5, 1, s = r'$\left(1,1\right)$')
+	# grapher.plot([1], [1], [1], color = 'black', marker = '.', markersize = 10)
+	# grapher.text(0.7, 0.5, 1, s = r'$\left(1,1\right)$')
+
+	########################################
+
+	grapher.fill_between(x1, y1, y2, facecolor = 'cyan', label = r'$\lbrace(x,y)\mid (y-e^{-x})(y-e^{-x^2})<0\rbrace$')
 
 	########################################
 
 	grapher.configure()
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
-	                 first         = -4,
-	                 last          = 4,
-	                 step          = 1 / 2)
+	                 trigonometric = False,
+	                 first         = -2,
+	                 last          = 2,
+	                 step          = 0.5)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -8,
-	                 last          = 8,
-	                 step          = 1)
+	                 first         = -2,
+	                 last          = 2,
+	                 step          = 0.5)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
 	                 first         = None,
