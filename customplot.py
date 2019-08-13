@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import doctest
 import fractions
 import matplotlib
 import matplotlib.pyplot as plt
@@ -71,17 +72,23 @@ Returns:
 ################################################################################
 
 def graph_ticks(first, last, step):
-	'''\
+	r'''\
 Create a list of tick values and labels at intervals of 'step * np.pi'.	I think
-it is best explained with examples.
-	graph_ticks(-1, 5, 2) == ['$-\\pi$', '$\\pi$', '$3\\pi$', '$5\\pi$']
-	graph_ticks(-2, 2, 1) == ['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$']
-	graph_ticks(-1, -1 / 4, 1 / 4) == ['$-\\pi$', '$-\\frac{3\\pi}{4}$', '$-\\frac{\\pi}{2}$', '$-\\frac{\pi}{4}$']
+it is best explained with examples. (To properly demonstrate the working, this
+docstring is being marked as a raw string. Otherwise, the backslashes will be
+interpreted as parts of escape sequences.)
+>>> graph_ticks(-1, 5, 2)
+(['$-\\pi$', '$\\pi$', '$3\\pi$', '$5\\pi$'], array([-3.14159265,  3.14159265,  9.42477796, 15.70796327]))
+>>> graph_ticks(-1, -1 / 4, 1 / 4)
+(['$-\\pi$', '$-\\frac{3\\pi}{4}$', '$-\\frac{\\pi}{2}$', '$-\\frac{\\pi}{4}$'], array([-3.14159265, -2.35619449, -1.57079633, -0.78539816]))
+>>> graph_ticks(-2, 2, 1)
+(['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$'], array([-6.28318531, -3.14159265,  0.        ,  3.14159265,  6.28318531]))
+
 Simply put, I want a list of LaTeX-formatted strings for numbers going from one
-rational multiple of pi to another. Obviously, in addition to labels, a list of
-the values should also be created. I'll try to write the function as clearly as
-possible. (Note that LaTeX uses the backslash to indicate keywords! Remember to
-either escape the backslash or simply use raw strings. I have done the latter.)
+rational multiple of pi to another, and a np.array of the corresponding values.
+Thus, a two-element tuple should be returned. (Note that LaTeX uses a backslash
+to indicate keywords! Remember to either escape the backslash or simply use raw
+strings. That latter approach has been used in this script because it simpler.)
 	
 Args:
 	first: float, first grid line (grid lines start at 'first * np.pi')
@@ -89,7 +96,7 @@ Args:
 	step: float, grid gap (distance between consecutive grid lines is 'step * np.pi')
 	
 Returns:
-	tuple, containing list of labels and list of values indicated by the labels
+	tuple, containing list of labels and an array of values indicated by the labels
 '''
 	
 	# list of coefficients of pi
@@ -443,42 +450,47 @@ def main():
 
 	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = np.exp(-x1)
+	y1 = np.sin(x1)
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=e^{-x}$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\sin\,x$')
 
 	x2 = np.linspace(-32, 32, 100000)
-	y2 = np.exp(-x1 ** 2)
+	y2 = -x2
 	z2 = np.sin(x1)
-	grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=e^{-x^2}$')
+	grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=-x$')
 
-	# x3 = np.linspace(-32, 32, 100000)
-	# y3 = -x3
+	# x3 = [2.03, 2.03]
+	# y3 = [1.79, -0.44]
 	# z3 = np.sin(x3)
-	# grapher.plot(x3, y3, z3, color = 'green', linestyle = '--', linewidth = 0.8, label = r'$y=-x$')
+	# grapher.plot(x3, y3, z3, color = 'black', linestyle = '--', linewidth = 0.8, label = r'')
 
 	########################################
 
-	# grapher.plot([1], [1], [1], color = 'black', marker = '.', markersize = 10)
-	# grapher.text(0.7, 0.5, 1, s = r'$\left(1,1\right)$')
+	# grapher.plot([2.03], [1.79], [1], color = 'red', marker = '.', markersize = 10)
+	# grapher.text(2.13, 1.79, 1, s = r'$\left(2.03,1.78\right)$')
+
+	# grapher.plot([2.03], [-0.44], [1], color = 'blue', marker = '.', markersize = 10)
+	# grapher.text(2.13, -0.44, 1, s = r'$\left(2.03,-0.44\right)$')
+
+	# grapher.text(0.9, 0.67, 1, s = r'$\max\lbrace D\rbrace=2.64$')
 
 	########################################
 
-	grapher.fill_between(x1, y1, y2, facecolor = 'cyan', label = r'$\lbrace(x,y)\mid (y-e^{-x})(y-e^{-x^2})<0\rbrace$')
+	# grapher.fill_between(x1, y1, y2, where = [True if -1 < i < 1 else False for i in x1], facecolor = 'cyan', linewidth = 0, label = r'$R$')
 
 	########################################
 
 	grapher.configure()
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
-	                 first         = -2,
-	                 last          = 2,
+	                 trigonometric = True,
+	                 first         = -3,
+	                 last          = 3,
 	                 step          = 0.5)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -2,
-	                 last          = 2,
-	                 step          = 0.5)
+	                 first         = -5,
+	                 last          = 5,
+	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
 	                 first         = None,
@@ -489,4 +501,5 @@ def main():
 ################################################################################
 
 if __name__ == '__main__':
+	# doctest.testmod()
 	main()
