@@ -323,12 +323,12 @@ Args:
 
 	########################################
 
-	def configure(self):
+	def configure(self, axis_labels = (r'$x$', r'$y$', r'$z$')):
 		'''\
 Spice up the graph plot. Add a legend, axis labels and grid lines.
 
 Args:
-	no arguments
+	axis_labels: tuple of 3 strings (which are the labels for the three axes)
 
 Returns:
 	None
@@ -341,10 +341,10 @@ Returns:
 
 		# set legend and axis labels
 		self.ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
-		self.ax.set_xlabel(r'$x$')
-		self.ax.set_ylabel(r'$y$')
+		self.ax.set_xlabel(axis_labels[0])
+		self.ax.set_ylabel(axis_labels[1])
 		if self.dim == '3d':
-			self.ax.set_zlabel(r'$z$')
+			self.ax.set_zlabel(axis_labels[2])
 
 		# if this is a '2d' plot, draw thick coordinate axes
 		if self.dim == '2d':
@@ -449,15 +449,15 @@ def main():
 	########################################
 
 	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
-	x1 = np.linspace(-32, 32, 100000)
-	y1 = np.sin(x1)
+	x1 = np.linspace(-4, 4, 100000)
+	y1 = 1 / x1 - np.floor(1 / x1); remove_vertical_lines_at_discontinuities(y1)
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\sin\,x$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\mathrm{frac}\left(\dfrac{1}{x}\right)$')
 
-	x2 = np.linspace(-32, 32, 100000)
-	y2 = -x2
-	z2 = np.sin(x1)
-	grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=-x$')
+	# x2 = np.linspace(-32, 32, 100000)
+	# y2 = 25 * np.ones(100000)
+	# z2 = np.sin(x1)
+	# grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=25$')
 
 	# x3 = [2.03, 2.03]
 	# y3 = [1.79, -0.44]
@@ -466,11 +466,11 @@ def main():
 
 	########################################
 
-	# grapher.plot([2.03], [1.79], [1], color = 'red', marker = '.', markersize = 10)
-	# grapher.text(2.13, 1.79, 1, s = r'$\left(2.03,1.78\right)$')
+	# grapher.plot([6], [25], [1], color = 'black', marker = '.', markersize = 10)
+	# grapher.text(6.2, 25.2, 1, s = r'$A\left(6,25\right)$')
 
-	# grapher.plot([2.03], [-0.44], [1], color = 'blue', marker = '.', markersize = 10)
-	# grapher.text(2.13, -0.44, 1, s = r'$\left(2.03,-0.44\right)$')
+	# grapher.plot([16], [25], [1], color = 'black', marker = '.', markersize = 10)
+	# grapher.text(14.2, 25.2, 1, s = r'$B\left(16,25\right)$')
 
 	# grapher.text(0.9, 0.67, 1, s = r'$\max\lbrace D\rbrace=2.64$')
 
@@ -480,17 +480,17 @@ def main():
 
 	########################################
 
-	grapher.configure()
+	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'))
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
-	                 first         = -3,
-	                 last          = 3,
+	                 trigonometric = False,
+	                 first         = -4,
+	                 last          = 4,
 	                 step          = 0.5)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -5,
-	                 last          = 5,
-	                 step          = 1)
+	                 first         = -1.5,
+	                 last          = 2.5,
+	                 step          = 0.5)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
 	                 first         = None,
@@ -501,5 +501,6 @@ def main():
 ################################################################################
 
 if __name__ == '__main__':
-	# doctest.testmod()
+	doctest.testmod()
 	main()
+
