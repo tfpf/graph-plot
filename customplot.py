@@ -4,7 +4,7 @@ import doctest
 import fractions
 import matplotlib
 import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d as mp
+import mpl_toolkits.mplot3d
 import numpy as np
 import sys
 import time
