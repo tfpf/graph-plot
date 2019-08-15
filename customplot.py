@@ -323,12 +323,13 @@ Args:
 
 	########################################
 
-	def configure(self, axis_labels = (r'$x$', r'$y$', r'$z$')):
+	def configure(self, axis_labels = (r'$x$', r'$y$', r'$z$'), title = None):
 		'''\
 Spice up the graph plot. Add a legend, axis labels and grid lines.
 
 Args:
 	axis_labels: tuple of 3 strings (which are the labels for the three axes)
+	title: str, title of the graph
 
 Returns:
 	None
@@ -345,6 +346,8 @@ Returns:
 		self.ax.set_ylabel(axis_labels[1])
 		if self.dim == '3d':
 			self.ax.set_zlabel(axis_labels[2])
+		if title is not None:
+			self.ax.set_title(title)
 
 		# if this is a '2d' plot, draw thick coordinate axes
 		if self.dim == '2d':
@@ -480,7 +483,7 @@ def main():
 
 	########################################
 
-	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'))
+	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
 	                 trigonometric = False,
 	                 first         = -4,
