@@ -34,7 +34,8 @@ Returns:
 
 	# calculate the required width of all columns
 	# width of a certain column is maximum of widths of strings in that column
-	widths = [max([len(str(row[i])) for row in items]) for i in range(columns)]
+	widths = [max([len(str(row[i])) for row in items])
+	                                for i in range(columns)]
 
 	# use the above-calculated widths to centre each column
 	for row in items:
@@ -58,7 +59,7 @@ Args:
 Returns:
 	None
 '''
-	
+
 	# if the difference between two consecutive points is large, the function is discontinuous there
 	# differentiating 'y' gives an array whose length is less than the length of 'y' by 1
 	# hence, I concatenate a zero to the front of derivative array
@@ -72,7 +73,7 @@ Returns:
 ################################################################################
 
 def graph_ticks(first, last, step):
-	r'''\
+	r'''
 Create a list of tick values and labels at intervals of 'step * np.pi'.	I think
 it is best explained with examples. (To properly demonstrate the working, this
 docstring is being marked as a raw string. Otherwise, the backslashes will be
@@ -93,10 +94,12 @@ strings. That latter approach has been used in this script because it simpler.)
 Args:
 	first: float, first grid line (grid lines start at 'first * np.pi')
 	last: float, last grid line (grid lines end at 'last * np.pi')
-	step: float, grid gap (distance between consecutive grid lines is 'step * np.pi')
+	step: float, grid gap (distance between consecutive grid lines is
+		'step * np.pi')
 	
 Returns:
-	tuple, containing list of labels and an array of values indicated by the labels
+	tuple, containing list of labels and an array of values indicated by the
+		labels
 '''
 	
 	# list of coefficients of pi
@@ -223,7 +226,8 @@ Returns:
 		if dim == '2d':
 			self.ax = self.fig.add_subplot(1, 1, 1)
 		else:
-			self.ax = self.fig.add_subplot(1, 1, 1, projection = dim)
+			self.ax = self.fig.add_subplot(1, 1, 1,
+			                               projection = dim)
 		
 		# each run, the title of the window should be unique
 		# use Unix time in the title
@@ -267,7 +271,8 @@ Plot a curve. These arguments get passed as they are to the function which
 actually plots. In case of a '2d' plot, the third item in 'args' is ignored.
 
 Args:
-	args: tuple of 3 np.array objects, corresponding to three coordinate axes
+	args: tuple of 3 np.array objects, corresponding to three coordinate
+		axes
 	kwargs: dict, remaining arguments meant for plotting
 
 Returns:
@@ -275,6 +280,13 @@ Returns:
 '''
 
 		# 'args' contains 'x', 'y' and 'z'
+		# remove vertical line around points of discontinuity
+		# this should be done only if the array contains multiple points
+		# if a single point is being plotted, do nothing
+		for arg in args:
+			if len(arg) > 1:
+				remove_vertical_lines_at_discontinuities(arg)
+
 		# 'kwargs' contains style information and the label
 		# if this is a '2d' plot, ignore the 'z' argument
 		if self.dim == '2d':
@@ -291,7 +303,8 @@ method. This is meant to be used after the above 'plot' method has been used to
 plot a single point.
 
 Args:
-	args: tuple of 3 single-item (float) lists (coordinates of the text), 1 string (text string)
+	args: tuple of 3 single-item (float) lists (coordinates of the text),
+		1 string (text string)
 	kwargs: dict, remaining arguments meant for placing text
 
 Returns:
@@ -314,7 +327,8 @@ are directly passed to the actual 'fill_between' method. Obviously, this makes
 sense only for '2d' plots.
 
 Args:
-	args: tuple of 3 np.array objects (indicating the 2 curves to fill between)
+	args: tuple of 3 np.array objects (indicating the 2 curves to fill
+		between)
 	kwargs: dict, remaining arguments meant for filling
 '''
 
@@ -323,12 +337,14 @@ Args:
 
 	########################################
 
-	def configure(self, axis_labels = (r'$x$', r'$y$', r'$z$'), title = None):
+	def configure(self, axis_labels = (r'$x$', r'$y$', r'$z$'),
+	                    title       = None):
 		'''\
 Spice up the graph plot. Add a legend, axis labels and grid lines.
 
 Args:
-	axis_labels: tuple of 3 strings (which are the labels for the three axes)
+	axis_labels: tuple of 3 strings (which are the labels for the three
+		axes)
 	title: str, title of the graph
 
 Returns:
@@ -338,10 +354,14 @@ Returns:
 		# whether the scale should be the same on the coordinate axes
 		# currently, because of a library bug, this works only in '2d'
 		if self.aspect_ratio and self.dim == '2d':
-			self.ax.set_aspect(aspect = self.aspect_ratio, adjustable = 'box')
+			self.ax.set_aspect(aspect = self.aspect_ratio,
+			                   adjustable = 'box')
 
 		# set legend and axis labels
-		self.ax.legend(loc = 'best', fancybox = True, shadow = True, numpoints = 1)
+		self.ax.legend(loc       = 'best',
+		               fancybox  = True,
+		               shadow    = True,
+		               numpoints = 1)
 		self.ax.set_xlabel(axis_labels[0])
 		self.ax.set_ylabel(axis_labels[1])
 		if self.dim == '3d':
@@ -419,7 +439,9 @@ Returns:
 			# this is the non-trigonometric case
 			# if you don't provide 'first' and 'last', they will be chosen automatically
 			if first and last and step:
-				ticks_set_function(np.arange(first, last + step, step))
+				ticks_set_function(np.arange(first,
+				                             last + step,
+				                             step))
 			if first and last:
 				limits_set_function(first, last) # removes extra point which may appear because of finite floating-point precision
 			
@@ -433,7 +455,8 @@ Returns:
 			# as a result, it fixes the ticks, so that the ticks will not be redrawn when you zoom or pan the graph
 			# I assume that this is okay, because the purpose of this script is to plot a nice-looking graph
 			# minute analysis is not the purpose here
-			labels_set_function([fr'${t.get_text()}$' for t in labels_get_function()])
+			labels_set_function([fr'${t.get_text()}$'
+			                     for t in labels_get_function()])
 
 ################################################################################
 
@@ -452,48 +475,52 @@ def main():
 	########################################
 
 	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
-	x1 = np.linspace(-4, 4, 100000)
-	y1 = 1 / x1 - np.floor(1 / x1); remove_vertical_lines_at_discontinuities(y1)
-	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\mathrm{frac}\left(\dfrac{1}{x}\right)$')
+	x1 = np.linspace(-32, 32, 100000)
+	y1 = np.tan(x1)
+	z1 = np.tan(x1)
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\tan\,x$')
 
 	# x2 = np.linspace(-32, 32, 100000)
-	# y2 = 25 * np.ones(100000)
+	# y2 = -2 * np.sqrt(x1 - 1)
 	# z2 = np.sin(x1)
-	# grapher.plot(x2, y2, z2, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$y=25$')
+	# grapher.plot(x2, y2, z2, color = 'red', linestyle = '-', linewidth = 0.8, label = r'')
 
-	# x3 = [2.03, 2.03]
-	# y3 = [1.79, -0.44]
+	# x3 = [8, 0]
+	# y3 = [4, 4]
 	# z3 = np.sin(x3)
-	# grapher.plot(x3, y3, z3, color = 'black', linestyle = '--', linewidth = 0.8, label = r'')
+	# grapher.plot(x3, y3, z3, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'')
 
 	########################################
 
-	# grapher.plot([6], [25], [1], color = 'black', marker = '.', markersize = 10)
-	# grapher.text(6.2, 25.2, 1, s = r'$A\left(6,25\right)$')
+	# grapher.plot([8], [4], [1], color = 'black', marker = '.', markersize = 10)
+	# grapher.text(8.1, 4.1, 1, s = r'$P\left(x,y\right)$')
 
-	# grapher.plot([16], [25], [1], color = 'black', marker = '.', markersize = 10)
-	# grapher.text(14.2, 25.2, 1, s = r'$B\left(16,25\right)$')
+	# grapher.plot([2], [0], [1], color = 'black', marker = '.', markersize = 10)
+	# grapher.text(2.1, -0.4, 1, s = r'$\left(2,0\right)$')
 
-	# grapher.text(0.9, 0.67, 1, s = r'$\max\lbrace D\rbrace=2.64$')
+	# grapher.plot([0], [4], [1], color = 'black', marker = '.', markersize = 10)
+	# grapher.text(-1, 4.1, 1, s = r'$\left(0,y\right)$')
+
+	# grapher.text(4, 4.1, 1, s = r'$d_2$')
+	# grapher.text(5, 1.7, 1, s = r'$d_1$')
 
 	########################################
 
-	# grapher.fill_between(x1, y1, y2, where = [True if -1 < i < 1 else False for i in x1], facecolor = 'cyan', linewidth = 0, label = r'$R$')
+	# grapher.fill_between(x1, y1, 0, where = [True if 0 < i < 2 else False for i in x1], facecolor = 'cyan', linewidth = 0, label = r'$R$')
 
 	########################################
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
+	                 trigonometric = True,
 	                 first         = -4,
 	                 last          = 4,
 	                 step          = 0.5)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -1.5,
-	                 last          = 2.5,
-	                 step          = 0.5)
+	                 first         = -5,
+	                 last          = 5,
+	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
 	                 first         = None,
