@@ -60,6 +60,10 @@ Returns:
 	None
 '''
 
+	# if the argument is a list, the following code may not work
+	# hence, convert it to an array first
+	y = np.array(y)
+
 	# if the difference between two consecutive points is large, the function is discontinuous there
 	# differentiating 'y' gives an array whose length is less than the length of 'y' by 1
 	# hence, I concatenate a zero to the front of derivative array
@@ -69,6 +73,11 @@ Returns:
 	# at the above points, change the value to 'np.nan'
 	# this removes the vertical lines
 	y[points_of_discontinuity] = np.nan
+
+	# if 'y' was a list, it will remain a list outside this function
+	# because it was reasigned inside this function
+	# so, it must be returned
+	return y
 
 ################################################################################
 
@@ -283,17 +292,17 @@ Returns:
 		# remove vertical line around points of discontinuity
 		# this should be done only if the array contains multiple points
 		# if a single point is being plotted, do nothing
-		for arg in args:
-			if len(arg) > 1:
-				remove_vertical_lines_at_discontinuities(arg)
+		sanitised_args = tuple(remove_vertical_lines_at_discontinuities(arg)
+		                       if len(arg) > 10000 else arg
+		                       for arg in args)
 
 		# 'kwargs' contains style information and the label
 		# pass it without any changes
 		# if this is a '2d' plot, ignore the 'z' argument in 'args'
 		if self.dim == '2d':
-			self.ax.plot(*args[: -1], **kwargs)
+			self.ax.plot(*sanitised_args[: -1], **kwargs)
 		else:
-			self.ax.plot(*args, **kwargs)
+			self.ax.plot(*sanitised_args, **kwargs)
 
 	########################################
 
@@ -492,19 +501,19 @@ def main():
 
 	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = x1 ** 2 / (1 + x1 ** 2)
+	y1 = list(np.tan(x1))
 	z1 = np.tan(x1)
-	grapher.plot(y1, x1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$x=y^2(1-x)$')
+	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\tan\,x$')
 
 	# x2 = np.linspace(-32, 32, 100000)
 	# y2 = -2 * np.sqrt(x1 - 1)
 	# z2 = np.sin(x1)
 	# grapher.plot(x2, y2, z2, color = 'red', linestyle = '-', linewidth = 0.8, label = r'')
 
-	x3 = np.linspace(-32, 32, 100000)
-	y3 = np.ones(100000)
-	z3 = np.sin(x3)
-	grapher.plot(y3, x3, z3, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$x=1$')
+	# x3 = np.linspace(-32, 32, 100000)
+	# y3 = np.ones(100000)
+	# z3 = np.sin(x3)
+	# grapher.plot(x3, y3, z3, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$x=1$')
 
 	########################################
 
@@ -522,20 +531,20 @@ def main():
 
 	########################################
 
-	grapher.fill_betweenx(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = r'$R$')
+	# grapher.fill_betweenx(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = r'$R$')
 
 	########################################
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
-	                 first         = -2,
-	                 last          = 3,
-	                 step          = 1)
-	grapher.axis_fix(axis          = 'y',
-	                 trigonometric = False,
+	                 trigonometric = True,
 	                 first         = -4,
 	                 last          = 4,
+	                 step          = 0.5)
+	grapher.axis_fix(axis          = 'y',
+	                 trigonometric = False,
+	                 first         = -8,
+	                 last          = 8,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
