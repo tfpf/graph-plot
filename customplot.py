@@ -288,7 +288,8 @@ Returns:
 				remove_vertical_lines_at_discontinuities(arg)
 
 		# 'kwargs' contains style information and the label
-		# if this is a '2d' plot, ignore the 'z' argument
+		# pass it without any changes
+		# if this is a '2d' plot, ignore the 'z' argument in 'args'
 		if self.dim == '2d':
 			self.ax.plot(*args[: -1], **kwargs)
 		else:
@@ -334,6 +335,21 @@ Args:
 
 		if self.dim == '2d':
 			self.ax.fill_between(*args, **kwargs)
+
+	########################################
+
+	def fill_betweenx(self, *args, **kwargs):
+		'''\
+Fill a vertical region with a colour. Mostly the same as 'fill_between'.
+
+Args:
+	args: tuple of 3 np.array objects (indicating the 2 curves to fill
+		between)
+	kwargs: dict, remaining arguments meant for filling
+'''
+
+		if self.dim == '2d':
+			self.ax.fill_betweenx(*args, **kwargs)
 
 	########################################
 
@@ -476,19 +492,19 @@ def main():
 
 	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = np.tan(x1)
+	y1 = x1 ** 2 / (1 + x1 ** 2)
 	z1 = np.tan(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\tan\,x$')
+	grapher.plot(y1, x1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$x=y^2(1-x)$')
 
 	# x2 = np.linspace(-32, 32, 100000)
 	# y2 = -2 * np.sqrt(x1 - 1)
 	# z2 = np.sin(x1)
 	# grapher.plot(x2, y2, z2, color = 'red', linestyle = '-', linewidth = 0.8, label = r'')
 
-	# x3 = [8, 0]
-	# y3 = [4, 4]
-	# z3 = np.sin(x3)
-	# grapher.plot(x3, y3, z3, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'')
+	x3 = np.linspace(-32, 32, 100000)
+	y3 = np.ones(100000)
+	z3 = np.sin(x3)
+	grapher.plot(y3, x3, z3, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$x=1$')
 
 	########################################
 
@@ -506,20 +522,20 @@ def main():
 
 	########################################
 
-	# grapher.fill_between(x1, y1, 0, where = [True if 0 < i < 2 else False for i in x1], facecolor = 'cyan', linewidth = 0, label = r'$R$')
+	grapher.fill_betweenx(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = r'$R$')
 
 	########################################
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
-	                 first         = -4,
-	                 last          = 4,
-	                 step          = 0.5)
+	                 trigonometric = False,
+	                 first         = -2,
+	                 last          = 3,
+	                 step          = 1)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -5,
-	                 last          = 5,
+	                 first         = -4,
+	                 last          = 4,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
