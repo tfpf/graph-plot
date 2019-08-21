@@ -33,7 +33,7 @@ Returns:
 	items = [items[i :: rows] for i in range(rows)]
 
 	# calculate the required width of all columns
-	# width of a certain column is maximum of widths of strings in that column
+	# width of a column is width of longest string in that column
 	widths = [max([len(str(row[i])) for row in items])
 	                                for i in range(columns)]
 
@@ -64,19 +64,17 @@ Returns:
 	# hence, convert it to an array first
 	y = np.array(y)
 
-	# if the difference between two consecutive points is large, the function is discontinuous there
-	# differentiating 'y' gives an array whose length is less than the length of 'y' by 1
-	# hence, I concatenate a zero to the front of derivative array
-	# points where its elements are large are the points where 'y' is discontinuous
-	points_of_discontinuity = np.concatenate([[0], np.diff(y)]) > 0.5
-	
-	# at the above points, change the value to 'np.nan'
-	# this removes the vertical lines
+	# find out the points at which 'y' is discontinuous
+	# first, differentiate it to get an array which is shorter than 'y' by 1
+	# prepend a zero to its front to an array which has the same size as 'y'
+	# 'y' is assumed discontinuous at points where the derivative is large
+	points_of_discontinuity = np.abs(np.concatenate([[0],
+	                                                 np.diff(y)])) > 0.5
+
+	# at the above points, change the value to NaN
+	# this removes the vertical lines because those points won't be plotted
 	y[points_of_discontinuity] = np.nan
 
-	# if 'y' was a list, it will remain a list outside this function
-	# because it was reasigned inside this function
-	# so, it must be returned
 	return y
 
 ################################################################################
@@ -94,8 +92,8 @@ interpreted as parts of escape sequences.)
 >>> graph_ticks(-2, 2, 1)
 (['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$'], array([-6.28318531, -3.14159265,  0.        ,  3.14159265,  6.28318531]))
 
-Simply put, I want a list of LaTeX-formatted strings for numbers going from one
-rational multiple of pi to another, and a np.array of the corresponding values.
+What's required is a list of LaTeX-formatted strings for numbers going from one
+rational multiple of pi to another, and the 'np.array' of corresponding values.
 Thus, a two-element tuple should be returned. (Note that LaTeX uses a backslash
 to indicate keywords! Remember to either escape the backslash or simply use raw
 strings. That latter approach has been used in this script because it simpler.)
@@ -110,11 +108,11 @@ Returns:
 	tuple, containing list of labels and an array of values indicated by the
 		labels
 '''
-	
-	# list of coefficients of pi
+
+	# create an array containing the desired coefficients of pi
 	# notice the 'last + step'
 	# it is written that way because I don't want 'last' to be excluded
-	# multiplying this by 'np.pi' will give the ticks (i.e. locations of grid lines)
+	# of course, this needs to be multiplied by pi before it is returned
 	lattice = np.arange(first, last + step, step)
 	
 	# create a new list to store the label strings
@@ -134,18 +132,19 @@ Returns:
 			continue
 
 		# build a string which has to be appended to 'label'
-		# to do this, create a list of the different pieces of the string
-		# then join them
+		# Python does not have a string builder data type
+		# so, create a list to store the different parts of the string
+		# then join those parts
 		# this is the fastest way to build a string
 		# https://waymoot.org/home/python_string/
 		builder = ['$']
 		
-		# for negative tick values, write a minus sign outside the fraction
+		# for negative tick values, write a minus sign right away
 		if num < 0:
 			builder.append('-')
 			num = -num # now I don't have to worry about the sign
 		
-		# '\frac{}{}' construct of LaTeX has to be used if denominator is not 1
+		# use '\frac{}{}' of LaTeX if denominator is not 1
 		if den != 1:
 			builder.append(r'\frac{')
 		
@@ -195,7 +194,7 @@ Methods:
 	configure: spice up the plot to make it more complete
 	axis_fix: modify the ticks and labels on the axes so they look nice
 	text: place a text string on the graph (just like 'plot', the arguments
-		are just passed to the actual text-placing function, i.e.
+		are simply passed to the actual text-placing function, i.e.
 		'ax.text')
 '''
 
@@ -214,11 +213,12 @@ Returns:
 '''
 
 		# check the 'dim' argument and set the plot style
-		# I use 'classic' because it causes LaTeX-formatted strings to be rendered in Computer Modern
-		# Computer Modern is prettier than the default font (at least on Linux)
-		# for two-dimensional plots, I like to also use 'seaborn-poster', which increases the font size
-		# in three-dimensional plots, this increased font size overlaps with surrounding text
-		# hence, for three-dimensional plots, I use only 'classic'
+		# 'classic' style renders LaTeX strings in Computer Modern
+		# Computer Modern is a great font for maths equations
+		# 'seaborn-poster' style increases the font size
+		# use both for two-dimensional plots
+		# use only 'classic' for three-dimensional plot
+		# because adjacent text items overlap when font size increases
 		if dim == '2d':
 			plt.style.use(['classic', 'seaborn-poster'])
 		elif dim == '3d':
@@ -438,7 +438,7 @@ Returns:
 			labels_get_function = self.ax.get_yticklabels
 			labels_set_function = self.ax.set_yticklabels
 			ticks_set_function = self.ax.set_yticks
-		elif axis == 'z' and self.dim == '3d': # to modify 'z' axis, the plot must be '3d'
+		elif axis == 'z' and self.dim == '3d':
 			limits_set_function = self.ax.set_zlim
 			labels_get_function = self.ax.get_zticklabels
 			labels_set_function = self.ax.set_zticklabels
@@ -451,42 +451,62 @@ Returns:
 
 			# this case requires all three following arguments
 			if first is None or last is None or step is None:
-				raise ValueError('Argument \'trigonometric\' has been set to True--arguments \'first\', \'last\' and \'step\' must not be None.')
+				raise ValueError('Argument \'trigonometric\' '
+				                 'has been set to True. '
+				                 'Arguments \'first\', \'last\''
+				                 ' and \'step\' must not be '
+				                 'None.')
 
 			# obtain lists of ticks and labels to set up grid lines
+			# there may be an extra tick beyond 'last * np.pi'
+			# this may happen because of floating-point precision
+			# to remove this, set limits only after setting ticks
 			labels, ticks = graph_ticks(first, last, step)
 			ticks_set_function(ticks)
 			labels_set_function(labels)
-			limits_set_function(np.pi * first, np.pi * last) # removes extra point which may appear because of finite floating-point precision
+			limits_set_function(np.pi * first, np.pi * last)
 			
 		# placing grid lines normally
 		else:
 			
 			# this is the non-trigonometric case
-			# if you don't provide 'first' and 'last', they will be chosen automatically
+			# 'first' and 'last' need not be given
+			# if not given, they are taken from 'np.linspace' below
 			if first and last and step:
 				ticks_set_function(np.arange(first,
 				                             last + step,
 				                             step))
+
+			# again, limits must be set only after setting the ticks
 			if first and last:
-				limits_set_function(first, last) # removes extra point which may appear because of finite floating-point precision
+				limits_set_function(first, last)
 			
 			# draw the graph with the ticks obtained above
-			# if ticks were not obtained above, they will have been chosen automatically
-			# without this line, 'labels_get_function' will not return anything useful
+			# ensures meaningful output of 'labels_get_function'
 			self.fig.canvas.draw()
 			
-			# this line changes the font used for the ticks to Computer Modern (if the 'classic' plot style is being used)
-			# this line also changes the ticks from integers to strings
-			# as a result, it fixes the ticks, so that the ticks will not be redrawn when you zoom or pan the graph
-			# I assume that this is okay, because the purpose of this script is to plot a nice-looking graph
-			# minute analysis is not the purpose here
+			# change the ticks font to Computer Modern
+			# (requires using the 'classic' plot style)
+			# the tick labels will become fixed non-numeric strings
+			# thus, ticks will not be redrawn when you zoom or pan
+			# this should not be an issue
+			# minute analysis is not the purpose of this script
 			labels_set_function([fr'${t.get_text()}$'
 			                     for t in labels_get_function()])
 
 ################################################################################
 
 def main():
+	'''\
+Instantiate the 'CustomPlot' class. Call its 'plot', 'configure' and 'axis_fix'
+mathods (at the very least), and obtain an eye-candy graph.
+
+Args:
+	no arguments
+
+Returns:
+	None
+'''
 
 	# read command line argument
 	# check whether this should be a two- or three-dimensional plot
@@ -502,19 +522,26 @@ def main():
 
 	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = list(np.tan(x1))
+	y1 = np.tan(x1)
 	z1 = np.tan(x1)
-	grapher.plot(x1, y1, z1, color = 'red', linestyle = '-', linewidth = 0.8, label = r'$y=\tan\,x$')
-
-	# x2 = np.linspace(-32, 32, 100000)
-	# y2 = -2 * np.sqrt(x1 - 1)
-	# z2 = np.sin(x1)
-	# grapher.plot(x2, y2, z2, color = 'red', linestyle = '-', linewidth = 0.8, label = r'')
-
+	grapher.plot(x1, y1, z1, color     = 'red',
+	                         linestyle = '-',
+	                         linewidth = 0.8,
+	                         label     = r'$y=\tan\,x$')
+	x2 = np.linspace(-32, 32, 100000)
+	y2 = 1 / np.tan(x1)
+	z2 = np.sin(x1)
+	grapher.plot(x2, y2, z2, color     = 'blue',
+	                         linestyle = '-',
+	                         linewidth = 0.8,
+	                         label     = r'$y=\cot\,x$')
 	# x3 = np.linspace(-32, 32, 100000)
-	# y3 = np.ones(100000)
+	# y3 = np.tan(np.pi / 2 - x3)
 	# z3 = np.sin(x3)
-	# grapher.plot(x3, y3, z3, color = 'blue', linestyle = '-', linewidth = 0.8, label = r'$x=1$')
+	# grapher.plot(x3, y3, z3, color     = 'green',
+	#                          linestyle = '-',
+	#                          linewidth = 0.8,
+	#                          label     = r'$y=\tan\left(\dfrac{\pi}{2}-x\right)$')
 
 	########################################
 
@@ -539,13 +566,13 @@ def main():
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
 	                 trigonometric = True,
-	                 first         = -4,
-	                 last          = 4,
-	                 step          = 0.5)
+	                 first         = -3,
+	                 last          = 3,
+	                 step          = 0.25)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -8,
-	                 last          = 8,
+	                 first         = -4,
+	                 last          = 4,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
