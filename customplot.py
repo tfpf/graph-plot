@@ -46,7 +46,7 @@ Returns:
 
 ################################################################################
 
-def remove_vertical_lines_at_discontinuities(y):
+def sanitise_discontinuous(y):
 	'''\
 At a point of jump discontinuity, a vertical line is drawn automatically. This
 vertical line joins the two points around the point of discontinuity.
@@ -292,7 +292,8 @@ Returns:
 		# remove vertical line around points of discontinuity
 		# this should be done only if the array contains multiple points
 		# if a single point is being plotted, do nothing
-		sanitised_args = tuple(remove_vertical_lines_at_discontinuities(arg)
+		# use 10000 as the array length to allow margin for error
+		sanitised_args = tuple(sanitise_discontinuous(arg)
 		                       if len(arg) > 10000 else arg
 		                       for arg in args)
 
@@ -379,7 +380,7 @@ Returns:
 		# whether the scale should be the same on the coordinate axes
 		# currently, because of a library bug, this works only in '2d'
 		if self.aspect_ratio and self.dim == '2d':
-			self.ax.set_aspect(aspect = self.aspect_ratio,
+			self.ax.set_aspect(aspect     = self.aspect_ratio,
 			                   adjustable = 'box')
 
 		# set legend and axis labels
@@ -558,4 +559,3 @@ def main():
 if __name__ == '__main__':
 	doctest.testmod()
 	main()
-
