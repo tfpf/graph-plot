@@ -9,7 +9,7 @@ import numpy as np
 import sys
 import time
 
-################################################################################
+###############################################################################
 
 def show_nice_list(items, columns = 3):
 	'''\
@@ -44,14 +44,14 @@ Returns:
 			sys.stdout.flush()
 		print()
 
-################################################################################
+###############################################################################
 
 def sanitise_discontinuous(y):
 	'''\
 At a point of jump discontinuity, a vertical line is drawn automatically. This
 vertical line joins the two points around the point of discontinuity.
-Traditionally, in maths, these vertical lines are not drawn. Hence, they need to
-be removed from the plot.
+Traditionally, in maths, these vertical lines are not drawn. Hence, they need
+to be removed from the plot.
 
 Args:
 	y: np.array, array of values of the discontinuous function
@@ -64,9 +64,8 @@ Returns:
 	# hence, convert it to an array first
 	y = np.array(y)
 
-	# find out the points at which 'y' is discontinuous
-	# first, differentiate it to get an array which is shorter than 'y' by 1
-	# prepend a zero to its front to an array which has the same size as 'y'
+	# differentiate it to get an array which is shorter than 'y' by 1
+	# prepend a zero to its front; now the length is same as that of 'y'
 	# 'y' is assumed discontinuous at points where the derivative is large
 	points_of_discontinuity = np.abs(np.concatenate([[0],
 	                                                 np.diff(y)])) > 0.5
@@ -77,7 +76,7 @@ Returns:
 
 	return y
 
-################################################################################
+###############################################################################
 
 def graph_ticks(first, last, step):
 	r'''
@@ -97,16 +96,16 @@ rational multiple of pi to another, and the 'np.array' of corresponding values.
 Thus, a two-element tuple should be returned. (Note that LaTeX uses a backslash
 to indicate keywords! Remember to either escape the backslash or simply use raw
 strings. That latter approach has been used in this script because it simpler.)
-	
+
 Args:
 	first: float, first grid line (grid lines start at 'first * np.pi')
 	last: float, last grid line (grid lines end at 'last * np.pi')
 	step: float, grid gap (distance between consecutive grid lines is
 		'step * np.pi')
-	
+
 Returns:
-	tuple, containing list of labels and an array of values indicated by the
-		labels
+	tuple, containing list of labels and an array of values indicated by
+		the labels
 '''
 
 	# create an array containing the desired coefficients of pi
@@ -114,10 +113,10 @@ Returns:
 	# it is written that way because I don't want 'last' to be excluded
 	# of course, this needs to be multiplied by pi before it is returned
 	lattice = np.arange(first, last + step, step)
-	
+
 	# create a new list to store the label strings
 	labels = []
-	
+
 	# represent each number in 'lattice' as a LaTeX-formatted string
 	for number in lattice:
 
@@ -138,36 +137,36 @@ Returns:
 		# this is the fastest way to build a string
 		# https://waymoot.org/home/python_string/
 		builder = ['$']
-		
+
 		# for negative tick values, write a minus sign right away
 		if num < 0:
 			builder.append('-')
 			num = -num # now I don't have to worry about the sign
-		
+
 		# use '\frac{}{}' of LaTeX if denominator is not 1
 		if den != 1:
 			builder.append(r'\frac{')
-		
+
 		# if the coefficient is 1, it is not conventionally written
 		if num == 1:
 			builder.append(r'\pi')
 		else:
 			builder.append(fr'{num}\pi')
-		
+
 		# complete the '\frac{}{}' construct (if applicable)
 		if den != 1:
 			builder.append(fr'}}{{{den}}}$')
 		else:
 			builder.append('$')
-		
+
 		# now all pieces of the string are in place
 		# create the LaTeX-formatted string by joining the pieces
 		# append thusly created string to the list of labels
 		labels.append(''.join(builder))
-		
+
 	return labels, np.pi * lattice
 
-################################################################################
+###############################################################################
 
 class CustomPlot:
 	'''\
@@ -189,8 +188,8 @@ Methods:
 	__init__: set up a window to plot the graph
 	__repr__: define representation of object
 	__str__: define string form of object
-	plot: check whether the plot is '2d' or '3d', then pass all arguments to
-		the actual plotting function, i.e. 'ax.plot'
+	plot: check whether the plot is '2d' or '3d', then pass all arguments
+		to the actual plotting function, i.e. 'ax.plot'
 	configure: spice up the plot to make it more complete
 	axis_fix: modify the ticks and labels on the axes so they look nice
 	text: place a text string on the graph (just like 'plot', the arguments
@@ -224,24 +223,26 @@ Returns:
 		elif dim == '3d':
 			plt.style.use('classic')
 		else:
-			raise ValueError('Member \'dim\' of class \'CustomPlot\' must be either \'2d\' or \'3d\'.')
+			raise ValueError('Member \'dim\' of class '
+			                 '\'CustomPlot\' must be either \'2d\''
+			                 ' or \'3d\'.')
 		self.dim = dim
 		self.aspect_ratio = aspect_ratio
 
 		# figure containing the plot
 		self.fig = plt.figure()
 
-		# depending on the dimensionality, create an object for the axes
+		# create an object for the axes
 		if dim == '2d':
 			self.ax = self.fig.add_subplot(1, 1, 1)
 		else:
 			self.ax = self.fig.add_subplot(1, 1, 1,
 			                               projection = dim)
-		
+
 		# each run, the title of the window should be unique
 		# use Unix time in the title
 		self.fig.canvas.set_window_title(f'graph_{int(time.time())}')
-		
+
 	########################################
 
 	def __repr__(self):
@@ -255,8 +256,9 @@ Returns:
 	str, the representation of the object
 '''
 
-		return f'CustomPlot(dim = \'{self.dim}\', aspect_ratio = {self.aspect_ratio})'
-	
+		return (f'CustomPlot(dim = \'{self.dim}\', '
+		        f'aspect_ratio = {self.aspect_ratio})')
+
 	########################################
 
 	def __str__(self):
@@ -270,7 +272,8 @@ Returns:
 	str, the string form of the object
 '''
 
-		return f'CustomPlot(dim = \'{self.dim}\', aspect_ratio = {self.aspect_ratio})'
+		return (f'CustomPlot(dim = \'{self.dim}\', '
+		        f'aspect_ratio = {self.aspect_ratio})')
 
 	########################################
 
@@ -290,9 +293,9 @@ Returns:
 
 		# 'args' contains 'x', 'y' and 'z'
 		# remove vertical line around points of discontinuity
-		# this should be done only if the array contains multiple points
-		# if a single point is being plotted, do nothing
-		# use 10000 as the array length to allow margin for error
+		# do this only to functions (i.e. if it contains many points)
+		# if 'args' contains only 1 or 2 points, do nothing
+		# use 10000 as the length threshold to allow margin for error
 		sanitised_args = tuple(sanitise_discontinuous(arg)
 		                       if len(arg) > 10000 else arg
 		                       for arg in args)
@@ -384,7 +387,7 @@ Returns:
 			                   adjustable = 'box')
 
 		# set legend and axis labels
-		self.ax.legend(loc       = 'best',
+		self.ax.legend(loc       = 'upper right',
 		               fancybox  = True,
 		               shadow    = True,
 		               numpoints = 1)
@@ -403,7 +406,9 @@ Returns:
 		# enable grid
 		self.ax.grid(b = True, which = 'major', linewidth = 0.8)
 		if self.dim == '2d': # takes too much memory in '3d'
-			self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
+			self.ax.grid(b         = True,
+			             which     = 'minor',
+			             linewidth = 0.2)
 			self.ax.minorticks_on()
 
 	########################################
@@ -427,7 +432,8 @@ Returns:
 	None
 '''
 
-		# use the 'axis' argument to decide which axis is to be modified
+		# decide which axis is to be modified
+		# this method may be called for each axis
 		if axis == 'x':
 			limits_set_function = self.ax.set_xlim
 			labels_get_function = self.ax.get_xticklabels
@@ -453,9 +459,9 @@ Returns:
 			if first is None or last is None or step is None:
 				raise ValueError('Argument \'trigonometric\' '
 				                 'has been set to True. '
-				                 'Arguments \'first\', \'last\''
-				                 ' and \'step\' must not be '
-				                 'None.')
+				                 'Arguments \'first\', '
+				                 '\'last\' and \'step\' must '
+				                 'not be None.')
 
 			# obtain lists of ticks and labels to set up grid lines
 			# there may be an extra tick beyond 'last * np.pi'
@@ -465,10 +471,10 @@ Returns:
 			ticks_set_function(ticks)
 			labels_set_function(labels)
 			limits_set_function(np.pi * first, np.pi * last)
-			
+
 		# placing grid lines normally
 		else:
-			
+
 			# this is the non-trigonometric case
 			# 'first' and 'last' need not be given
 			# if not given, they are taken from 'np.linspace' below
@@ -477,14 +483,14 @@ Returns:
 				                             last + step,
 				                             step))
 
-			# again, limits must be set only after setting the ticks
+			# again, limits must be set after setting the ticks
 			if first and last:
 				limits_set_function(first, last)
-			
+
 			# draw the graph with the ticks obtained above
 			# ensures meaningful output of 'labels_get_function'
 			self.fig.canvas.draw()
-			
+
 			# change the ticks font to Computer Modern
 			# (requires using the 'classic' plot style)
 			# the tick labels will become fixed non-numeric strings
@@ -494,12 +500,12 @@ Returns:
 			labels_set_function([fr'${t.get_text()}$'
 			                     for t in labels_get_function()])
 
-################################################################################
+###############################################################################
 
 def main():
 	'''\
 Instantiate the 'CustomPlot' class. Call its 'plot', 'configure' and 'axis_fix'
-mathods (at the very least), and obtain an eye-candy graph.
+methods (at the very least), and obtain an eye-candy graph.
 
 Args:
 	no arguments
@@ -514,9 +520,25 @@ Returns:
 		dimension = '2d'
 	else:
 		dimension = sys.argv[1]
-
-	# instantiate the class to take care of all the objects required
 	grapher = CustomPlot(dim = dimension, aspect_ratio = 1)
+
+	########################################
+
+	# grapher.text(-0.6, -0.2, 1, s = r'$\left(0,0\right)$')
+	# grapher.plot([0], [0], [1],
+	#              color      = 'black',
+	#              marker     = '.',
+	#              markersize = 10)
+	# grapher.text(3.15, -2.9, 1, s = r'$\left(3,-3\right)$')
+	# grapher.plot([3], [-3], [1],
+	#              color      = 'black',
+	#              marker     = '.',
+	#              markersize = 10)
+	# grapher.text(-1, 4.1, 1, s = r'$\left(0,y\right)$')
+	# grapher.plot([0], [4], [1],
+	#              color      = 'black',
+	#              marker     = '.',
+	#              markersize = 10)
 
 	########################################
 
@@ -528,47 +550,33 @@ Returns:
 	                         linestyle = '-',
 	                         linewidth = 0.8,
 	                         label     = r'$y=\tan\,x$')
-	x2 = np.linspace(-32, 32, 100000)
-	y2 = 1 / np.tan(x1)
-	z2 = np.sin(x1)
-	grapher.plot(x2, y2, z2, color     = 'blue',
-	                         linestyle = '-',
-	                         linewidth = 0.8,
-	                         label     = r'$y=\cot\,x$')
-	# x3 = np.linspace(-32, 32, 100000)
-	# y3 = np.tan(np.pi / 2 - x3)
+	# x2 = np.linspace(-32, 32, 100000)
+	# y2 = 1 - np.abs(x2)
+	# z2 = np.sin(x1)
+	# grapher.plot(x2, y2, z2, color     = 'blue',
+	#                          linestyle = '-',
+	#                          linewidth = 0.8,
+	#                          label     = r'$y=1-|x|$')
+	# y3 = np.linspace(-32, 32, 100000)
+	# x3 = -np.ones(100000)
 	# z3 = np.sin(x3)
 	# grapher.plot(x3, y3, z3, color     = 'green',
 	#                          linestyle = '-',
 	#                          linewidth = 0.8,
-	#                          label     = r'$y=\tan\left(\dfrac{\pi}{2}-x\right)$')
+	#                          label     = r'$x=-1$')
 
-	########################################
-
-	# grapher.plot([8], [4], [1], color = 'black', marker = '.', markersize = 10)
-	# grapher.text(8.1, 4.1, 1, s = r'$P\left(x,y\right)$')
-
-	# grapher.plot([2], [0], [1], color = 'black', marker = '.', markersize = 10)
-	# grapher.text(2.1, -0.4, 1, s = r'$\left(2,0\right)$')
-
-	# grapher.plot([0], [4], [1], color = 'black', marker = '.', markersize = 10)
-	# grapher.text(-1, 4.1, 1, s = r'$\left(0,y\right)$')
-
-	# grapher.text(4, 4.1, 1, s = r'$d_2$')
-	# grapher.text(5, 1.7, 1, s = r'$d_1$')
-
-	########################################
-
-	# grapher.fill_betweenx(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = r'$R$')
-
-	########################################
+	# grapher.fill_between(x1, y1, 0, facecolor = 'cyan',
+	#                                 linewidth = 0,
+	#                                 label     = r'$R$',
+	#                                 where = [True if -1 < i < 1 else False
+	#                                          for i in x1])
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
 	                 trigonometric = True,
-	                 first         = -3,
+	                 first         = -2,
 	                 last          = 3,
-	                 step          = 0.25)
+	                 step          = 1 / 4)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
 	                 first         = -4,
@@ -581,7 +589,7 @@ Returns:
 	                 step          = None)
 	plt.show()
 
-################################################################################
+###############################################################################
 
 if __name__ == '__main__':
 	doctest.testmod()
