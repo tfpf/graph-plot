@@ -191,6 +191,9 @@ Methods:
 	plot: check whether the plot is '2d' or '3d', then pass all arguments
 		to the actual plotting function, i.e. 'ax.plot'
 	configure: spice up the plot to make it more complete
+	fill_between: fill the region between two function with a colour
+	fill_betweenx: fill the region between two vertically oriented plots
+		with a colour
 	axis_fix: modify the ticks and labels on the axes so they look nice
 	text: place a text string on the graph (just like 'plot', the arguments
 		are simply passed to the actual text-placing function, i.e.
