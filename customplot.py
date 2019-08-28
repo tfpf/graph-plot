@@ -481,13 +481,13 @@ Returns:
 			# this is the non-trigonometric case
 			# 'first' and 'last' need not be given
 			# if not given, they are taken from 'np.linspace' below
-			if first and last and step:
+			if None not in {first, last, step}:
 				ticks_set_function(np.arange(first,
 				                             last + step,
 				                             step))
 
 			# again, limits must be set after setting the ticks
-			if first and last:
+			if None not in {first, last}:
 				limits_set_function(first, last)
 
 			# draw the graph with the ticks obtained above
@@ -547,43 +547,44 @@ Returns:
 
 	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = np.tan(x1)
+	y1 = np.abs(x1 - 1) + np.abs(x1 ** 2 - 2 * x1)
 	z1 = np.tan(x1)
 	grapher.plot(x1, y1, z1, color     = 'red',
 	                         linestyle = '-',
 	                         linewidth = 0.8,
-	                         label     = r'$y=\tan\,x$')
-	# x2 = np.linspace(-32, 32, 100000)
-	# y2 = 1 - np.abs(x2)
+	                         label     = r'$y=|x-1|+|x^2-2x|$')
+	# x2 = [1, 1]
+	# y2 = [-100, 1000]
 	# z2 = np.sin(x1)
 	# grapher.plot(x2, y2, z2, color     = 'blue',
 	#                          linestyle = '-',
 	#                          linewidth = 0.8,
-	#                          label     = r'$y=1-|x|$')
-	# y3 = np.linspace(-32, 32, 100000)
-	# x3 = -np.ones(100000)
+	#                          label     = r'$x=1$')
+	# x3 = [5, 5]
+	# y3 = [-100, 1000]
 	# z3 = np.sin(x3)
 	# grapher.plot(x3, y3, z3, color     = 'green',
 	#                          linestyle = '-',
 	#                          linewidth = 0.8,
-	#                          label     = r'$x=-1$')
+	#                          label     = r'$x=5$')
 
 	# grapher.fill_between(x1, y1, 0, facecolor = 'cyan',
 	#                                 linewidth = 0,
 	#                                 label     = r'$R$',
-	#                                 where = [True if -1 < i < 1 else False
-	#                                          for i in x1])
+	#                                 where     = [True if 1 < i < 5
+	#                                              else False
+	#                                              for i in x1])
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
-	                 first         = -2,
-	                 last          = 3,
-	                 step          = 1 / 4)
+	                 trigonometric = False,
+	                 first         = 0,
+	                 last          = 2,
+	                 step          = 1)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -4,
-	                 last          = 4,
+	                 first         = -1,
+	                 last          = 8,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
@@ -597,3 +598,4 @@ Returns:
 if __name__ == '__main__':
 	doctest.testmod()
 	main()
+
