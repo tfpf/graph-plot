@@ -54,10 +54,10 @@ Traditionally, in maths, these vertical lines are not drawn. Hence, they need
 to be removed from the plot.
 
 Args:
-	y: np.array, array of values of the discontinuous function
+	y: np.array or list of values of the discontinuous function
 
 Returns:
-	None
+	np.array with np.nan at the points of discontinuity
 '''
 
 	# if the argument is a list, the following code may not work
@@ -182,7 +182,7 @@ Attributes:
 	fig: matplotlib.figure.Figure, in which the graph will be plotted
 	ax: matplotlib.axes._subplots.AxesSubplot (for '2d' graph) or
 		matplotlib.axes._subplots.Axes3DSubplot (for '3d' graph), axes
-		for the graph plot
+		object for the graph plot
 
 Methods:
 	__init__: set up a window to plot the graph
@@ -190,14 +190,14 @@ Methods:
 	__str__: define string form of object
 	plot: check whether the plot is '2d' or '3d', then pass all arguments
 		to the actual plotting function, i.e. 'ax.plot'
-	configure: spice up the plot to make it more complete
-	fill_between: fill the region between two function with a colour
-	fill_betweenx: fill the region between two vertically oriented plots
-		with a colour
-	axis_fix: modify the ticks and labels on the axes so they look nice
 	text: place a text string on the graph (just like 'plot', the arguments
 		are simply passed to the actual text-placing function, i.e.
 		'ax.text')
+	configure: spice up the plot to make it more complete
+	fill_between: fill the region between two function with a colour
+	fill_betweenx: fill the region between two vertically-oriented plots
+		with a colour
+	axis_fix: modify the ticks and labels on the axes so they look nice
 '''
 
 	########################################
@@ -459,7 +459,7 @@ Returns:
 		if trigonometric:
 
 			# this case requires all three following arguments
-			if first is None or last is None or step is None:
+			if None in {first, last, step}:
 				raise ValueError('Argument \'trigonometric\' '
 				                 'has been set to True. '
 				                 'Arguments \'first\', '
@@ -547,19 +547,19 @@ Returns:
 
 	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = np.abs(x1 - 1) + np.abs(x1 ** 2 - 2 * x1)
+	y1 = 1 / (1 + np.exp(-2 * x1))
 	z1 = np.tan(x1)
 	grapher.plot(x1, y1, z1, color     = 'red',
 	                         linestyle = '-',
 	                         linewidth = 0.8,
-	                         label     = r'$y=|x-1|+|x^2-2x|$')
-	# x2 = [1, 1]
-	# y2 = [-100, 1000]
-	# z2 = np.sin(x1)
-	# grapher.plot(x2, y2, z2, color     = 'blue',
-	#                          linestyle = '-',
-	#                          linewidth = 0.8,
-	#                          label     = r'$x=1$')
+	                         label     = r'$y=\dfrac{1}{1+e^{-2x}}$')
+	x2 = np.linspace(-32, 32, 100000)
+	y2 = np.cos(np.pi * x2) + 3
+	z2 = np.sin(x1)
+	grapher.plot(x2, y2, z2, color     = 'blue',
+	                         linestyle = '-',
+	                         linewidth = 0.8,
+	                         label     = r'$y=\cos\,\pi x+3$')
 	# x3 = [5, 5]
 	# y3 = [-100, 1000]
 	# z3 = np.sin(x3)
@@ -570,21 +570,26 @@ Returns:
 
 	# grapher.fill_between(x1, y1, 0, facecolor = 'cyan',
 	#                                 linewidth = 0,
-	#                                 label     = r'$R$',
-	#                                 where     = [True if 1 < i < 5
-	#                                              else False
+	#                                 label     = r'$S$',
+	#                                 where     = [True
+	#                                              if 0 < i < 1 else False
 	#                                              for i in x1])
+	# grapher.fill_between(x2, y2, 0, facecolor = 'cyan',
+	#                                 linewidth = 0,
+	#                                 label     = r'',
+	#                                 where     = [False
+	#                                              for i in x2])
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
 	                 trigonometric = False,
-	                 first         = 0,
-	                 last          = 2,
+	                 first         = -6,
+	                 last          = 6,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
 	                 first         = -1,
-	                 last          = 8,
+	                 last          = 5,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
