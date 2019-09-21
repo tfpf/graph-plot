@@ -78,7 +78,7 @@ Returns:
 
 ###############################################################################
 
-def graph_ticks(first, last, step):
+def graph_ticks(first, last, step, symbol = r'\pi'):
 	r'''
 Create a list of tick values and labels at intervals of 'step * np.pi'.	I think
 it is best explained with examples. (To properly demonstrate the working, this
@@ -310,6 +310,24 @@ Returns:
 			self.ax.plot(*sanitised_args[: -1], **kwargs)
 		else:
 			self.ax.plot(*sanitised_args, **kwargs)
+
+	########################################
+
+	def plot_wireframe(self, *args, **kwargs):
+		'''\
+Plot a three-dimensional wireframe surface. Arguments are passed directly to
+actual plotting function.
+
+Args:
+	args: tuple of 3 np.array objects, corresponding to three coordinate
+		axes
+	kwargs: dict, remaining arguments meant for plotting
+
+Returns:
+	None
+'''
+
+		self.ax.plot_wireframe(*args, **kwargs)
 
 	########################################
 
@@ -545,35 +563,47 @@ Returns:
 
 	########################################
 
-	t = np.linspace(-5 * np.pi, 5 * np.pi, 100000)
+	t = np.linspace(-np.pi, np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = 1 / (1 + np.exp(-2 * x1))
+	y1 = x1 / np.sqrt(x1 - 2)
 	z1 = np.tan(x1)
 	grapher.plot(x1, y1, z1, color     = 'red',
 	                         linestyle = '-',
 	                         linewidth = 0.8,
-	                         label     = r'$y=\dfrac{1}{1+e^{-2x}}$')
+	                         label     = r'$y=\dfrac{x}{\sqrt{x-2}}$')
 	x2 = np.linspace(-32, 32, 100000)
-	y2 = np.cos(np.pi * x2) + 3
+	y2 = 3 * np.ones(100000)
 	z2 = np.sin(x1)
 	grapher.plot(x2, y2, z2, color     = 'blue',
 	                         linestyle = '-',
 	                         linewidth = 0.8,
-	                         label     = r'$y=\cos\,\pi x+3$')
-	# x3 = [5, 5]
-	# y3 = [-100, 1000]
+	                         label     = r'$y=3$')
+	# x3 = [np.sqrt(3)]
+	# y3 = [0]
 	# z3 = np.sin(x3)
-	# grapher.plot(x3, y3, z3, color     = 'green',
+	# grapher.plot(x3, y3, z3, color     = 'black',
+	#                          marker    = '.',
+	#                          linewidth = 0.8,
+	#                          label     = r'')
+	# x4 = np.linspace(-32, 32, 100000)
+	# y4 = -1.5 * x4 + 5.5
+	# z4 = np.sin(x1)
+	# grapher.plot(x4, y4, z4, color     = 'blue',
 	#                          linestyle = '-',
 	#                          linewidth = 0.8,
-	#                          label     = r'$x=5$')
+	#                          label     = r'$3x+2y=11$')
 
-	# grapher.fill_between(x1, y1, 0, facecolor = 'cyan',
-	#                                 linewidth = 0,
-	#                                 label     = r'$S$',
-	#                                 where     = [True
-	#                                              if 0 < i < 1 else False
-	#                                              for i in x1])
+	grapher.plot([6], [3], [1], color = 'black', marker = '.',)
+	grapher.text(6, 2.8, 1, s = r'$\left(6,3\right)$')
+	grapher.plot([3], [3], [1], color = 'black', marker = '.',)
+	grapher.text(2.6, 2.8, 1, s = r'$\left(3,3\right)$')
+
+	grapher.fill_between(x1, y1, y2,  facecolor = 'cyan',
+	                                  linewidth = 0,
+	                                  label     = r'$R$',
+	                                  where     = [True
+	                                               if 3 < i < 6 else False
+	                                               for i in x1])
 	# grapher.fill_between(x2, y2, 0, facecolor = 'cyan',
 	#                                 linewidth = 0,
 	#                                 label     = r'',
@@ -583,12 +613,12 @@ Returns:
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
 	                 trigonometric = False,
-	                 first         = -6,
-	                 last          = 6,
+	                 first         = -2,
+	                 last          = 12,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -1,
+	                 first         = -2,
 	                 last          = 5,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
