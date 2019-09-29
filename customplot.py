@@ -190,13 +190,7 @@ Methods:
 	__str__: define string form of object
 	plot: check whether the plot is '2d' or '3d', then pass all arguments
 		to the actual plotting function, i.e. 'ax.plot'
-	text: place a text string on the graph (just like 'plot', the arguments
-		are simply passed to the actual text-placing function, i.e.
-		'ax.text')
 	configure: spice up the plot to make it more complete
-	fill_between: fill the region between two function with a colour
-	fill_betweenx: fill the region between two vertically-oriented plots
-		with a colour
 	axis_fix: modify the ticks and labels on the axes so they look nice
 '''
 
@@ -310,80 +304,6 @@ Returns:
 			self.ax.plot(*sanitised_args[: -1], **kwargs)
 		else:
 			self.ax.plot(*sanitised_args, **kwargs)
-
-	########################################
-
-	def plot_wireframe(self, *args, **kwargs):
-		'''\
-Plot a three-dimensional wireframe surface. Arguments are passed directly to
-actual plotting function.
-
-Args:
-	args: tuple of 3 np.array objects, corresponding to three coordinate
-		axes
-	kwargs: dict, remaining arguments meant for plotting
-
-Returns:
-	None
-'''
-
-		self.ax.plot_wireframe(*args, **kwargs)
-
-	########################################
-
-	def text(self, *args, **kwargs):
-		'''\
-Show text on the graph. The arguments are simply passed to the actual 'text'
-method. This is meant to be used after the above 'plot' method has been used to
-plot a single point.
-
-Args:
-	args: tuple of 3 single-item (float) lists (coordinates of the text),
-		1 string (text string)
-	kwargs: dict, remaining arguments meant for placing text
-
-Returns:
-	None
-'''
-
-		# same as in 'plot' method
-		# third argument ignored for '2d' plot
-		if self.dim == '2d':
-			self.ax.text(*args[: -1], **kwargs)
-		else:
-			self.ax.text(*args, **kwargs)
-
-	########################################
-
-	def fill_between(self, *args, **kwargs):
-		'''\
-Fill an area with a colour. Can be used to show regions on the graph. Arguments
-are directly passed to the actual 'fill_between' method. Obviously, this makes
-sense only for '2d' plots.
-
-Args:
-	args: tuple of 3 np.array objects (indicating the 2 curves to fill
-		between)
-	kwargs: dict, remaining arguments meant for filling
-'''
-
-		if self.dim == '2d':
-			self.ax.fill_between(*args, **kwargs)
-
-	########################################
-
-	def fill_betweenx(self, *args, **kwargs):
-		'''\
-Fill a vertical region with a colour. Mostly the same as 'fill_between'.
-
-Args:
-	args: tuple of 3 np.array objects (indicating the 2 curves to fill
-		between)
-	kwargs: dict, remaining arguments meant for filling
-'''
-
-		if self.dim == '2d':
-			self.ax.fill_betweenx(*args, **kwargs)
 
 	########################################
 
@@ -545,87 +465,41 @@ Returns:
 
 	########################################
 
-	# grapher.text(-0.6, -0.2, 1, s = r'$\left(0,0\right)$')
-	# grapher.plot([0], [0], [1],
-	#              color      = 'black',
-	#              marker     = '.',
-	#              markersize = 10)
-	# grapher.text(3.15, -2.9, 1, s = r'$\left(3,-3\right)$')
-	# grapher.plot([3], [-3], [1],
-	#              color      = 'black',
-	#              marker     = '.',
-	#              markersize = 10)
-	# grapher.text(-1, 4.1, 1, s = r'$\left(0,y\right)$')
-	# grapher.plot([0], [4], [1],
-	#              color      = 'black',
-	#              marker     = '.',
-	#              markersize = 10)
-
-	########################################
-
 	t = np.linspace(-np.pi, np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = x1 / np.sqrt(x1 - 2)
-	z1 = np.tan(x1)
+	y1 = np.cos(x1)
+	z1 = np.sin(x1)
 	grapher.plot(x1, y1, z1, color     = 'red',
 	                         linestyle = '-',
 	                         linewidth = 0.8,
-	                         label     = r'$y=\dfrac{x}{\sqrt{x-2}}$')
-	x2 = np.linspace(-32, 32, 100000)
-	y2 = 3 * np.ones(100000)
-	z2 = np.sin(x1)
-	grapher.plot(x2, y2, z2, color     = 'blue',
-	                         linestyle = '-',
-	                         linewidth = 0.8,
-	                         label     = r'$y=3$')
-	# x3 = [np.sqrt(3)]
-	# y3 = [0]
-	# z3 = np.sin(x3)
-	# grapher.plot(x3, y3, z3, color     = 'black',
-	#                          marker    = '.',
-	#                          linewidth = 0.8,
-	#                          label     = r'')
-	# x4 = np.linspace(-32, 32, 100000)
-	# y4 = -1.5 * x4 + 5.5
-	# z4 = np.sin(x1)
-	# grapher.plot(x4, y4, z4, color     = 'blue',
-	#                          linestyle = '-',
-	#                          linewidth = 0.8,
-	#                          label     = r'$3x+2y=11$')
+	                         label     = r'$y=\cos\,x$')
 
-	grapher.plot([6], [3], [1], color = 'black', marker = '.',)
-	grapher.text(6, 2.8, 1, s = r'$\left(6,3\right)$')
-	grapher.plot([3], [3], [1], color = 'black', marker = '.',)
-	grapher.text(2.6, 2.8, 1, s = r'$\left(3,3\right)$')
+	grapher.plot([np.pi], [-1], [0], color = 'red', marker = '.',)
+	grapher.ax.text(np.pi, -1.2, -0.2, s = r'$\left(\pi,-1\right)$')
 
-	grapher.fill_between(x1, y1, y2,  facecolor = 'cyan',
-	                                  linewidth = 0,
-	                                  label     = r'$R$',
-	                                  where     = [True
-	                                               if 3 < i < 6 else False
-	                                               for i in x1])
-	# grapher.fill_between(x2, y2, 0, facecolor = 'cyan',
-	#                                 linewidth = 0,
-	#                                 label     = r'',
-	#                                 where     = [False
-	#                                              for i in x2])
+	# grapher.ax.fill_between(x1, y1, 0, facecolor = 'cyan',
+	#                                    linewidth = 0,
+	#                                    label     = r'$R$',
+	#                                    where     = [True
+	#                                                 if np.pi / 2 < i < 3 * np.pi / 2 else False
+	#                                                 for i in x1])
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
+	                 trigonometric = True,
 	                 first         = -2,
-	                 last          = 12,
-	                 step          = 1)
+	                 last          = 2,
+	                 step          = 1 / 4)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -2,
-	                 last          = 5,
+	                 first         = -3,
+	                 last          = 3,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
-	                 first         = None,
-	                 last          = None,
-	                 step          = None)
+	                 first         = -2,
+	                 last          = 2,
+	                 step          = 0.5)
 	plt.show()
 
 ###############################################################################
