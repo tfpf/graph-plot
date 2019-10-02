@@ -2,7 +2,6 @@
 
 import doctest
 import fractions
-import matplotlib
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d
 import numpy as np
@@ -57,7 +56,7 @@ Args:
 	y: np.array or list of values of the discontinuous function
 
 Returns:
-	np.array with np.nan at the points of discontinuity
+	np.array with NaN at the points of discontinuity
 '''
 
 	# if the argument is a list, the following code may not work
@@ -67,6 +66,7 @@ Returns:
 	# differentiate it to get an array which is shorter than 'y' by 1
 	# prepend a zero to its front; now the length is same as that of 'y'
 	# 'y' is assumed discontinuous at points where the derivative is large
+	# derivative is 'large' if its magnitude is greater than 0.5
 	points_of_discontinuity = np.abs(np.concatenate([[0],
 	                                                 np.diff(y)])) > 0.5
 
@@ -95,7 +95,7 @@ What's required is a list of LaTeX-formatted strings for numbers going from one
 rational multiple of pi to another, and the 'np.array' of corresponding values.
 Thus, a two-element tuple should be returned. (Note that LaTeX uses a backslash
 to indicate keywords! Remember to either escape the backslash or simply use raw
-strings. That latter approach has been used in this script because it simpler.)
+strings. The latter approach was used just to keep all of those things simple.)
 
 Args:
 	first: float, first grid line (grid lines start at 'first * np.pi')
@@ -209,11 +209,11 @@ Returns:
 '''
 
 		# check the 'dim' argument and set the plot style
-		# 'classic' style renders LaTeX strings in Computer Modern
+		# 'classic' plot style renders LaTeX strings in Computer Modern
 		# Computer Modern is a great font for maths equations
 		# 'seaborn-poster' style increases the font size
 		# use both for two-dimensional plots
-		# use only 'classic' for three-dimensional plot
+		# use only 'classic' for three-dimensional plots
 		# because adjacent text items overlap when font size increases
 		if dim == '2d':
 			plt.style.use(['classic', 'seaborn-poster'])
@@ -280,8 +280,8 @@ Plot a curve. These arguments get passed as they are to the function which
 actually plots. In case of a '2d' plot, the third item in 'args' is ignored.
 
 Args:
-	args: tuple of 3 np.array objects, corresponding to three coordinate
-		axes
+	args: tuple of 3 objects, each of which could be either a single-item
+		list or a NumPy array
 	kwargs: dict, remaining arguments meant for plotting
 
 Returns:
@@ -290,14 +290,16 @@ Returns:
 
 		# 'args' contains 'x', 'y' and 'z'
 		# remove vertical line around points of discontinuity
-		# do this only to functions (i.e. if it contains many points)
+		# do this only to functions (i.e. if it contains 100000 points)
 		# if 'args' contains only 1 or 2 points, do nothing
 		# use 10000 as the length threshold to allow margin for error
+		# all objects must have the same length
+		# maybe optimise the 'if' condition here? TODO
 		sanitised_args = tuple(sanitise_discontinuous(arg)
 		                       if len(arg) > 10000 else arg
 		                       for arg in args)
 
-		# 'kwargs' contains style information and the label
+		# 'kwargs' contains style information and the legend label
 		# pass it without any changes
 		# if this is a '2d' plot, ignore the 'z' argument in 'args'
 		if self.dim == '2d':
@@ -314,7 +316,7 @@ Spice up the graph plot. Add a legend, axis labels and grid lines.
 
 Args:
 	axis_labels: tuple of 3 strings (which are the labels for the three
-		axes)
+		coordinate axes)
 	title: str, title of the graph
 
 Returns:
@@ -340,6 +342,7 @@ Returns:
 			self.ax.set_title(title)
 
 		# if this is a '2d' plot, draw thick coordinate axes
+		# does not work as expected in '3d'
 		if self.dim == '2d':
 			self.ax.axhline(linewidth = 1.2, color = 'k')
 			self.ax.axvline(linewidth = 1.2, color = 'k')
@@ -466,34 +469,43 @@ Returns:
 	########################################
 
 	t = np.linspace(-np.pi, np.pi, 100000)
-	x1 = np.linspace(-32, 32, 100000)
-	y1 = np.cos(x1)
+	x1 = np.linspace(-16, 16, 100000)
+	y1 = 3 - x1
 	z1 = np.sin(x1)
 	grapher.plot(x1, y1, z1, color     = 'red',
 	                         linestyle = '-',
 	                         linewidth = 0.8,
-	                         label     = r'$y=\cos\,x$')
+	                         label     = r'$y=3-x$')
+	# x2 = np.linspace(-32, 32, 100000)
+	# y2 = x2 ** 2 + 1
+	# z2 = np.sin(x2)
+	# grapher.plot(x2, y2, z2, color     = 'blue',
+	#                          linestyle = '-',
+	#                          linewidth = 0.8,
+	#                          label     = r'$y=x^2+1$')
 
-	grapher.plot([np.pi], [-1], [0], color = 'red', marker = '.',)
-	grapher.ax.text(np.pi, -1.2, -0.2, s = r'$\left(\pi,-1\right)$')
+	grapher.plot([-1], [4], [0], color = 'red', marker = '.',)
+	grapher.ax.text(-0.9, 4.1, s = r'$\left(-1,4\right)$')
+	grapher.plot([3], [0], [0], color = 'red', marker = '.',)
+	grapher.ax.text(3.1, 0.1, s = r'$\left(3,0\right)$')
 
-	# grapher.ax.fill_between(x1, y1, 0, facecolor = 'cyan',
-	#                                    linewidth = 0,
-	#                                    label     = r'$R$',
-	#                                    where     = [True
-	#                                                 if np.pi / 2 < i < 3 * np.pi / 2 else False
-	#                                                 for i in x1])
+	# grapher.ax.fill_between(x1, y1, y2, facecolor = 'cyan',
+	#                                     linewidth = 0,
+	#                                     label     = r'$R$',
+	#                                     where     = [True
+	#                                                  if True else False
+	#                                                  for i in x1])
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
-	                 first         = -2,
-	                 last          = 2,
-	                 step          = 1 / 4)
+	                 trigonometric = False,
+	                 first         = -6,
+	                 last          = 8,
+	                 step          = 1)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -3,
-	                 last          = 3,
+	                 first         = -2,
+	                 last          = 6,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
