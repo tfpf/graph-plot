@@ -277,35 +277,33 @@ Returns:
 	def plot(self, *args, **kwargs):
 		'''\
 Plot a curve. These arguments get passed as they are to the function which
-actually plots. In case of a '2d' plot, the third item in 'args' is ignored.
+actually plots. Before plotting, unwanted vertical lines at points of
+discontinuity are removed.
 
 Args:
-	args: tuple of 3 objects, each of which could be either a single-item
-		list or a NumPy array
+	args: tuple of 2 or 3 objects, each of which could be one of the
+		following: one-item list, two-item list, 100000-item NumPy
+		array
 	kwargs: dict, remaining arguments meant for plotting
 
 Returns:
 	None
 '''
 
-		# 'args' contains 'x', 'y' and 'z'
+		# 'args' may be a 2-tuple of 'x' and 'y' ('2d' plot)
+		# or it may be a 3-tuple of 'x', 'y' and 'z' ('3d' plot)
+		# user has to enter the arguments correctly
 		# remove vertical line around points of discontinuity
-		# do this only to functions (i.e. if it contains 100000 points)
-		# if 'args' contains only 1 or 2 points, do nothing
-		# use 10000 as the length threshold to allow margin for error
-		# all objects must have the same length
-		# maybe optimise the 'if' condition here? TODO
-		sanitised_args = tuple(sanitise_discontinuous(arg)
-		                       if len(arg) > 10000 else arg
-		                       for arg in args)
+		# but only if the 'x' is a 100000-element array
+		# 'y' and 'z' must be of the same length as 'x'
+		if len(args[0] > 1000):
+			args = tuple(sanitise_discontinuous(arg)
+			             for arg in args)
+		self.ax.plot(*args, **kwargs)
 
-		# 'kwargs' contains style information and the legend label
-		# pass it without any changes
-		# if this is a '2d' plot, ignore the 'z' argument in 'args'
-		if self.dim == '2d':
-			self.ax.plot(*sanitised_args[: -1], **kwargs)
-		else:
-			self.ax.plot(*sanitised_args, **kwargs)
+	########################################
+
+	#def plot_surface
 
 	########################################
 
@@ -330,10 +328,10 @@ Returns:
 			                   adjustable = 'box')
 
 		# set legend and axis labels
-		self.ax.legend(loc       = 'upper right',
-		               fancybox  = True,
-		               shadow    = True,
-		               numpoints = 1)
+		# self.ax.legend(loc       = 'upper right',
+		#                fancybox  = True,
+		#                shadow    = True,
+		#                numpoints = 1)
 		self.ax.set_xlabel(axis_labels[0])
 		self.ax.set_ylabel(axis_labels[1])
 		if self.dim == '3d':
@@ -464,18 +462,18 @@ Returns:
 		dimension = '2d'
 	else:
 		dimension = sys.argv[1]
-	grapher = CustomPlot(dim = dimension, aspect_ratio = 1)
+	grapher = CustomPlot(dim = dimension, aspect_ratio = 0)
 
 	########################################
 
-	t = np.linspace(-np.pi, np.pi, 100000)
-	x1 = np.linspace(-16, 16, 100000)
-	y1 = 3 - x1
-	z1 = np.sin(x1)
-	grapher.plot(x1, y1, z1, color     = 'red',
-	                         linestyle = '-',
-	                         linewidth = 0.8,
-	                         label     = r'$y=3-x$')
+	# t = np.linspace(-np.pi, np.pi, 100000)
+	# x1 = np.linspace(-16, 16, 100000)
+	# y1 = 1 / np.log(x1)
+	# z1 = np.sin(x1)
+	# grapher.plot(x1, y1, color     = 'red',
+	#                      linestyle = '-',
+	#                      linewidth = 0.8,
+	#                      label     = r'$y=\dfrac{1}{\log\,x}$')
 	# x2 = np.linspace(-32, 32, 100000)
 	# y2 = x2 ** 2 + 1
 	# z2 = np.sin(x2)
@@ -483,11 +481,19 @@ Returns:
 	#                          linestyle = '-',
 	#                          linewidth = 0.8,
 	#                          label     = r'$y=x^2+1$')
+	y3 = np.linspace(2, 2.5, 100)
+	t = np.linspace(-np.pi, np.pi, 100)
+	R, T = np.meshgrid(y3, t)
+	Y = R * np.cos(T)
+	X = np.arccos((R - np.sqrt(R ** 2 - 4)) / 2)
+	Z = R * np.sin(T)
+	grapher.ax.auto_scale_xyz([-3, 3], [-3, 3], [-3, 3])
+	grapher.ax.plot_surface(X, Y, Z, cmap = 'Reds')
 
-	grapher.plot([-1], [4], [0], color = 'red', marker = '.',)
-	grapher.ax.text(-0.9, 4.1, s = r'$\left(-1,4\right)$')
-	grapher.plot([3], [0], [0], color = 'red', marker = '.',)
-	grapher.ax.text(3.1, 0.1, s = r'$\left(3,0\right)$')
+	# grapher.plot([-1], [4], [0], color = 'red', marker = '.',)
+	# grapher.ax.text(-0.9, 4.1, s = r'$\left(-1,4\right)$')
+	# grapher.plot([3], [0], [0], color = 'red', marker = '.',)
+	# grapher.ax.text(3.1, 0.1, s = r'$\left(3,0\right)$')
 
 	# grapher.ax.fill_between(x1, y1, y2, facecolor = 'cyan',
 	#                                     linewidth = 0,
@@ -498,20 +504,20 @@ Returns:
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
-	                 first         = -6,
-	                 last          = 8,
-	                 step          = 1)
+	                 trigonometric = True,
+	                 first         = -1 / 24,
+	                 last          = 9 / 24,
+	                 step          = 1 / 24)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -2,
-	                 last          = 6,
+	                 first         = -3,
+	                 last          = 3,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
-	                 first         = -2,
-	                 last          = 2,
-	                 step          = 0.5)
+	                 first         = -3,
+	                 last          = 3,
+	                 step          = 1)
 	plt.show()
 
 ###############################################################################
