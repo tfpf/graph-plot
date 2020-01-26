@@ -5,6 +5,7 @@ import fractions
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d
 import numpy as np
+import scipy.signal as sig
 import sys
 import time
 
@@ -15,33 +16,30 @@ def show_nice_list(items, columns = 3):
 Display a list in neat centred columns.
 
 Args:
-	items: list, containing objects with an '__str__' method defined
-	columns: int, number of columns to arrange 'items' in
+	items: list (each of its contents must have `__str__` defined)
+	columns: int (number of columns to arrange `items` in)
 
 Returns:
 	None
 '''
 
-	# pad the list with empty strings
+	# convert the list of strings to list of list of strings
 	while len(items) % columns:
 		items.append('')
 	rows = len(items) // columns
-
-	# the number of elements in the list is now exactly 'rows * columns'
-	# break the list row-wise so that it becomes a two-dimensional list
 	items = [items[i :: rows] for i in range(rows)]
 
 	# calculate the required width of all columns
 	# width of a column is width of longest string in that column
 	widths = [max([len(str(row[i])) for row in items])
 	                                for i in range(columns)]
-
-	# use the above-calculated widths to centre each column
 	for row in items:
 		for r, width in zip(row, widths):
 			sys.stdout.write(str(r).center(width + 2, ' '))
 			sys.stdout.flush()
 		print()
+
+	return None
 
 ###############################################################################
 
@@ -50,37 +48,29 @@ def sanitise_discontinuous(y):
 At a point of jump discontinuity, a vertical line is drawn automatically. This
 vertical line joins the two points around the point of discontinuity.
 Traditionally, in maths, these vertical lines are not drawn. Hence, they need
-to be removed from the plot.
+to be removed from the plot. If the value is set to NaN at these points, they
+will not be plotted.
 
 Args:
-	y: np.array or list of values of the discontinuous function
+	y: np.array or list (values of the discontinuous function)
 
 Returns:
 	np.array with NaN at the points of discontinuity
 '''
 
-	# if the argument is a list, the following code may not work
-	# hence, convert it to an array first
+	# locate points of discontinuity (check where the derivative is large)
 	y = np.array(y)
-
-	# differentiate it to get an array which is shorter than 'y' by 1
-	# prepend a zero to its front; now the length is same as that of 'y'
-	# 'y' is assumed discontinuous at points where the derivative is large
-	# derivative is 'large' if its magnitude is greater than 0.5
 	points_of_discontinuity = np.abs(np.concatenate([[0],
-	                                                 np.diff(y)])) > 0.5
-
-	# at the above points, change the value to NaN
-	# this removes the vertical lines because those points won't be plotted
+	                                                 np.diff(y)])) > 0.1
 	y[points_of_discontinuity] = np.nan
 
 	return y
 
 ###############################################################################
 
-def graph_ticks(first, last, step, symbol = r'\pi'):
+def graph_ticks(first, last, step):
 	r'''
-Create a list of tick values and labels at intervals of 'step * np.pi'.	I think
+Create a list of tick values and labels at intervals of `step * np.pi`.	I think
 it is best explained with examples. (To properly demonstrate the working, this
 docstring is being marked as a raw string. Otherwise, the backslashes will be
 interpreted as parts of escape sequences.)
@@ -92,16 +82,18 @@ interpreted as parts of escape sequences.)
 (['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$'], array([-6.28318531, -3.14159265,  0.        ,  3.14159265,  6.28318531]))
 
 What's required is a list of LaTeX-formatted strings for numbers going from one
-rational multiple of pi to another, and the 'np.array' of corresponding values.
+rational multiple of pi to another, and the `np.array` of corresponding values.
 Thus, a two-element tuple should be returned. (Note that LaTeX uses a backslash
 to indicate keywords! Remember to either escape the backslash or simply use raw
 strings. The latter approach was used just to keep all of those things simple.)
+As a side effect of using LaTeX strings as labels instead of whatever is chosen
+automatically, panning or zooming the graph does not update the grid lines like
+it does otherwise.
 
 Args:
-	first: float, first grid line (grid lines start at 'first * np.pi')
-	last: float, last grid line (grid lines end at 'last * np.pi')
-	step: float, grid gap (distance between consecutive grid lines is
-		'step * np.pi')
+	first: float (first grid line) (grid lines start at `first * np.pi`)
+	last: float (last grid line) (grid lines end at `last * np.pi`)
+	step: float (grid gap) (grid lines separated by `step * np.pi`)
 
 Returns:
 	tuple, containing list of labels and an array of values indicated by
@@ -109,28 +101,23 @@ Returns:
 '''
 
 	# create an array containing the desired coefficients of pi
-	# notice the 'last + step'
-	# it is written that way because I don't want 'last' to be excluded
-	# of course, this needs to be multiplied by pi before it is returned
+	# notice the `last + step`
+	# it is written that way because I don't want `last` to be excluded
 	lattice = np.arange(first, last + step, step)
 
 	# create a new list to store the label strings
 	labels = []
-
-	# represent each number in 'lattice' as a LaTeX-formatted string
 	for number in lattice:
-
-		# obtain the numerator and denominator
 		value = fractions.Fraction(number).limit_denominator()
 		num = value.numerator
 		den = value.denominator
 
-		# get the zero out of the way first
+		# case 1: `value` is zero
 		if num == 0:
 			labels.append(r'$0$')
 			continue
 
-		# build a string which has to be appended to 'label'
+		# build a string which has to be appended to `label`
 		# Python does not have a string builder data type
 		# so, create a list to store the different parts of the string
 		# then join those parts
@@ -138,30 +125,20 @@ Returns:
 		# https://waymoot.org/home/python_string/
 		builder = ['$']
 
-		# for negative tick values, write a minus sign right away
+		# case 2: `value` is non-zero
 		if num < 0:
 			builder.append('-')
-			num = -num # now I don't have to worry about the sign
-
-		# use '\frac{}{}' of LaTeX if denominator is not 1
+			num = -num
 		if den != 1:
 			builder.append(r'\frac{')
-
-		# if the coefficient is 1, it is not conventionally written
 		if num == 1:
 			builder.append(r'\pi')
 		else:
 			builder.append(fr'{num}\pi')
-
-		# complete the '\frac{}{}' construct (if applicable)
 		if den != 1:
 			builder.append(fr'}}{{{den}}}$')
 		else:
 			builder.append('$')
-
-		# now all pieces of the string are in place
-		# create the LaTeX-formatted string by joining the pieces
-		# append thusly created string to the list of labels
 		labels.append(''.join(builder))
 
 	return labels, np.pi * lattice
@@ -170,26 +147,22 @@ Returns:
 
 class CustomPlot:
 	'''\
-A class to easily plot two- and three-dimensional curves.
-
-Args:
-	dim: str, dimension of the plot ('2d' or '3d')
-	aspect_ratio: float, ratio of scales on axes
+A class to easily plot two- and three-dimensional graphs.
 
 Attributes:
-	dim: str, dimension of the plot (either '2d' or '3d')
-	aspect_ratio: float, ratio of scales on axes
-	fig: matplotlib.figure.Figure, in which the graph will be plotted
-	ax: matplotlib.axes._subplots.AxesSubplot (for '2d' graph) or
-		matplotlib.axes._subplots.Axes3DSubplot (for '3d' graph), axes
-		object for the graph plot
+	dim: str (dimension of the plot, either '2d' or '3d')
+	aspect_ratio: float (ratio of scales on axes)
+	fig: matplotlib.figure.Figure (figure to contain the plot)
+	ax: matplotlib.axes._subplots.AxesSubplot (if `dim` is '2d') or
+		matplotlib.axes._subplots.Axes3DSubplot (if `dim` is '3d')
+		(axes object for the graph plot)
 
 Methods:
-	__init__: set up a window to plot the graph
-	__repr__: define representation of object
-	__str__: define string form of object
-	plot: check whether the plot is '2d' or '3d', then pass all arguments
-		to the actual plotting function, i.e. 'ax.plot'
+	__init__
+	__repr__
+	__str__
+	plot: check the attribute `dim`, then pass arguments to the actual
+		plotting function `ax.plot`
 	configure: spice up the plot to make it more complete
 	axis_fix: modify the ticks and labels on the axes so they look nice
 '''
@@ -201,16 +174,14 @@ Methods:
 Assign essential class attributes.
 
 Args:
-	dim: str, dimension of the plot (either '2d' or '3d')
-	aspect_ratio: float, ratio of scales on axes
+	dim: str (dimension of the plot, either '2d' or '3d')
+	aspect_ratio: float (ratio of scales on axes)
 
 Returns:
 	None
 '''
 
-		# check the 'dim' argument and set the plot style
-		# 'classic' plot style renders LaTeX strings in Computer Modern
-		# Computer Modern is a great font for maths equations
+		# 'classic' style renders LaTeX strings in Computer Modern font
 		# 'seaborn-poster' style increases the font size
 		# use both for two-dimensional plots
 		# use only 'classic' for three-dimensional plots
@@ -225,11 +196,7 @@ Returns:
 			                 ' or \'3d\'.')
 		self.dim = dim
 		self.aspect_ratio = aspect_ratio
-
-		# figure containing the plot
 		self.fig = plt.figure()
-
-		# create an object for the axes
 		if dim == '2d':
 			self.ax = self.fig.add_subplot(1, 1, 1)
 		else:
@@ -239,6 +206,8 @@ Returns:
 		# each run, the title of the window should be unique
 		# use Unix time in the title
 		self.fig.canvas.set_window_title(f'graph_{int(time.time())}')
+
+		return None
 
 	########################################
 
@@ -250,7 +219,7 @@ Args:
 	no arguments
 
 Returns:
-	str, the representation of the object
+	str
 '''
 
 		return (f'CustomPlot(dim = \'{self.dim}\', '
@@ -266,7 +235,7 @@ Args:
 	no arguments
 
 Returns:
-	str, the string form of the object
+	str
 '''
 
 		return (f'CustomPlot(dim = \'{self.dim}\', '
@@ -281,29 +250,23 @@ actually plots. Before plotting, unwanted vertical lines at points of
 discontinuity are removed.
 
 Args:
-	args: tuple of 2 or 3 objects, each of which could be one of the
-		following: one-item list, two-item list, 100000-item NumPy
-		array
-	kwargs: dict, remaining arguments meant for plotting
+	args: tuple of 2 or 3 objects (each of the said objects is one of the
+		following: 1-item list, 2-item list, 100000-item NumPy
+		array)
+	kwargs: dict (remaining arguments meant for plotting)
 
 Returns:
 	None
 '''
 
-		# 'args' may be a 2-tuple of 'x' and 'y' ('2d' plot)
-		# or it may be a 3-tuple of 'x', 'y' and 'z' ('3d' plot)
-		# user has to enter the arguments correctly
-		# remove vertical line around points of discontinuity
-		# but only if the 'x' is a 100000-element array
-		# 'y' and 'z' must be of the same length as 'x'
-		if len(args[0] > 1000):
+		# if the arguments are 100000-item NumPy arrays, sanitise them
+		# otherwise, vertical lines (if any) are supposedly intentional
+		if len(args[0]) > 1000:
 			args = tuple(sanitise_discontinuous(arg)
 			             for arg in args)
 		self.ax.plot(*args, **kwargs)
 
-	########################################
-
-	#def plot_surface
+		return None
 
 	########################################
 
@@ -315,7 +278,7 @@ Spice up the graph plot. Add a legend, axis labels and grid lines.
 Args:
 	axis_labels: tuple of 3 strings (which are the labels for the three
 		coordinate axes)
-	title: str, title of the graph
+	title: str (title of the graph)
 
 Returns:
 	None
@@ -323,15 +286,15 @@ Returns:
 
 		# whether the scale should be the same on the coordinate axes
 		# currently, because of a library bug, this works only in '2d'
-		if self.aspect_ratio and self.dim == '2d':
+		if self.aspect_ratio != 0 and self.dim == '2d':
 			self.ax.set_aspect(aspect     = self.aspect_ratio,
 			                   adjustable = 'box')
 
 		# set legend and axis labels
-		# self.ax.legend(loc       = 'upper right',
-		#                fancybox  = True,
-		#                shadow    = True,
-		#                numpoints = 1)
+		self.ax.legend(loc       = 'upper right',
+		               fancybox  = True,
+		               shadow    = True,
+		               numpoints = 1)
 		self.ax.set_xlabel(axis_labels[0])
 		self.ax.set_ylabel(axis_labels[1])
 		if self.dim == '3d':
@@ -340,18 +303,21 @@ Returns:
 			self.ax.set_title(title)
 
 		# if this is a '2d' plot, draw thick coordinate axes
-		# does not work as expected in '3d'
+		# this does not work as expected in '3d'
 		if self.dim == '2d':
 			self.ax.axhline(linewidth = 1.2, color = 'k')
 			self.ax.axvline(linewidth = 1.2, color = 'k')
 
 		# enable grid
+		# minor grid takes too much memory in '3d' plot
 		self.ax.grid(b = True, which = 'major', linewidth = 0.8)
-		if self.dim == '2d': # takes too much memory in '3d'
+		if self.dim == '2d':
 			self.ax.grid(b         = True,
 			             which     = 'minor',
 			             linewidth = 0.2)
 			self.ax.minorticks_on()
+
+		return None
 
 	########################################
 
@@ -361,21 +327,23 @@ Returns:
 	                   last          = None,
 	                   step          = None):
 		'''\
-Modify the labels and ticks on one of the axes of coordinates.
+Modify the labels and ticks on the specified axis of coordinates. Note that the
+limits on the axis must necessarily be set after setting the axis ticks. This
+is because floating point precision issues might introduce an extra tick beyond
+the last point (`last`) to be displayed. This extra tick is eliminate simply by
+specifying in the axis limit that the axis must end at `last`.
 
 Args:
-	axis: str, which axis to modify ('x', 'y' or 'z')
-	trigonometric: bool, whether axis ticks are at rational multiples of pi
-	first: float, grid start point
-	last: float, grid end point
-	step: float, grid gap
+	axis: str (which axis to modify: 'x', 'y' or 'z')
+	trigonometric: bool (whether ticks are at rational multiples of pi)
+	first: float (grid start point)
+	last: float (grid end point)
+	step: float (grid gap)
 
 Returns:
 	None
 '''
 
-		# decide which axis is to be modified
-		# this method may be called for each axis
 		if axis == 'x':
 			limits_set_function = self.ax.set_xlim
 			labels_get_function = self.ax.get_xticklabels
@@ -392,61 +360,40 @@ Returns:
 			labels_set_function = self.ax.set_zticklabels
 			ticks_set_function = self.ax.set_zticks
 		else:
-			return
+			return None
 
-		# placing vertical grid lines at rational multiples of pi
+		# case 1: grid lines at pi times the arguments provided
 		if trigonometric:
-
-			# this case requires all three following arguments
 			if None in {first, last, step}:
 				raise ValueError('Argument \'trigonometric\' '
 				                 'has been set to True. '
 				                 'Arguments \'first\', '
 				                 '\'last\' and \'step\' must '
 				                 'not be None.')
-
-			# obtain lists of ticks and labels to set up grid lines
-			# there may be an extra tick beyond 'last * np.pi'
-			# this may happen because of floating-point precision
-			# to remove this, set limits only after setting ticks
 			labels, ticks = graph_ticks(first, last, step)
 			ticks_set_function(ticks)
 			labels_set_function(labels)
 			limits_set_function(np.pi * first, np.pi * last)
 
-		# placing grid lines normally
+		# case 2: grid lines at the values provided in the arguments
 		else:
-
-			# this is the non-trigonometric case
-			# 'first' and 'last' need not be given
-			# if not given, they are taken from 'np.linspace' below
 			if None not in {first, last, step}:
 				ticks_set_function(np.arange(first,
 				                             last + step,
 				                             step))
-
-			# again, limits must be set after setting the ticks
 			if None not in {first, last}:
 				limits_set_function(first, last)
-
-			# draw the graph with the ticks obtained above
-			# ensures meaningful output of 'labels_get_function'
 			self.fig.canvas.draw()
-
-			# change the ticks font to Computer Modern
-			# (requires using the 'classic' plot style)
-			# the tick labels will become fixed non-numeric strings
-			# thus, ticks will not be redrawn when you zoom or pan
-			# this should not be an issue
-			# minute analysis is not the purpose of this script
 			labels_set_function([fr'${t.get_text()}$'
 			                     for t in labels_get_function()])
+
+		return None
 
 ###############################################################################
 
 def main():
 	'''\
-Instantiate the 'CustomPlot' class. Call its 'plot', 'configure' and 'axis_fix'
+Instantiate the `CustomPlot` class. Call its `plot`, `configure` and `axis_fix`
 methods (at the very least), and obtain an eye-candy graph.
 
 Args:
@@ -456,69 +403,95 @@ Returns:
 	None
 '''
 
-	# read command line argument
-	# check whether this should be a two- or three-dimensional plot
 	if len(sys.argv) < 2:
 		dimension = '2d'
 	else:
 		dimension = sys.argv[1]
-	grapher = CustomPlot(dim = dimension, aspect_ratio = 0)
+	grapher = CustomPlot(dim = dimension, aspect_ratio = 1)
 
 	########################################
 
-	# t = np.linspace(-np.pi, np.pi, 100000)
-	# x1 = np.linspace(-16, 16, 100000)
-	# y1 = 1 / np.log(x1)
-	# z1 = np.sin(x1)
-	# grapher.plot(x1, y1, color     = 'red',
+	t = np.linspace(-np.pi / 2, np.pi / 2, 100000)
+	x1 = np.linspace(-32, 32, 1000000)
+	y1 = np.sin(np.arccos(x1))
+	z1 = np.sin(x1)
+	grapher.plot(x1, y1, color     = 'red',
+	                     linestyle = '-',
+	                     linewidth = 0.8,
+	                     label     = r'$y=\sin\,\cos^{-1}x$')
+	# x2 = np.linspace(-32, 32, 100000)
+	# y2 = np.sin(x2)
+	# z2 = np.sin(x2)
+	# grapher.plot(x2, y2, color     = 'blue',
 	#                      linestyle = '-',
 	#                      linewidth = 0.8,
-	#                      label     = r'$y=\dfrac{1}{\log\,x}$')
-	# x2 = np.linspace(-32, 32, 100000)
-	# y2 = x2 ** 2 + 1
-	# z2 = np.sin(x2)
-	# grapher.plot(x2, y2, z2, color     = 'blue',
-	#                          linestyle = '-',
-	#                          linewidth = 0.8,
-	#                          label     = r'$y=x^2+1$')
-	y3 = np.linspace(2, 2.5, 100)
-	t = np.linspace(-np.pi, np.pi, 100)
-	R, T = np.meshgrid(y3, t)
-	Y = R * np.cos(T)
-	X = np.arccos((R - np.sqrt(R ** 2 - 4)) / 2)
-	Z = R * np.sin(T)
-	grapher.ax.auto_scale_xyz([-3, 3], [-3, 3], [-3, 3])
-	grapher.ax.plot_surface(X, Y, Z, cmap = 'Reds')
+	#                      label     = r'$y=\sin\,x$')
+	# grapher.ax.plot(5, -10, 'k.')
+	# grapher.ax.text(4, -10.8, r'$(5,-10)$')
+	# x4 = np.linspace(0, 3, 100000)
+	# y4 = -x4 + 3
+	# z4 = np.sin(x4)
+	# grapher.plot(x4, y4, color     = 'red',
+	#                      linestyle = '-',
+	#                      linewidth = 0.8,
+	#                      label     = r'')
+	# y3 = np.linspace(2, 2.5, 100)
+	# t = np.linspace(-np.pi, np.pi, 100)
+	# R, T = np.meshgrid(y3, t)
+	# Y = R * np.cos(T)
+	# X = np.arccos((R - np.sqrt(R ** 2 - 4)) / 2)
+	# Z = R * np.sin(T)
+	# grapher.ax.plot_surface(X, Y, Z, cmap = 'Reds')
+	# r = np.linspace(0, 4, 200)
+	# t = np.linspace(-np.pi, np.pi, 200)
+	# R, T = np.meshgrid(r, t)
+	# x5 = R * np.cos(T)
+	# y5 = R * np.sin(T)
+	# z5 = 9 - x5 ** 2 - y5 ** 2
+	# x5 = np.linspace(-4, 4, 200)
+	# y5 = np.linspace(-4, 4, 200)
+	# x5, y5 = np.meshgrid(x5, y5)
+	# z5 = 9 - x5 ** 2 - y5 ** 2
+	# for i in range(200):
+	# 	for j in range(200):
+	# 		if z5[i, j] < 0:
+	# 			z5[i, j] = 0
+	# grapher.ax.plot_surface(x5, y5, z5, cmap = 'Reds')
 
-	# grapher.plot([-1], [4], [0], color = 'red', marker = '.',)
-	# grapher.ax.text(-0.9, 4.1, s = r'$\left(-1,4\right)$')
-	# grapher.plot([3], [0], [0], color = 'red', marker = '.',)
-	# grapher.ax.text(3.1, 0.1, s = r'$\left(3,0\right)$')
-
-	# grapher.ax.fill_between(x1, y1, y2, facecolor = 'cyan',
-	#                                     linewidth = 0,
-	#                                     label     = r'$R$',
-	#                                     where     = [True
-	#                                                  if True else False
-	#                                                  for i in x1])
+	# grapher.ax.fill_between(x1, y1, y2,  facecolor = 'cyan',
+	#                                      linewidth = 0,
+	#                                      label = r'$S$',
+	#                                      where     = [True
+	#                                                   if 0 < 1 else False
+	#                                                   for i in x1])
+	# grapher.ax.fill_between(x1, [min(i, j) for i, j in zip(y4, y6)], -4,  facecolor = 'cyan',
+	#                                      linewidth = 0,
+	#                                      label     = r'',
+	#                                      where     = [True
+	#                                                   if -8 < i < 0 else False
+	#                                                   for i in x1])
+	# grapher.ax.fill_between(x2, y2, -4, facecolor = 'cyan',
+	#                                     linewidth = 0)
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
-	                 first         = -1 / 24,
-	                 last          = 9 / 24,
-	                 step          = 1 / 24)
+	                 trigonometric = False,
+	                 first         = -2,
+	                 last          = 2,
+	                 step          = 0.25)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -3,
-	                 last          = 3,
-	                 step          = 1)
+	                 first         = -1,
+	                 last          = 2,
+	                 step          = 0.25)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
-	                 first         = -3,
-	                 last          = 3,
-	                 step          = 1)
+	                 first         = -10,
+	                 last          = 10,
+	                 step          = 2)
 	plt.show()
+
+	return None
 
 ###############################################################################
 
