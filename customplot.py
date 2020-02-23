@@ -2,12 +2,21 @@
 
 import doctest
 import fractions
+import matplotlib
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d
 import numpy as np
 import scipy.signal as sig
 import sys
 import time
+
+# list available GUI and non-GUI backends for matplotlib
+# print(matplotlib.rcsetup.interactive_bk)
+# print(matplotlib.rcsetup.non_interactive_bk)
+matplotlib.use('TkAgg')
+
+# default save directory when saving plot from GUI
+matplotlib.rcParams["savefig.directory"] = '/mnt/c/Users/vpaij/Pictures/'
 
 ###############################################################################
 
@@ -412,20 +421,27 @@ Returns:
 	########################################
 
 	t = np.linspace(-np.pi / 2, np.pi / 2, 100000)
-	x1 = np.linspace(-32, 32, 1000000)
-	y1 = np.sin(np.arccos(x1))
+	x1 = np.linspace(-32, 32, 500000)
+	y1 = np.sin(x1)
 	z1 = np.sin(x1)
 	grapher.plot(x1, y1, color     = 'red',
 	                     linestyle = '-',
 	                     linewidth = 0.8,
-	                     label     = r'$y=\sin\,\cos^{-1}x$')
-	# x2 = np.linspace(-32, 32, 100000)
-	# y2 = np.sin(x2)
-	# z2 = np.sin(x2)
-	# grapher.plot(x2, y2, color     = 'blue',
+	                     label     = r'$y=\sin\,x$')
+	x2 = np.linspace(-32, 32, 100000)
+	y2 = 2 * x2 / np.pi
+	z2 = np.sin(x2)
+	grapher.plot(x2, y2, color     = 'blue',
+	                     linestyle = '-',
+	                     linewidth = 0.8,
+	                     label     = r'$y=\dfrac{2x}{\pi}$')
+	# x3 = np.linspace(-32, 32, 100000)
+	# y3 = np.sin(x3) - np.cos(x3)
+	# z3 = np.sin(x3)
+	# grapher.plot(x3, y3, color     = 'green',
 	#                      linestyle = '-',
 	#                      linewidth = 0.8,
-	#                      label     = r'$y=\sin\,x$')
+	#                      label     = r'$y=\sin\,\omega t-\cos\,\omega t$')
 	# grapher.ax.plot(5, -10, 'k.')
 	# grapher.ax.text(4, -10.8, r'$(5,-10)$')
 	# x4 = np.linspace(0, 3, 100000)
@@ -475,14 +491,14 @@ Returns:
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
-	                 first         = -2,
-	                 last          = 2,
-	                 step          = 0.25)
+	                 trigonometric = True,
+	                 first         = -0.5,
+	                 last          = 1,
+	                 step          = 0.125)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -1,
-	                 last          = 2,
+	                 first         = -1.25,
+	                 last          = 1.25,
 	                 step          = 0.25)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
