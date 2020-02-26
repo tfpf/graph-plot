@@ -6,7 +6,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d
 import numpy as np
-import scipy.signal as sig
 import sys
 import time
 
@@ -34,7 +33,7 @@ Returns:
 
 	# convert the list of strings to list of list of strings
 	while len(items) % columns:
-		items.append('')
+		items.append('')                              
 	rows = len(items) // columns
 	items = [items[i :: rows] for i in range(rows)]
 
@@ -422,26 +421,28 @@ Returns:
 
 	t = np.linspace(-np.pi / 2, np.pi / 2, 100000)
 	x1 = np.linspace(-32, 32, 500000)
-	y1 = np.sin(x1)
+	s = 0.4
+	m = 0
+	y1 = 1 / np.sqrt(2 * np.pi * s ** 2) * np.exp(-(x1 - m) ** 2 / (2 * s ** 2))
 	z1 = np.sin(x1)
 	grapher.plot(x1, y1, color     = 'red',
 	                     linestyle = '-',
 	                     linewidth = 0.8,
-	                     label     = r'$y=\sin\,x$')
-	x2 = np.linspace(-32, 32, 100000)
-	y2 = 2 * x2 / np.pi
-	z2 = np.sin(x2)
-	grapher.plot(x2, y2, color     = 'blue',
-	                     linestyle = '-',
-	                     linewidth = 0.8,
-	                     label     = r'$y=\dfrac{2x}{\pi}$')
+	                     label     = r'$y=\dfrac{1}{\sqrt{2\pi\sigma^2}}\,e^{-\dfrac{(x-\mu)^2}{2\sigma^2}}$')
+	# x2 = np.linspace(-32, 32, 100000)
+	# y2 = np.sin(x2)
+	# z2 = np.sin(x2)
+	# grapher.plot(x2, y2, color     = 'blue',
+	#                      linestyle = '-',
+	#                      linewidth = 0.8,
+	#                      label     = r'$y=\sin\,x$')
 	# x3 = np.linspace(-32, 32, 100000)
-	# y3 = np.sin(x3) - np.cos(x3)
+	# y3 = 6 * np.abs(x3)
 	# z3 = np.sin(x3)
 	# grapher.plot(x3, y3, color     = 'green',
 	#                      linestyle = '-',
 	#                      linewidth = 0.8,
-	#                      label     = r'$y=\sin\,\omega t-\cos\,\omega t$')
+	#                      label     = r'$y=\dfrac{\mathrm{d^2}}{\mathrm{d}x^2}|x|^3$')
 	# grapher.ax.plot(5, -10, 'k.')
 	# grapher.ax.text(4, -10.8, r'$(5,-10)$')
 	# x4 = np.linspace(0, 3, 100000)
@@ -474,12 +475,13 @@ Returns:
 	# 			z5[i, j] = 0
 	# grapher.ax.plot_surface(x5, y5, z5, cmap = 'Reds')
 
-	# grapher.ax.fill_between(x1, y1, y2,  facecolor = 'cyan',
-	#                                      linewidth = 0,
-	#                                      label = r'$S$',
-	#                                      where     = [True
-	#                                                   if 0 < 1 else False
-	#                                                   for i in x1])
+	grapher.ax.fill_between(x1, y1, 0,
+	                        facecolor = 'cyan',
+	                        linewidth = 0,
+	                        label     = r'$P(|X-\mu|<\sigma)$',
+	                        where     = [True
+	                                     if -s < i < s else False
+	                                     for i in x1])
 	# grapher.ax.fill_between(x1, [min(i, j) for i, j in zip(y4, y6)], -4,  facecolor = 'cyan',
 	#                                      linewidth = 0,
 	#                                      label     = r'',
@@ -491,20 +493,22 @@ Returns:
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
-	                 first         = -0.5,
-	                 last          = 1,
-	                 step          = 0.125)
+	                 trigonometric = False,
+	                 first         = -4 * s,
+	                 last          = 4 * s,
+	                 step          = 1 * s)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -1.25,
-	                 last          = 1.25,
-	                 step          = 0.25)
+	                 first         = -0.1 / s,
+	                 last          = 0.6 / s,
+	                 step          = 0.1 / s)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
 	                 first         = -10,
 	                 last          = 10,
 	                 step          = 2)
+	grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
+	grapher.ax.set_yticklabels([r'$-\dfrac{0.1}{\sigma}$', r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$', r'$\dfrac{0.5}{\sigma}$', r'$\dfrac{0.5}{\sigma}$'])
 	plt.show()
 
 	return None
