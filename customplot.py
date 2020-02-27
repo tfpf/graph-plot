@@ -33,7 +33,7 @@ Returns:
 
 	# convert the list of strings to list of list of strings
 	while len(items) % columns:
-		items.append('')                              
+		items.append('')
 	rows = len(items) // columns
 	items = [items[i :: rows] for i in range(rows)]
 
@@ -76,7 +76,7 @@ Returns:
 
 ###############################################################################
 
-def graph_ticks(first, last, step):
+def graph_ticks(first, last, step, symbol = r'\pi'):
 	r'''
 Create a list of tick values and labels at intervals of `step * np.pi`.	I think
 it is best explained with examples. (To properly demonstrate the working, this
@@ -102,6 +102,7 @@ Args:
 	first: float (first grid line) (grid lines start at `first * np.pi`)
 	last: float (last grid line) (grid lines end at `last * np.pi`)
 	step: float (grid gap) (grid lines separated by `step * np.pi`)
+	symbol: str (the symbol to use instead of the symbol for pi)
 
 Returns:
 	tuple, containing list of labels and an array of values indicated by
@@ -140,11 +141,11 @@ Returns:
 		if den != 1:
 			builder.append(r'\frac{')
 		if num == 1:
-			builder.append(r'\pi')
+			builder.append(symbol)
 		else:
-			builder.append(fr'{num}\pi')
+			builder.append(f'{num}{symbol}')
 		if den != 1:
-			builder.append(fr'}}{{{den}}}$')
+			builder.append(f'}}{{{den}}}$')
 		else:
 			builder.append('$')
 		labels.append(''.join(builder))
@@ -331,6 +332,7 @@ Returns:
 
 	def axis_fix(self, axis          = None,
 	                   trigonometric = False,
+	                   symbol        = r'\pi',
 	                   first         = None,
 	                   last          = None,
 	                   step          = None):
@@ -344,6 +346,7 @@ specifying in the axis limit that the axis must end at `last`.
 Args:
 	axis: str (which axis to modify: 'x', 'y' or 'z')
 	trigonometric: bool (whether ticks are at rational multiples of pi)
+	symbol: str (symbol to use instead of the symbol for pi)
 	first: float (grid start point)
 	last: float (grid end point)
 	step: float (grid gap)
@@ -356,17 +359,17 @@ Returns:
 			limits_set_function = self.ax.set_xlim
 			labels_get_function = self.ax.get_xticklabels
 			labels_set_function = self.ax.set_xticklabels
-			ticks_set_function = self.ax.set_xticks
+			ticks_set_function  = self.ax.set_xticks
 		elif axis == 'y':
 			limits_set_function = self.ax.set_ylim
 			labels_get_function = self.ax.get_yticklabels
 			labels_set_function = self.ax.set_yticklabels
-			ticks_set_function = self.ax.set_yticks
+			ticks_set_function  = self.ax.set_yticks
 		elif axis == 'z' and self.dim == '3d':
 			limits_set_function = self.ax.set_zlim
 			labels_get_function = self.ax.get_zticklabels
 			labels_set_function = self.ax.set_zticklabels
-			ticks_set_function = self.ax.set_zticks
+			ticks_set_function  = self.ax.set_zticks
 		else:
 			return None
 
@@ -378,7 +381,7 @@ Returns:
 				                 'Arguments \'first\', '
 				                 '\'last\' and \'step\' must '
 				                 'not be None.')
-			labels, ticks = graph_ticks(first, last, step)
+			labels, ticks = graph_ticks(first, last, step, symbol)
 			ticks_set_function(ticks)
 			labels_set_function(labels)
 			limits_set_function(np.pi * first, np.pi * last)
@@ -421,14 +424,12 @@ Returns:
 
 	t = np.linspace(-np.pi / 2, np.pi / 2, 100000)
 	x1 = np.linspace(-32, 32, 500000)
-	s = 0.4
-	m = 0
-	y1 = 1 / np.sqrt(2 * np.pi * s ** 2) * np.exp(-(x1 - m) ** 2 / (2 * s ** 2))
+	y1 = np.cos(x1)
 	z1 = np.sin(x1)
 	grapher.plot(x1, y1, color     = 'red',
 	                     linestyle = '-',
 	                     linewidth = 0.8,
-	                     label     = r'$y=\dfrac{1}{\sqrt{2\pi\sigma^2}}\,e^{-\dfrac{(x-\mu)^2}{2\sigma^2}}$')
+	                     label     = r'$y=\cos\,x$')
 	# x2 = np.linspace(-32, 32, 100000)
 	# y2 = np.sin(x2)
 	# z2 = np.sin(x2)
@@ -475,13 +476,13 @@ Returns:
 	# 			z5[i, j] = 0
 	# grapher.ax.plot_surface(x5, y5, z5, cmap = 'Reds')
 
-	grapher.ax.fill_between(x1, y1, 0,
-	                        facecolor = 'cyan',
-	                        linewidth = 0,
-	                        label     = r'$P(|X-\mu|<\sigma)$',
-	                        where     = [True
-	                                     if -s < i < s else False
-	                                     for i in x1])
+	# grapher.ax.fill_between(x1, y1, 0,
+	#                         facecolor = 'cyan',
+	#                         linewidth = 0,
+	#                         label     = r'$P\left(|X-\mu|>3\sigma\right)$',
+	#                         where     = [True
+	#                                      if i > 3 * s or i < -3 * s else False
+	#                                      for i in x1])
 	# grapher.ax.fill_between(x1, [min(i, j) for i, j in zip(y4, y6)], -4,  facecolor = 'cyan',
 	#                                      linewidth = 0,
 	#                                      label     = r'',
@@ -493,22 +494,25 @@ Returns:
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
-	                 first         = -4 * s,
-	                 last          = 4 * s,
-	                 step          = 1 * s)
+	                 trigonometric = True,
+	                 symbol        = r'\pi',
+	                 first         = -4,
+	                 last          = 4,
+	                 step          = 0.5)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 first         = -0.1 / s,
-	                 last          = 0.6 / s,
-	                 step          = 0.1 / s)
+	                 symbol        = r'\pi',
+	                 first         = -6,
+	                 last          = 6,
+	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
+	                 symbol        = r'\pi',
 	                 first         = -10,
 	                 last          = 10,
 	                 step          = 2)
-	grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
-	grapher.ax.set_yticklabels([r'$-\dfrac{0.1}{\sigma}$', r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$', r'$\dfrac{0.5}{\sigma}$', r'$\dfrac{0.5}{\sigma}$'])
+	# grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
+	# grapher.ax.set_yticklabels([r'$-\dfrac{0.1}{\sigma}$', r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$', r'$\dfrac{0.5}{\sigma}$', r'$\dfrac{0.5}{\sigma}$'])
 	plt.show()
 
 	return None
