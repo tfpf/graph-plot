@@ -76,7 +76,7 @@ Returns:
 
 ###############################################################################
 
-def graph_ticks(first, last, step, symbol = r'\pi'):
+def graph_ticks(first, last, step, symbol = r'\pi', symval = np.pi):
 	r'''
 Create a list of tick values and labels at intervals of `step * np.pi`.	I think
 it is best explained with examples. (To properly demonstrate the working, this
@@ -103,6 +103,7 @@ Args:
 	last: float (last grid line) (grid lines end at `last * np.pi`)
 	step: float (grid gap) (grid lines separated by `step * np.pi`)
 	symbol: str (the symbol to use instead of the symbol for pi)
+	symval: float (numerical value of `symbol`)
 
 Returns:
 	tuple, containing list of labels and an array of values indicated by
@@ -150,7 +151,7 @@ Returns:
 			builder.append('$')
 		labels.append(''.join(builder))
 
-	return labels, np.pi * lattice
+	return labels, symval * lattice
 
 ###############################################################################
 
@@ -332,7 +333,8 @@ Returns:
 
 	def axis_fix(self, axis          = None,
 	                   trigonometric = False,
-	                   symbol        = r'\pi',
+	                   s             = r'\pi',
+	                   v             = np.pi,
 	                   first         = None,
 	                   last          = None,
 	                   step          = None):
@@ -345,8 +347,9 @@ specifying in the axis limit that the axis must end at `last`.
 
 Args:
 	axis: str (which axis to modify: 'x', 'y' or 'z')
-	trigonometric: bool (whether ticks are at rational multiples of pi)
-	symbol: str (symbol to use instead of the symbol for pi)
+	trigonometric: bool (whether ticks are at rational multiples of `v`)
+	s: str (symbol to use instead of the symbol for pi)
+	v: float (numerical value of `s`)
 	first: float (grid start point)
 	last: float (grid end point)
 	step: float (grid gap)
@@ -373,7 +376,7 @@ Returns:
 		else:
 			return None
 
-		# case 1: grid lines at pi times the arguments provided
+		# case 1: grid lines at `v` times the arguments provided
 		if trigonometric:
 			if None in {first, last, step}:
 				raise ValueError('Argument \'trigonometric\' '
@@ -381,10 +384,10 @@ Returns:
 				                 'Arguments \'first\', '
 				                 '\'last\' and \'step\' must '
 				                 'not be None.')
-			labels, ticks = graph_ticks(first, last, step, symbol)
+			labels, ticks = graph_ticks(first, last, step, s, v)
 			ticks_set_function(ticks)
 			labels_set_function(labels)
-			limits_set_function(np.pi * first, np.pi * last)
+			limits_set_function(v * first, v * last)
 
 		# case 2: grid lines at the values provided in the arguments
 		else:
@@ -422,21 +425,21 @@ Returns:
 
 	########################################
 
-	t = np.linspace(-np.pi / 2, np.pi / 2, 100000)
-	x1 = np.linspace(-32, 32, 500000)
+	t = np.linspace(-np.pi, np.pi, 100000)
+	x1 = np.linspace(-32, 32, 1000000)
 	y1 = np.cos(x1)
 	z1 = np.sin(x1)
 	grapher.plot(x1, y1, color     = 'red',
 	                     linestyle = '-',
 	                     linewidth = 0.8,
 	                     label     = r'$y=\cos\,x$')
-	# x2 = np.linspace(-32, 32, 100000)
-	# y2 = np.sin(x2)
-	# z2 = np.sin(x2)
-	# grapher.plot(x2, y2, color     = 'blue',
-	#                      linestyle = '-',
-	#                      linewidth = 0.8,
-	#                      label     = r'$y=\sin\,x$')
+	x2 = np.linspace(-32, 32, 1000000)
+	y2 = np.sin(x1)
+	z2 = np.sin(x2)
+	grapher.plot(x2, y2, color     = 'blue',
+	                     linestyle = '-',
+	                     linewidth = 0.8,
+	                     label     = r'$y=\sin\,x$')
 	# x3 = np.linspace(-32, 32, 100000)
 	# y3 = 6 * np.abs(x3)
 	# z3 = np.sin(x3)
@@ -444,8 +447,8 @@ Returns:
 	#                      linestyle = '-',
 	#                      linewidth = 0.8,
 	#                      label     = r'$y=\dfrac{\mathrm{d^2}}{\mathrm{d}x^2}|x|^3$')
-	# grapher.ax.plot(5, -10, 'k.')
-	# grapher.ax.text(4, -10.8, r'$(5,-10)$')
+	# grapher.ax.plot(-3, -4, 'k.')
+	# grapher.ax.text(-4.4, -3.8, r'$(-3,-4)$')
 	# x4 = np.linspace(0, 3, 100000)
 	# y4 = -x4 + 3
 	# z4 = np.sin(x4)
@@ -476,38 +479,42 @@ Returns:
 	# 			z5[i, j] = 0
 	# grapher.ax.plot_surface(x5, y5, z5, cmap = 'Reds')
 
-	# grapher.ax.fill_between(x1, y1, 0,
+	# grapher.ax.fill_between(x1, y2, y3,
 	#                         facecolor = 'cyan',
 	#                         linewidth = 0,
-	#                         label     = r'$P\left(|X-\mu|>3\sigma\right)$',
+	#                         label     = r'$4x\geq3y,x^2+y^2+6x+8y\leq0$',
 	#                         where     = [True
-	#                                      if i > 3 * s or i < -3 * s else False
+	#                                      if -6 < i < 0 else False
 	#                                      for i in x1])
-	# grapher.ax.fill_between(x1, [min(i, j) for i, j in zip(y4, y6)], -4,  facecolor = 'cyan',
-	#                                      linewidth = 0,
-	#                                      label     = r'',
-	#                                      where     = [True
-	#                                                   if -8 < i < 0 else False
-	#                                                   for i in x1])
+	# grapher.ax.fill_between(x1, y1, y3,
+	#                         facecolor = 'cyan',
+	#                         linewidth = 0,
+	#                         label     = r'',
+	#                         where     = [True
+	#                                      if 0 < i < 2 else False
+	#                                      for i in x1])
 	# grapher.ax.fill_between(x2, y2, -4, facecolor = 'cyan',
 	#                                     linewidth = 0)
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
 	                 trigonometric = True,
-	                 symbol        = r'\pi',
+	                 s             = r'u',
+	                 v             = 1,
 	                 first         = -4,
 	                 last          = 4,
 	                 step          = 0.5)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
-	                 symbol        = r'\pi',
+	                 s             = r'\pi',
+	                 v             = np.pi,
 	                 first         = -6,
 	                 last          = 6,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
-	                 symbol        = r'\pi',
+	                 s             = r'\pi',
+	                 v             = np.pi,
 	                 first         = -10,
 	                 last          = 10,
 	                 step          = 2)
