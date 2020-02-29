@@ -194,7 +194,7 @@ Returns:
 		# some plot styles change LaTeX string font to Commputer Modern
 		if dim == '2d':
 			# plt.style.use(['classic', 'seaborn-poster'])
-			plt.style.use(['fivethirtyeight', 'bmh'])
+			plt.style.use(['bmh', 'seaborn-poster'])
 		elif dim == '3d':
 			plt.style.use('classic')
 		else:
@@ -299,6 +299,7 @@ Returns:
 
 		# set legend and axis labels
 		self.ax.legend(loc       = 'upper right',
+		               fontsize  = 'large',
 		               fancybox  = True,
 		               shadow    = True,
 		               numpoints = 1)
@@ -339,8 +340,8 @@ Returns:
 Modify the labels and ticks on the specified axis of coordinates. Note that the
 limits on the axis must necessarily be set after setting the axis ticks. This
 is because floating point precision issues might introduce an extra tick beyond
-the last point (`last`) to be displayed. This extra tick is eliminate simply by
-specifying in the axis limit that the axis must end at `last`.
+the last point (`last`) to be displayed. This extra tick is eliminated by
+simply specifying in the axis limit that the axis must end at `last`.
 
 Args:
 	axis: str (which axis to modify: 'x', 'y' or 'z')
@@ -385,19 +386,18 @@ Returns:
 			ticks_set_function(ticks)
 			labels_set_function(labels)
 			limits_set_function(v * first, v * last)
+			return None
 
 		# case 2: grid lines at the values provided in the arguments
-		else:
-			if None not in {first, last, step}:
-				ticks_set_function(np.arange(first,
-				                             last + step,
-				                             step))
-			if None not in {first, last}:
-				limits_set_function(first, last)
-			self.fig.canvas.draw()
-			labels_set_function([fr'${t.get_text()}$'
-			                     for t in labels_get_function()])
-
+		if None not in {first, last, step}:
+			ticks_set_function(np.arange(first,
+			                             last + step,
+			                             step))
+		if None not in {first, last}:
+			limits_set_function(first, last)
+		self.fig.canvas.draw()
+		labels_set_function([fr'${t.get_text()}$'
+		                     for t in labels_get_function()])
 		return None
 
 ###############################################################################
@@ -424,19 +424,19 @@ Returns:
 
 	t = np.linspace(-np.pi, np.pi, 100000)
 	x1 = np.linspace(-32, 32, 1000000)
-	y1 = np.cos(x1)
+	y1 = np.abs(x1 - 1) + np.abs(x1 + 1)
 	z1 = np.sin(x1)
 	grapher.plot(x1, y1, color     = 'red',
 	                     linestyle = '-',
 	                     linewidth = 0.8,
-	                     label     = r'$y=\cos\,x$')
-	x2 = np.linspace(-32, 32, 1000000)
-	y2 = np.sin(x1)
-	z2 = np.sin(x2)
-	grapher.plot(x2, y2, color     = 'blue',
-	                     linestyle = '-',
-	                     linewidth = 0.8,
-	                     label     = r'$y=\sin\,x$')
+	                     label     = r'$y=|x-1|+|x+1|$')
+	# x2 = np.linspace(-32, 32, 1000000)
+	# y2 = np.abs(x2) ** (1 / 3) * np.sign(x2)
+	# z2 = np.sin(x2)
+	# grapher.plot(x2, y2, color     = 'blue',
+	#                      linestyle = '-',
+	#                      linewidth = 0.8,
+	#                      label     = r'$y=x^{\frac{1}{3}}$')
 	# x3 = np.linspace(-32, 32, 100000)
 	# y3 = 6 * np.abs(x3)
 	# z3 = np.sin(x3)
@@ -476,37 +476,44 @@ Returns:
 	# 			z5[i, j] = 0
 	# grapher.ax.plot_surface(x5, y5, z5, cmap = 'Reds')
 
-	# grapher.ax.fill_between(x1, y2, y3,
+	# grapher.ax.fill_between(x1, y2, -y2,
 	#                         facecolor = 'cyan',
 	#                         linewidth = 0,
-	#                         label     = r'$4x\geq3y,x^2+y^2+6x+8y\leq0$',
+	#                         label     = r'$1<|z|<2$',
 	#                         where     = [True
-	#                                      if -6 < i < 0 else False
+	#                                      if -2 < i < -1 or 1 < i < 2 else False
 	#                                      for i in x1])
-	# grapher.ax.fill_between(x1, y1, y3,
+	# grapher.ax.fill_between(x1, y1, y2,
 	#                         facecolor = 'cyan',
 	#                         linewidth = 0,
 	#                         label     = r'',
 	#                         where     = [True
-	#                                      if 0 < i < 2 else False
+	#                                      if -1 < i < 1 else False
+	#                                      for i in x1])
+	# grapher.ax.fill_between(x1, -y1, -y2,
+	#                         facecolor = 'cyan',
+	#                         linewidth = 0,
+	#                         label     = r'',
+	#                         where     = [True
+	#                                      if -1 < i < 1 else False
 	#                                      for i in x1])
 	# grapher.ax.fill_between(x2, y2, -4, facecolor = 'cyan',
 	#                                     linewidth = 0)
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = True,
+	                 trigonometric = False,
 	                 s             = r'\pi',
 	                 v             = np.pi,
-	                 first         = -4,
-	                 last          = 4,
-	                 step          = 0.5)
+	                 first         = -8,
+	                 last          = 8,
+	                 step          = 1)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
 	                 s             = r'\pi',
 	                 v             = np.pi,
-	                 first         = -6,
-	                 last          = 6,
+	                 first         = 1,
+	                 last          = 9,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
