@@ -85,7 +85,7 @@ interpreted as parts of escape sequences.)
 >>> graph_ticks(-1, 5, 2)
 (['$-\\pi$', '$\\pi$', '$3\\pi$', '$5\\pi$'], array([-3.14159265,  3.14159265,  9.42477796, 15.70796327]))
 >>> graph_ticks(-1, -1 / 4, 1 / 4)
-(['$-\\pi$', '$-\\frac{3\\pi}{4}$', '$-\\frac{\\pi}{2}$', '$-\\frac{\\pi}{4}$'], array([-3.14159265, -2.35619449, -1.57079633, -0.78539816]))
+(['$-\\pi$', '$-\\dfrac{3\\pi}{4}$', '$-\\dfrac{\\pi}{2}$', '$-\\dfrac{\\pi}{4}$'], array([-3.14159265, -2.35619449, -1.57079633, -0.78539816]))
 >>> graph_ticks(-2, 2, 1)
 (['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$'], array([-6.28318531, -3.14159265,  0.        ,  3.14159265,  6.28318531]))
 
@@ -140,7 +140,7 @@ Returns:
 			builder.append('-')
 			num = -num
 		if den != 1:
-			builder.append(r'\frac{')
+			builder.append(r'\dfrac{')
 		if num == 1:
 			builder.append(symbol)
 		else:
@@ -191,13 +191,10 @@ Returns:
 	None
 '''
 
-		# 'classic' style renders LaTeX strings in Computer Modern font
-		# 'seaborn-poster' style increases the font size
-		# use both for two-dimensional plots
-		# use only 'classic' for three-dimensional plots
-		# because adjacent text items overlap when font size increases
+		# some plot styles change LaTeX string font to Commputer Modern
 		if dim == '2d':
-			plt.style.use(['classic', 'seaborn-poster'])
+			# plt.style.use(['classic', 'seaborn-poster'])
+			plt.style.use(['fivethirtyeight', 'bmh'])
 		elif dim == '3d':
 			plt.style.use('classic')
 		else:
@@ -499,8 +496,8 @@ Returns:
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
 	                 trigonometric = True,
-	                 s             = r'u',
-	                 v             = 1,
+	                 s             = r'\pi',
+	                 v             = np.pi,
 	                 first         = -4,
 	                 last          = 4,
 	                 step          = 0.5)
