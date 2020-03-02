@@ -15,7 +15,9 @@ import time
 matplotlib.use('TkAgg')
 
 # default save directory when saving plot from GUI
-matplotlib.rcParams["savefig.directory"] = '/mnt/c/Users/vpaij/Pictures/'
+matplotlib.rcParams['savefig.dpi']       = 200
+matplotlib.rcParams['savefig.format']    = 'png'
+matplotlib.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/'
 
 ###############################################################################
 
@@ -171,8 +173,7 @@ Methods:
 	__init__
 	__repr__
 	__str__
-	plot: check the attribute `dim`, then pass arguments to the actual
-		plotting function `ax.plot`
+	plot: wrapper for the actual plot function provided by matplotlib
 	configure: spice up the plot to make it more complete
 	axis_fix: modify the ticks and labels on the axes so they look nice
 '''
@@ -194,7 +195,7 @@ Returns:
 		# some plot styles change LaTeX string font to Commputer Modern
 		if dim == '2d':
 			# plt.style.use(['classic', 'seaborn-poster'])
-			plt.style.use(['bmh', 'seaborn-poster'])
+			plt.style.use(['bmh', 'seaborn-poster', 'candy.mplstyle'])
 		elif dim == '3d':
 			plt.style.use('classic')
 		else:
@@ -208,7 +209,7 @@ Returns:
 			self.ax = self.fig.add_subplot(1, 1, 1)
 		else:
 			self.ax = self.fig.add_subplot(1, 1, 1,
-			                               projection = dim)
+			                               projection = '3d')
 
 		# each run, the title of the window should be unique
 		# use Unix time in the title
@@ -268,10 +269,14 @@ Returns:
 
 		# if the arguments are 100000-item NumPy arrays, sanitise them
 		# otherwise, vertical lines (if any) are supposedly intentional
-		if len(args[0]) > 1000:
-			args = tuple(sanitise_discontinuous(arg)
-			             for arg in args)
-		self.ax.plot(*args, **kwargs)
+		try:
+			if len(args[0]) > 1000:
+				args = tuple(sanitise_discontinuous(arg)
+				             for arg in args)
+		except TypeError:
+			pass
+		finally:
+			self.ax.plot(*args, **kwargs)
 
 		return None
 
@@ -298,11 +303,7 @@ Returns:
 			                   adjustable = 'box')
 
 		# set legend and axis labels
-		self.ax.legend(loc       = 'upper right',
-		               fontsize  = 'large',
-		               fancybox  = True,
-		               shadow    = True,
-		               numpoints = 1)
+		self.ax.legend(loc = 'upper right')
 		self.ax.set_xlabel(axis_labels[0])
 		self.ax.set_ylabel(axis_labels[1])
 		if self.dim == '3d':
@@ -313,8 +314,13 @@ Returns:
 		# if this is a '2d' plot, draw thick coordinate axes
 		# this does not work as expected in '3d'
 		if self.dim == '2d':
-			self.ax.axhline(linewidth = 1.2, color = 'k')
-			self.ax.axvline(linewidth = 1.2, color = 'k')
+			kwargs = {
+			          'alpha'     : 0.6,
+			          'linewidth' : 1.2,
+			          'color'     : 'gray'
+			         }
+			self.ax.axhline(**kwargs)
+			self.ax.axvline(**kwargs)
 
 		# enable grid
 		# minor grid takes too much memory in '3d' plot
@@ -424,35 +430,27 @@ Returns:
 
 	t = np.linspace(-np.pi, np.pi, 100000)
 	x1 = np.linspace(-32, 32, 1000000)
-	y1 = np.abs(x1 - 1) + np.abs(x1 + 1)
+	y1 = np.abs(x1 + 2)
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, color     = 'red',
-	                     linestyle = '-',
-	                     linewidth = 0.8,
-	                     label     = r'$y=|x-1|+|x+1|$')
-	# x2 = np.linspace(-32, 32, 1000000)
-	# y2 = np.abs(x2) ** (1 / 3) * np.sign(x2)
-	# z2 = np.sin(x2)
-	# grapher.plot(x2, y2, color     = 'blue',
-	#                      linestyle = '-',
-	#                      linewidth = 0.8,
-	#                      label     = r'$y=x^{\frac{1}{3}}$')
-	# x3 = np.linspace(-32, 32, 100000)
-	# y3 = 6 * np.abs(x3)
-	# z3 = np.sin(x3)
-	# grapher.plot(x3, y3, color     = 'green',
-	#                      linestyle = '-',
-	#                      linewidth = 0.8,
-	#                      label     = r'$y=\dfrac{\mathrm{d^2}}{\mathrm{d}x^2}|x|^3$')
-	# grapher.ax.plot(-3, -4, 'k.')
-	# grapher.ax.text(-4.4, -3.8, r'$(-3,-4)$')
-	# x4 = np.linspace(0, 3, 100000)
-	# y4 = -x4 + 3
-	# z4 = np.sin(x4)
-	# grapher.plot(x4, y4, color     = 'red',
-	#                      linestyle = '-',
-	#                      linewidth = 0.8,
-	#                      label     = r'')
+	grapher.plot(x1, y1, color = 'red', label = r'$y=|x+2|$')
+	grapher.plot(1, 1, 'k.')
+	grapher.ax.text(1.1, 1.1, r'$(1,1)$')
+
+	x2 = np.linspace(-32, 32, 1000000)
+	y2 = 2 * x2
+	z2 = np.sin(x2)
+	grapher.plot(x2, y2, color = 'blue', label = r'$y=2x$')
+
+	x3 = np.linspace(-32, 32, 100000)
+	y3 = np.zeros(100000)
+	z3 = np.sin(x3)
+	grapher.plot(x3, y3, color = 'green', label = r'$y=0$')
+
+	x4 = np.linspace(-32, 32, 100000)
+	y4 = x4 / 8
+	z4 = np.sin(x4)
+	grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
+
 	# y3 = np.linspace(2, 2.5, 100)
 	# t = np.linspace(-np.pi, np.pi, 100)
 	# R, T = np.meshgrid(y3, t)
@@ -490,12 +488,12 @@ Returns:
 	#                         where     = [True
 	#                                      if -1 < i < 1 else False
 	#                                      for i in x1])
-	# grapher.ax.fill_between(x1, -y1, -y2,
+	# grapher.ax.fill_between(x1, y1, 0,
 	#                         facecolor = 'cyan',
 	#                         linewidth = 0,
-	#                         label     = r'',
+	#                         label     = r'$R$',
 	#                         where     = [True
-	#                                      if -1 < i < 1 else False
+	#                                      if -np.pi < i < np.pi else False
 	#                                      for i in x1])
 	# grapher.ax.fill_between(x2, y2, -4, facecolor = 'cyan',
 	#                                     linewidth = 0)
@@ -505,15 +503,15 @@ Returns:
 	                 trigonometric = False,
 	                 s             = r'\pi',
 	                 v             = np.pi,
-	                 first         = -8,
-	                 last          = 8,
+	                 first         = -7,
+	                 last          = 9,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
 	                 s             = r'\pi',
 	                 v             = np.pi,
-	                 first         = 1,
-	                 last          = 9,
+	                 first         = -2,
+	                 last          = 6,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
@@ -524,6 +522,7 @@ Returns:
 	                 step          = 2)
 	# grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
 	# grapher.ax.set_yticklabels([r'$-\dfrac{0.1}{\sigma}$', r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$', r'$\dfrac{0.5}{\sigma}$', r'$\dfrac{0.5}{\sigma}$'])
+	grapher.fig.tight_layout(pad = 3)
 	plt.show()
 
 	return None
