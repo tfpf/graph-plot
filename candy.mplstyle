@@ -3,7 +3,7 @@
 ###############################################################################
 
 lines.linewidth : 0.8
-lines.linestyle : :
+lines.linestyle : -
 # lines.color     : C0
 
 lines.marker          : None
@@ -132,20 +132,20 @@ text.usetex         : False
 # axes
 ###############################################################################
 
-axes.facecolor      : white
-axes.edgecolor      : black
-axes.linewidth      : 2
-axes.grid           : True
-axes.grid.axis      : both
-# axes.grid.which     : major
-axes.titlesize      : xx-large # xx-small|x-small|small|medium|large|x-large|xx-large|larger|smaller
-axes.titleweight    : normal # 100|200|300|...|900|normal|bold|light
-axes.titlepad       : 6.0
-# axes.labelsize      : large  ## fontsize of the x any y labels
-# axes.labelpad       : 4.0     ## space between label and axis
-# axes.labelweight    : normal  ## weight of the x and y labels
-axes.labelcolor     : gray
-axes.axisbelow      : line # True|line|False
+# axes.facecolor   : white
+axes.edgecolor   : black
+axes.linewidth   : 1.2
+axes.grid        : True
+axes.grid.axis   : both
+# axes.grid.which  : major
+axes.titlesize   : xx-large # xx-small|x-small|small|medium|large|x-large|xx-large|larger|smaller
+axes.titleweight : normal   # 100|200|300|...|900|normal|bold|light
+axes.titlepad    : 6.0
+# axes.labelsize   : large
+# axes.labelpad    : 4.0
+# axes.labelweight : normal
+axes.labelcolor  : 707070
+axes.axisbelow   : line     # True|line|False
 
 # axes.formatter.limits           : -7, 7
 # axes.formatter.use_locale       : False
@@ -154,12 +154,12 @@ axes.axisbelow      : line # True|line|False
 # axes.formatter.useoffset        : True
 # axes.formatter.offset_threshold : 4
 
-# axes.spines.left   : True
-# axes.spines.bottom : True
-# axes.spines.top    : True
-# axes.spines.right  : True
+axes.spines.left   : True
+axes.spines.bottom : True
+axes.spines.top    : True
+axes.spines.right  : True
 
-# axes.unicode_minus : True
+axes.unicode_minus : True
 
 # axes.prop_cycle : cycler('color', ['1f77b4', 'ff7f0e', '2ca02c', 'd62728', '9467bd', '8c564b', 'e377c2', '7f7f7f', 'bcbd22', '17becf'])
 
@@ -188,78 +188,84 @@ axes.axisbelow      : line # True|line|False
 # ticks
 ###############################################################################
 
-xtick.top            : False
-xtick.bottom         : True
+xtick.top           : False
+xtick.bottom        : True
+xtick.labeltop      : False
+xtick.labelbottom   : True
+# xtick.major.size    : 3.5
+# xtick.minor.size    : 2
+# xtick.major.width   : 0.8
+# xtick.minor.width   : 0.6
+# xtick.major.pad     : 3.5
+# xtick.minor.pad     : 3.4
+xtick.color         : black
+# xtick.labelsize     : medium
+xtick.direction     : in     # in|out|inout
+# xtick.minor.visible : False
+# xtick.major.top     : True
+# xtick.major.bottom  : True
+# xtick.minor.top     : True
+# xtick.minor.bottom  : True
+xtick.alignment     : center
 
-xtick.labeltop       : False
-xtick.labelbottom    : True
-#xtick.major.size     : 3.5    ## major tick size in points
-#xtick.minor.size     : 2      ## minor tick size in points
-#xtick.major.width    : 0.8    ## major tick width in points
-#xtick.minor.width    : 0.6    ## minor tick width in points
-#xtick.major.pad      : 3.5    ## distance to major tick label in points
-#xtick.minor.pad      : 3.4    ## distance to the minor tick label in points
-xtick.color          : black  ## color of the tick labels
-#xtick.labelsize      : medium ## fontsize of the tick labels
-xtick.direction      : in    ## direction: in, out, or inout
-#xtick.minor.visible  : False  ## visibility of minor ticks on x-axis
-#xtick.major.top      : True   ## draw x axis top major ticks
-#xtick.major.bottom   : True   ## draw x axis bottom major ticks
-#xtick.minor.top      : True   ## draw x axis top minor ticks
-#xtick.minor.bottom   : True   ## draw x axis bottom minor ticks
-xtick.alignment      : center ## alignment of xticks
+ytick.left          : True
+ytick.right         : False
+ytick.labelleft     : True
+ytick.labelright    : False
+# ytick.major.size    : 3.5
+# ytick.minor.size    : 2
+# ytick.major.width   : 0.8
+# ytick.minor.width   : 0.6
+# ytick.major.pad     : 3.5
+# ytick.minor.pad     : 3.4
+ytick.color         : black
+# ytick.labelsize     : medium
+ytick.direction     : in
+# ytick.minor.visible : False
+# ytick.major.left    : True
+# ytick.major.right   : True
+# ytick.minor.left    : True
+# ytick.minor.right   : True
+ytick.alignment     : baseline
 
-#ytick.left           : True   ## draw ticks on the left side
-#ytick.right          : False  ## draw ticks on the right side
-#ytick.labelleft      : True   ## draw tick labels on the left side
-#ytick.labelright     : False  ## draw tick labels on the right side
-#ytick.major.size     : 3.5    ## major tick size in points
-#ytick.minor.size     : 2      ## minor tick size in points
-#ytick.major.width    : 0.8    ## major tick width in points
-#ytick.minor.width    : 0.6    ## minor tick width in points
-#ytick.major.pad      : 3.5    ## distance to major tick label in points
-#ytick.minor.pad      : 3.4    ## distance to the minor tick label in points
-#ytick.color          : black  ## color of the tick labels
-#ytick.labelsize      : medium ## fontsize of the tick labels
-#ytick.direction      : out    ## direction: in, out, or inout
-#ytick.minor.visible  : False  ## visibility of minor ticks on y-axis
-#ytick.major.left     : True   ## draw y axis left major ticks
-#ytick.major.right    : True   ## draw y axis right major ticks
-#ytick.minor.left     : True   ## draw y axis left minor ticks
-#ytick.minor.right    : True   ## draw y axis right minor ticks
-#ytick.alignment      : center_baseline ## alignment of yticks
+###############################################################################
+# grid
+###############################################################################
 
-#### GRIDS
-#grid.color       :   b0b0b0    ## grid color
-#grid.linestyle   :   -         ## solid
-#grid.linewidth   :   0.8       ## in points
-#grid.alpha       :   1.0       ## transparency, between 0.0 and 1.0
+grid.color     : b0b0b0
+grid.linestyle : :
+grid.linewidth : 0.8
+grid.alpha     : 1.0
 
-#### Legend
-#legend.loc           : best
-#legend.frameon       : True     ## if True, draw the legend on a background patch
-#legend.framealpha    : 0.8      ## legend patch transparency
-#legend.facecolor     : inherit  ## inherit from axes.facecolor; or color spec
-#legend.edgecolor     : 0.8      ## background patch boundary color
-#legend.fancybox      : True     ## if True, use a rounded box for the
-                                 ## legend background, else a rectangle
-#legend.shadow        : False    ## if True, give background a shadow effect
-#legend.numpoints     : 1        ## the number of marker points in the legend line
-#legend.scatterpoints : 1        ## number of scatter points
-#legend.markerscale   : 1.0      ## the relative size of legend markers vs. original
-#legend.fontsize      : medium
-#legend.title_fontsize    : None ## None sets to the same as the default axes.
-## Dimensions as fraction of fontsize:
-#legend.borderpad     : 0.4      ## border whitespace
-#legend.labelspacing  : 0.5      ## the vertical space between the legend entries
-#legend.handlelength  : 2.0      ## the length of the legend lines
-#legend.handleheight  : 0.7      ## the height of the legend handle
-#legend.handletextpad : 0.8      ## the space between the legend line and legend text
-#legend.borderaxespad : 0.5      ## the border between the axes and legend edge
-#legend.columnspacing : 2.0      ## column separation
+###############################################################################
+# legend
+###############################################################################
 
-#### FIGURE
-## See http://matplotlib.org/api/figure_api.html#matplotlib.figure.Figure
+legend.loc           : best
+legend.frameon       : True
+legend.framealpha    : 0.5
+legend.facecolor     : white
+legend.edgecolor     : white
+legend.fancybox      : True
+legend.shadow        : False
+legend.numpoints     : 1
+legend.scatterpoints : 1
+legend.markerscale   : 1.0
+legend.fontsize      : x-large
+legend.title_fontsize    : None
+
+legend.borderpad     : 0.4
+legend.labelspacing  : 0.5
+legend.handlelength  : 1.6
+legend.handleheight  : 0.8
+legend.handletextpad : 0.8
+legend.borderaxespad : 0.5
+legend.columnspacing : 2.0
+
+###############################################################################
+# figure
+###############################################################################
+
 #figure.titlesize : large      ## size of the figure title (Figure.suptitle())
 #figure.titleweight : normal   ## weight of the figure title
 #figure.figsize   : 6.4, 4.8   ## figure size in inches
