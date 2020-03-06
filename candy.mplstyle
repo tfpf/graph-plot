@@ -144,7 +144,7 @@ axes.titlepad    : 6.0
 # axes.labelsize   : large
 # axes.labelpad    : 4.0
 # axes.labelweight : normal
-axes.labelcolor  : 707070
+axes.labelcolor  : 666666
 axes.axisbelow   : line     # True|line|False
 
 # axes.formatter.limits           : -7, 7
