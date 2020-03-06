@@ -15,9 +15,10 @@ import time
 matplotlib.use('TkAgg')
 
 # default save directory when saving plot from GUI
-matplotlib.rcParams['savefig.dpi']       = 200
-matplotlib.rcParams['savefig.format']    = 'png'
-matplotlib.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/'
+matplotlib.rcParams['savefig.dpi']         = 200
+matplotlib.rcParams['savefig.format']      = 'png'
+matplotlib.rcParams['savefig.directory']   = '/mnt/c/Users/vpaij/Pictures/'
+matplotlib.rcParams['savefig.orientation'] = 'portrait'
 
 ###############################################################################
 
@@ -429,27 +430,27 @@ Returns:
 	########################################
 
 	t = np.linspace(-np.pi, np.pi, 100000)
-	x1 = np.linspace(-32, 32, 1000000)
-	y1 = np.abs(x1 + 2)
+	x1 = np.linspace(-32, 32, 100000)
+	y1 = np.cos(x1)
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, color = 'red', label = r'$y=|x+2|$')
-	grapher.plot(1, 1, 'k.')
-	grapher.ax.text(1.1, 1.1, r'$(1,1)$')
+	grapher.plot(x1, y1, color = 'red', label = r'$y=\cos\,x$')
+	# grapher.plot(1, 1, 'k.')
+	# grapher.ax.text(1.1, 1.1, r'$(1,1)$')
 
-	x2 = np.linspace(-32, 32, 1000000)
-	y2 = 2 * x2
+	x2 = np.linspace(-32, 32, 100000)
+	y2 = np.sin(x2) ** 2
 	z2 = np.sin(x2)
-	grapher.plot(x2, y2, color = 'blue', label = r'$y=2x$')
+	grapher.plot(x2, y2, color = 'blue', label = r'$y=\sin^2x$')
 
-	x3 = np.linspace(-32, 32, 100000)
-	y3 = np.zeros(100000)
-	z3 = np.sin(x3)
-	grapher.plot(x3, y3, color = 'green', label = r'$y=0$')
+	# x3 = np.linspace(-32, 32, 100000)
+	# y3 = 2 * x3
+	# z3 = np.sin(x3)
+	# grapher.plot(x3, y3, color = 'green', label = r'$y=2x$')
 
-	x4 = np.linspace(-32, 32, 100000)
-	y4 = x4 / 8
-	z4 = np.sin(x4)
-	grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
+	# x4 = np.linspace(-32, 32, 100000)
+	# y4 = x4 / 8
+	# z4 = np.sin(x4)
+	# grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
 
 	# y3 = np.linspace(2, 2.5, 100)
 	# t = np.linspace(-np.pi, np.pi, 100)
@@ -474,19 +475,19 @@ Returns:
 	# 			z5[i, j] = 0
 	# grapher.ax.plot_surface(x5, y5, z5, cmap = 'Reds')
 
-	# grapher.ax.fill_between(x1, y2, -y2,
+	# grapher.ax.fill_between(x1, y2, y3,
 	#                         facecolor = 'cyan',
 	#                         linewidth = 0,
-	#                         label     = r'$1<|z|<2$',
+	#                         label     = r'$R$',
 	#                         where     = [True
-	#                                      if -2 < i < -1 or 1 < i < 2 else False
+	#                                      if 0 < i < 1 else False
 	#                                      for i in x1])
-	# grapher.ax.fill_between(x1, y1, y2,
+	# grapher.ax.fill_between(x1, y1, y3,
 	#                         facecolor = 'cyan',
 	#                         linewidth = 0,
 	#                         label     = r'',
 	#                         where     = [True
-	#                                      if -1 < i < 1 else False
+	#                                      if 1 < i < 2 else False
 	#                                      for i in x1])
 	# grapher.ax.fill_between(x1, y1, 0,
 	#                         facecolor = 'cyan',
@@ -500,18 +501,18 @@ Returns:
 
 	grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
 	grapher.axis_fix(axis          = 'x',
-	                 trigonometric = False,
+	                 trigonometric = True,
 	                 s             = r'\pi',
 	                 v             = np.pi,
-	                 first         = -7,
-	                 last          = 9,
-	                 step          = 1)
+	                 first         = -2,
+	                 last          = 2,
+	                 step          = 0.25)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
 	                 s             = r'\pi',
 	                 v             = np.pi,
-	                 first         = -2,
-	                 last          = 6,
+	                 first         = -3,
+	                 last          = 3,
 	                 step          = 1)
 	grapher.axis_fix(axis          = 'z',
 	                 trigonometric = False,
