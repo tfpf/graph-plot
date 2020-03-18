@@ -10,7 +10,7 @@ lines.marker          : None
 lines.markerfacecolor : auto
 lines.markeredgecolor : auto
 lines.markeredgewidth : 1.0
-lines.markersize      : 6
+lines.markersize      : 8
 markers.fillstyle     : full # full|left|right|bottom|top|none
 
 lines.dash_joinstyle  : miter       # miter|round|bevel
