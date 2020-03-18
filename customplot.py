@@ -304,7 +304,7 @@ Returns:
 			                   adjustable = 'box')
 
 		# set legend and axis labels
-		self.ax.legend(loc = 'upper right')
+		self.ax.legend(loc = 'best')
 		self.ax.set_xlabel(axis_labels[0])
 		self.ax.set_ylabel(axis_labels[1])
 		if self.dim == '3d':
@@ -431,26 +431,32 @@ Returns:
 
 	t = np.linspace(-np.pi, np.pi, 100000)
 	x1 = np.linspace(-32, 32, 100000)
-	y1 = np.cos(x1)
+	y1 = np.abs(np.sin(x1)) / np.tan(x1)
 	z1 = np.sin(x1)
-	grapher.plot(x1, y1, color = 'red', label = r'$y=\cos\,x$')
-	# grapher.plot(1, 1, 'k.')
-	# grapher.ax.text(1.1, 1.1, r'$(1,1)$')
+	grapher.plot(x1, y1, color = 'red', label = r'$y=|\sin\,x|\cot\,x$')
+	grapher.plot(0, 1, linestyle = ':', marker = 'o', markerfacecolor = 'none', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
+	# grapher.ax.text(1.1, 1.8, r'$(a,2a)$')
 
-	x2 = np.linspace(-32, 32, 100000)
-	y2 = np.sin(x2) ** 2
-	z2 = np.sin(x2)
-	grapher.plot(x2, y2, color = 'blue', label = r'$y=\sin^2x$')
+	# x2 = np.linspace(-32, 32, 100000)
+	# y2 = np.cos(x2)
+	# z2 = np.sin(x2)
+	# grapher.plot(x2, y2, color = 'blue', label = r'$y=\cos\,x$')
+	# grapher.plot(1, 0, 'k.')
+	# grapher.ax.text(1.1, 0.1, r'$(a,0)$')
 
 	# x3 = np.linspace(-32, 32, 100000)
 	# y3 = 2 * x3
 	# z3 = np.sin(x3)
 	# grapher.plot(x3, y3, color = 'green', label = r'$y=2x$')
+	# grapher.plot(0, 0, 'k.')
+	# grapher.ax.text(-0.5, -0.2, r'$(0,0)$')
 
 	# x4 = np.linspace(-32, 32, 100000)
 	# y4 = x4 / 8
 	# z4 = np.sin(x4)
 	# grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
+	# grapher.plot(1, 2, 'k.')
+	# grapher.ax.text(1.1, 1.8, r'$(a,2a)$')
 
 	# y3 = np.linspace(2, 2.5, 100)
 	# t = np.linspace(-np.pi, np.pi, 100)
@@ -475,7 +481,7 @@ Returns:
 	# 			z5[i, j] = 0
 	# grapher.ax.plot_surface(x5, y5, z5, cmap = 'Reds')
 
-	# grapher.ax.fill_between(x1, y2, y3,
+	# grapher.ax.fill_between(x1, y1, 0,
 	#                         facecolor = 'cyan',
 	#                         linewidth = 0,
 	#                         label     = r'$R$',
@@ -506,7 +512,7 @@ Returns:
 	                 v             = np.pi,
 	                 first         = -2,
 	                 last          = 2,
-	                 step          = 0.25)
+	                 step          = 1 / 4)
 	grapher.axis_fix(axis          = 'y',
 	                 trigonometric = False,
 	                 s             = r'\pi',
