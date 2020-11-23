@@ -329,7 +329,7 @@ Returns:
         if None not in {first, last}:
             limits_set_function(first, last)
         self.fig.canvas.draw()
-        labels_set_function([fr'${t.get_text()}$' for t in labels_get_function()])
+        labels_set_function([f'${t.get_text()}$' for t in labels_get_function()])
 
 ###############################################################################
 
@@ -344,19 +344,16 @@ def main():
 
     t = np.linspace(-np.pi, np.pi, 100000)
     x1 = np.linspace(-32, 32, 100000)
-    y1 = np.sin(x1)
+    y1 = np.sin(x1) + np.cos(x1)
     z1 = np.sin(x1)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\sin\,x$')
-    # grapher.plot(0, 0, marker = 'o', markerfacecolor = 'red', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
-    # grapher.plot(0, 1, marker = 'o', markerfacecolor = 'white', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\sin\,x+\cos\,x$')
     # grapher.plot(0, 0, linestyle = ':', marker = 'o', markerfacecolor = 'none', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
     # grapher.ax.text(1.1, 1.8, r'$(a,2a)$')
 
     x2 = np.linspace(-32, 32, 100000)
-    y2 = np.abs(x1 - 1)
+    y2 = np.floor(y1)
     z2 = np.sin(x2)
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=|x-1|$')
-    # grapher.plot([3 * np.pi / 2], [0], 'bo', markersize = 3.5, fillstyle = 'none')
+    grapher.plot(x2, y2, color = 'blue', label = r'$y=\lfloor\sin\,x+\cos\,x\rfloor$')
     # grapher.plot(1, 0, 'k.')
     # grapher.ax.text(1.1, 0.1, r'$(a,0)$')
 
@@ -405,13 +402,13 @@ def main():
                      v             = np.pi,
                      first         = -2,
                      last          = 2,
-                     step          = 1 / 3)
+                     step          = 1 / 4)
     grapher.axis_fix(axis          = 'y',
                      trigonometric = False,
                      s             = r'\pi',
                      v             = np.pi,
-                     first         = -2,
-                     last          = 2,
+                     first         = -3,
+                     last          = 3,
                      step          = 1)
     grapher.axis_fix(axis          = 'z',
                      trigonometric = False,
