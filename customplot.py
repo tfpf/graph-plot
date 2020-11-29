@@ -342,29 +342,29 @@ def main():
 
     ########################################
 
-    t = np.linspace(-np.pi, np.pi, 100000)
-    x1 = np.linspace(-32, 32, 100000)
-    y1 = np.sin(x1) + np.cos(x1)
+    t = np.linspace(-np.pi, np.pi, 500000)
+    x1 = np.linspace(-32, 32, 500000)
+    y1 = np.floor(x1)
     z1 = np.sin(x1)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\sin\,x+\cos\,x$')
-    # grapher.plot(0, 0, linestyle = ':', marker = 'o', markerfacecolor = 'none', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
-    # grapher.ax.text(1.1, 1.8, r'$(a,2a)$')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\lfloor x\rfloor$')
+    grapher.plot(range(-32, 32), range(-33, 31), linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
+    # grapher.ax.text(1.05, -0.05, r'$(1,0)$')
 
-    x2 = np.linspace(-32, 32, 100000)
-    y2 = np.floor(y1)
+    x2 = np.linspace(-32, 32, 500000)
+    y2 = x2
     z2 = np.sin(x2)
-    grapher.plot(x2, y2, color = 'blue', label = r'$y=\lfloor\sin\,x+\cos\,x\rfloor$')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\log\,2x$')
     # grapher.plot(1, 0, 'k.')
     # grapher.ax.text(1.1, 0.1, r'$(a,0)$')
 
-    x3 = np.linspace(-32, 32, 100000)
-    y3 = y1 + y2
+    x3 = np.linspace(0, 32, 500000)
+    y3 = x3
     z3 = np.sin(x3)
-    # grapher.plot(x3, y3, color = 'green', label = r'$y=|x|+|x-1|$')
+    # grapher.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
     # grapher.plot(0, 0, 'k.')
     # grapher.ax.text(-0.5, -0.2, r'$(0,0)$')
 
-    # x4 = np.linspace(-32, 32, 100000)
+    # x4 = np.linspace(-32, 32, 500000)
     # y4 = x4 / 8
     # z4 = np.sin(x4)
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
@@ -397,18 +397,18 @@ def main():
 
     grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
     grapher.axis_fix(axis          = 'x',
-                     trigonometric = True,
+                     trigonometric = False,
                      s             = r'\pi',
                      v             = np.pi,
-                     first         = -2,
-                     last          = 2,
-                     step          = 1 / 4)
+                     first         = -10,
+                     last          = 10,
+                     step          = 1)
     grapher.axis_fix(axis          = 'y',
                      trigonometric = False,
                      s             = r'\pi',
                      v             = np.pi,
-                     first         = -3,
-                     last          = 3,
+                     first         = -5,
+                     last          = 5,
                      step          = 1)
     grapher.axis_fix(axis          = 'z',
                      trigonometric = False,
