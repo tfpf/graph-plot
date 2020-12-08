@@ -130,7 +130,7 @@ Returns:
         # case 2: `coefficient' is non-zero
         if num < 0:
             builder.append('-')
-            num = -num
+            num = abs(num)
         if den != 1:
             builder.append(r'\dfrac{')
         if num != 1:
