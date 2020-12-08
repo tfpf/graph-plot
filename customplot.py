@@ -343,17 +343,19 @@ def main():
     ########################################
 
     t = np.linspace(-np.pi, np.pi, 500000)
-    x1 = np.linspace(-32, 32, 500000)
-    y1 = np.floor(x1)
+    x1 = np.linspace(-700, 900, 500000)
+    y1 = np.exp(x1 ** 3)
     z1 = np.sin(x1)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\lfloor x\rfloor$')
-    grapher.plot(range(-32, 32), range(-33, 31), linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=e^{x^3}$')
+    # grapher.plot(range(-32, 32), range(-33, 31), linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
+    # grapher.plot(range(-32, 32), [1] * 64, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
     # grapher.ax.text(1.05, -0.05, r'$(1,0)$')
 
     x2 = np.linspace(-32, 32, 500000)
-    y2 = x2
+    y2 = np.cos(x2)
     z2 = np.sin(x2)
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\log\,2x$')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\cos\,t$')
+    # grapher.plot(range(-32, 32), [0] * 64, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none')
     # grapher.plot(1, 0, 'k.')
     # grapher.ax.text(1.1, 0.1, r'$(a,0)$')
 
@@ -371,13 +373,11 @@ def main():
     # grapher.plot(1, 2, 'k.')
     # grapher.ax.text(1.1, 1.8, r'$(a,2a)$')
 
-    # grapher.ax.fill_between(x1, y1, y2,
-    #                         facecolor = 'cyan',
-    #                         linewidth = 0,
-    #                         label     = r'$R$',
-    #                         where     = [True
-    #                                      if 0 < i < np.pi / 4 else False
-    #                                      for i in x1])
+    grapher.ax.fill_between(x1, y1, 0,
+                            facecolor = 'cyan',
+                            linewidth = 0,
+                            label     = r'$R$',
+                            where     = [True if i < 0 else False for i in x1])
     # grapher.ax.fill_between(x1, y1, y3,
     #                         facecolor = 'cyan',
     #                         linewidth = 0,
@@ -400,15 +400,15 @@ def main():
                      trigonometric = False,
                      s             = r'\pi',
                      v             = np.pi,
-                     first         = -10,
-                     last          = 10,
+                     first         = -6,
+                     last          = 2,
                      step          = 1)
     grapher.axis_fix(axis          = 'y',
                      trigonometric = False,
                      s             = r'\pi',
                      v             = np.pi,
-                     first         = -5,
-                     last          = 5,
+                     first         = -1,
+                     last          = 3,
                      step          = 1)
     grapher.axis_fix(axis          = 'z',
                      trigonometric = False,
@@ -418,8 +418,8 @@ def main():
                      last          = 10,
                      step          = 2)
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
-    # grapher.ax.set_yticklabels([r'$-\dfrac{0.1}{\sigma}$', r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$', r'$\dfrac{0.5}{\sigma}$', r'$\dfrac{0.5}{\sigma}$'])
-    grapher.fig.tight_layout(pad = 3)
+    # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
+    grapher.fig.tight_layout(pad = 2)
     plt.show()
 
 ###############################################################################
