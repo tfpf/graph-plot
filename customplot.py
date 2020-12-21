@@ -12,7 +12,7 @@ import time
 # print(matplotlib.rcsetup.non_interactive_bk)
 matplotlib.use('TkAgg')
 
-matplotlib.rcParams['figure.dpi']          = 125
+matplotlib.rcParams['figure.dpi']          = 120
 matplotlib.rcParams['savefig.dpi']         = 200
 matplotlib.rcParams['savefig.format']      = 'png'
 matplotlib.rcParams['savefig.directory']   = '/mnt/c/Users/vpaij/Pictures/'
@@ -27,9 +27,6 @@ Display a list in neat centred columns.
 Args:
     items: list (each list element must have an `__str__' method)
     columns: int (number of columns to arrange `items' in)
-
-Returns:
-    None
 '''
 
     # convert 1D list to 2D list
@@ -108,15 +105,18 @@ Returns:
 
     coefficients = np.arange(first, last + step, step)
 
-    labels = []
-    for coefficient in coefficients:
+    # pre-allocate space for the list because its length is known
+    # this is approximately twice as fast as appending repeatedly
+    labels = [None] * len(coefficients)
+
+    for i, coefficient in enumerate(coefficients):
         value = fractions.Fraction(coefficient).limit_denominator()
         num = value.numerator
         den = value.denominator
 
         # case 1: `coefficient' is zero
         if num == 0:
-            labels.append(r'$0$')
+            labels[i] = '$0$'
             continue
 
         # build a string which has to be appended to `label'
@@ -139,7 +139,7 @@ Returns:
         if den != 1:
             builder.append(f'}}{{{den}}}')
         builder.append('$')
-        labels.append(''.join(builder))
+        labels[i] = ''.join(builder)
 
     return labels, symval * coefficients
 
@@ -152,50 +152,49 @@ A class to easily plot two- and three-dimensional graphs.
 Attributes:
     dim: str (dimension of the plot, either '2d' or '3d')
     aspect_ratio: float (ratio of scales on axes)
-    fig: matplotlib.figure.Figure (figure to contain the plot)
-    ax: matplotlib.axes._subplots.AxesSubplot (if `dim' is '2d') or
-        matplotlib.axes._subplots.Axes3DSubplot (if `dim' is '3d')
-        (axes object for the graph plot)
+    fig: Matplotlib figure instance
+    ax: Matplotlib subplot axes instance
 
 Methods:
     __init__
     __repr__
     __str__
-    plot: wrapper for the actual plot function provided by matplotlib
-    configure: spice up the plot to make it more complete
+    plot: wrapper for the actual plot function provided by Matplotlib
+    configure: do makeup
     axis_fix: modify the ticks and labels on the axes so they look nice
 '''
 
     ########################################
 
     def __init__(self, dim = '2d', aspect_ratio = 0):
+        if dim not in {'2d', '3d'}:
+            raise ValueError('Member \'dim\' of class \'CustomPlot\' must be either \'2d\' or \'3d\'.')
+
+        # the figure has been created after applying the plot style
+        # this is necessary for the plot style to get applied correctly
         if dim == '2d':
             # plt.style.use(['classic', 'seaborn-poster'])
             plt.style.use(['bmh', 'seaborn-poster', 'candy.mplstyle'])
-        elif dim == '3d':
-            plt.style.use('classic')
+            self.fig = plt.figure()
+            self.ax = self.fig.add_subplot(1, 1, 1)
         else:
-            raise ValueError('Member \'dim\' of class \'CustomPlot\' must be either \'2d\' or \'3d\'.')
+            plt.style.use('classic')
+            self.fig = plt.figure()
+            self.ax = self.fig.add_subplot(1, 1, 1, projection = '3d')
 
         self.dim = dim
         self.aspect_ratio = aspect_ratio
-        self.fig = plt.figure()
-        if dim == '2d':
-            self.ax = self.fig.add_subplot(1, 1, 1)
-        else:
-            self.ax = self.fig.add_subplot(1, 1, 1, projection = '3d')
-
         self.fig.canvas.set_window_title(f'graph_{int(time.time())}')
 
     ########################################
 
     def __repr__(self):
-        return (f'CustomPlot(dim = \'{self.dim}\', aspect_ratio = {self.aspect_ratio})')
+        return (f'CustomPlot(dim=\'{self.dim}\', aspect_ratio={self.aspect_ratio})')
 
     ########################################
 
     def __str__(self):
-        return (f'CustomPlot(dim = \'{self.dim}\', aspect_ratio = {self.aspect_ratio})')
+        return (f'CustomPlot(dim=\'{self.dim}\', aspect_ratio={self.aspect_ratio})')
 
     ########################################
 
@@ -207,17 +206,10 @@ If the arguments are lists or arrays containing a large number of items,
 vertical lines at points of discontinuity are removed. Else, the arguments are
 left unchanged. Then, these arguments get passed to the function which actually
 plots the graph.
-
-Args:
-    args
-    kwargs
-
-Returns:
-    None
 '''
 
         try:
-            if len(args[0]) > 1000:
+            if len(args[0]) > 100:
                 args = tuple(sanitise_discontinuous(arg) for arg in args)
         except TypeError:
             pass
@@ -226,19 +218,16 @@ Returns:
 
     ########################################
 
-    def configure(self, axis_labels = (r'$x$', r'$y$', r'$z$'), title = None):
+    def configure(self, axis_labels = ('$x$', '$y$', '$z$'), title = None):
         '''\
 Do makeup.
 
 Args:
     axis_labels: tuple (strings to use to label the coordinate axes
     title: str (title of the graph)
-
-Returns:
-    None
 '''
 
-        # whether the scale should be the same on the coordinate axes
+        # set the relative scale of the coordinate axes
         # currently, because of a library bug, this works only in '2d'
         if self.aspect_ratio != 0 and self.dim == '2d':
             self.ax.set_aspect(aspect = self.aspect_ratio, adjustable = 'box')
@@ -251,15 +240,15 @@ Returns:
         if title is not None:
             self.ax.set_title(title)
 
-        # if this is a '2d' plot, draw thick coordinate axes
-        # this does not work as expected in '3d'
+        # if this is a two-dimensional plot, draw thick coordinate axes
+        # this does not work as expected in three-dimensional plots
         if self.dim == '2d':
             kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
             self.ax.axhline(**kwargs)
             self.ax.axvline(**kwargs)
 
         # enable grid
-        # minor grid takes too much memory in '3d' plot
+        # minor grid takes too much memory in three-dimensional plots
         self.ax.grid(b = True, which = 'major', linewidth = 0.8)
         if self.dim == '2d':
             self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
@@ -267,13 +256,7 @@ Returns:
 
     ########################################
 
-    def axis_fix(self, axis          = None,
-                       trigonometric = False,
-                       s             = r'\pi',
-                       v             = np.pi,
-                       first         = None,
-                       last          = None,
-                       step          = None):
+    def axis_fix(self, axis = None, symbolic = False, s = r'\pi', v = np.pi, first = None, last = None, step = None):
         '''\
 Modify the labels and ticks on the specified axis of coordinates. Note that the
 limits on the axis must necessarily be set after setting the axis ticks. This
@@ -283,39 +266,26 @@ simply specifying in the axis limit that the axis must end at `last'.
 
 Args:
     axis: str (which axis to modify: 'x', 'y' or 'z')
-    trigonometric: bool (whether ticks are at rational multiples of `v')
+    symbolic: bool (whether ticks are at rational multiples of `v')
     s: str (symbol to use instead of the symbol for pi)
     v: float (numerical value of `s')
     first: float (grid start point)
     last: float (grid end point)
     step: float (grid gap)
-
-Returns:
-    None
 '''
 
-        if axis == 'x':
-            limits_set_function = self.ax.set_xlim
-            labels_get_function = self.ax.get_xticklabels
-            labels_set_function = self.ax.set_xticklabels
-            ticks_set_function  = self.ax.set_xticks
-        elif axis == 'y':
-            limits_set_function = self.ax.set_ylim
-            labels_get_function = self.ax.get_yticklabels
-            labels_set_function = self.ax.set_yticklabels
-            ticks_set_function  = self.ax.set_yticks
-        elif axis == 'z' and self.dim == '3d':
-            limits_set_function = self.ax.set_zlim
-            labels_get_function = self.ax.get_zticklabels
-            labels_set_function = self.ax.set_zticklabels
-            ticks_set_function  = self.ax.set_zticks
-        else:
+        if axis == 'z' and self.dim == '2d':
             return
 
+        limits_set_function = getattr(self.ax, f'set_{axis}lim')
+        labels_get_function = getattr(self.ax, f'get_{axis}ticklabels')
+        labels_set_function = getattr(self.ax, f'set_{axis}ticklabels')
+        ticks_set_function  = getattr(self.ax, f'set_{axis}ticks')
+
         # case 1: grid lines at rational multiples of `v'
-        if trigonometric:
+        if symbolic:
             if None in {first, last, step}:
-                raise ValueError('When \'trigonometric\' is True, \'first\', \'last\' and \'step\' must not be None.')
+                raise ValueError('When \'symbolic\' is True, \'first\', \'last\' and \'step\' must not be None.')
 
             labels, ticks = graph_ticks(first, last, step, s, v)
             ticks_set_function(ticks)
@@ -334,89 +304,65 @@ Returns:
 ###############################################################################
 
 def main():
-    if len(sys.argv) < 2:
-        dimension = '2d'
-    else:
+    try:
         dimension = sys.argv[1]
+    except IndexError:
+        dimension = '2d'
+
     grapher = CustomPlot(dim = dimension, aspect_ratio = 1)
 
     ########################################
 
-    t = np.linspace(-np.pi, np.pi, 500000)
-    x1 = np.linspace(-700, 900, 500000)
-    y1 = np.exp(x1 ** 3)
+    t = np.linspace(-9 * np.pi, 9 * np.pi, 100000)
+    x1 = np.linspace(-32, 32, 100000)
+    y1 = np.sqrt(x1)
     z1 = np.sin(x1)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=e^{x^3}$')
-    # grapher.plot(range(-32, 32), range(-33, 31), linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
-    # grapher.plot(range(-32, 32), [1] * 64, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
-    # grapher.ax.text(1.05, -0.05, r'$(1,0)$')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\sqrt{x}$')
+    # grapher.plot([0], [1], linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
+    # grapher.ax.text(np.e, 1 / np.e + .2, r'$(e,e^{-1})$')
+    # grapher.ax.text(-np.e, -1 / np.e - .4, r'$(-e,-e^{-1})$')
 
-    x2 = np.linspace(-32, 32, 500000)
-    y2 = np.cos(x2)
-    z2 = np.sin(x2)
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\cos\,t$')
-    # grapher.plot(range(-32, 32), [0] * 64, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none')
-    # grapher.plot(1, 0, 'k.')
-    # grapher.ax.text(1.1, 0.1, r'$(a,0)$')
+    # x2 = np.linspace(-32, 32, 100000)
+    # y2 = x2 ** 2
+    # z2 = np.sin(x2)
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=x^2$')
 
-    x3 = np.linspace(0, 32, 500000)
-    y3 = x3
-    z3 = np.sin(x3)
+    # x3 = np.linspace(0, 32, 100000)
+    # y3 = x3
+    # z3 = np.sin(x3)
     # grapher.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
-    # grapher.plot(0, 0, 'k.')
-    # grapher.ax.text(-0.5, -0.2, r'$(0,0)$')
 
-    # x4 = np.linspace(-32, 32, 500000)
+    # x4 = np.linspace(-32, 32, 100000)
     # y4 = x4 / 8
     # z4 = np.sin(x4)
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
-    # grapher.plot(1, 2, 'k.')
-    # grapher.ax.text(1.1, 1.8, r'$(a,2a)$')
 
-    grapher.ax.fill_between(x1, y1, 0,
-                            facecolor = 'cyan',
-                            linewidth = 0,
-                            label     = r'$R$',
-                            where     = [True if i < 0 else False for i in x1])
-    # grapher.ax.fill_between(x1, y1, y3,
-    #                         facecolor = 'cyan',
-    #                         linewidth = 0,
-    #                         label     = r'',
-    #                         where     = [True
-    #                                      if 1 < i < 2 else False
-    #                                      for i in x1])
-    # grapher.ax.fill_between(x1, y1, 0,
-    #                         facecolor = 'cyan',
-    #                         linewidth = 0,
-    #                         label     = r'$R$',
-    #                         where     = [True
-    #                                      if i < 0 else False
-    #                                      for i in x1])
-    # grapher.ax.fill_between(x2, y2, -4, facecolor = 'cyan',
-    #                                     linewidth = 0)
+    # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
+    # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '',    where = [True if 1 < i < 2 else False for i in x1])
+    # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
-    grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
-    grapher.axis_fix(axis          = 'x',
-                     trigonometric = False,
-                     s             = r'\pi',
-                     v             = np.pi,
-                     first         = -6,
-                     last          = 2,
-                     step          = 1)
-    grapher.axis_fix(axis          = 'y',
-                     trigonometric = False,
-                     s             = r'\pi',
-                     v             = np.pi,
-                     first         = -1,
-                     last          = 3,
-                     step          = 1)
-    grapher.axis_fix(axis          = 'z',
-                     trigonometric = False,
-                     s             = r'\pi',
-                     v             = np.pi,
-                     first         = -10,
-                     last          = 10,
-                     step          = 2)
+    grapher.configure(axis_labels = ('$x$', '$y$', '$z$'), title = None)
+    grapher.axis_fix(axis     = 'x',
+                     symbolic = False,
+                     s        = r'\pi',
+                     v        = np.pi,
+                     first    = -2,
+                     last     = 6,
+                     step     = 1)
+    grapher.axis_fix(axis     = 'y',
+                     symbolic = False,
+                     s        = r'\pi',
+                     v        = np.pi,
+                     first    = -1,
+                     last     = 3,
+                     step     = 1)
+    grapher.axis_fix(axis     = 'z',
+                     symbolic = False,
+                     s        = r'\pi',
+                     v        = np.pi,
+                     first    = -10,
+                     last     = 10,
+                     step     = 2)
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
     grapher.fig.tight_layout(pad = 2)
