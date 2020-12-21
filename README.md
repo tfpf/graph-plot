@@ -13,7 +13,7 @@ have grid lines drawn at multiples of pi. Grid spacing can be customised, too.
 You also must have some basic knowledge about these two modules.
 
 # Usage
-Read [customplot\_example.pdf](customplot\_example.pdf) for instructions.
+Read [example.pdf](example.pdf) for instructions.
 
 You may want to change the `savefig.directory` Matplotlib RC parameter (it's
 somewhere at the top in the file `customplot.py`) or remove that line
