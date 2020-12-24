@@ -13,12 +13,5 @@ have grid lines drawn at multiples of pi. Grid spacing can be customised, too.
 You also must have some basic knowledge about these two modules.
 
 # Usage
-Read [example.pdf](example.pdf) for instructions.
-
-You may want to change the `savefig.directory` Matplotlib RC parameter (it's
-somewhere at the top in the file `customplot.py`) or remove that line
-altogether. (If you don't do this, it won't really cause any problems.)
-
-Then run the program using `python3 customplot.py` or whatever python command
-you are using.
+Read [example.pdf](example.pdf) for instructions on how to run this program.
 
