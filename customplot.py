@@ -4,7 +4,6 @@ import fractions
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
 import time
 
 # GUI and non-GUI backends for matplotlib
@@ -185,7 +184,7 @@ Methods:
             self.ax = self.fig.add_subplot(1, 1, 1)
         else:
             self.ax = self.fig.add_subplot(1, 1, 1, projection = '3d')
-            
+
         self.dim = dim
         self.aspect_ratio = aspect_ratio
         self.xkcd = xkcd
@@ -315,14 +314,7 @@ Args:
 ###############################################################################
 
 def main():
-    try:
-        dimension = sys.argv[1]
-    except IndexError:
-        dimension = '2d'
-
-    grapher = CustomPlot(dim = dimension, aspect_ratio = 1, xkcd = False)
-
-    ########################################
+    grapher = CustomPlot(dim = '2d', aspect_ratio = 1, xkcd = False)
 
     t = np.linspace(-np.pi, np.pi, 100000)
     x1 = np.linspace(-32, 32, 100000)
@@ -333,9 +325,9 @@ def main():
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
     # x2 = np.linspace(-32, 32, 100000)
-    # y2 = x2
+    # y2 = np.cos(np.sin(x2))
     # z2 = np.sin(x2)
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=x$')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\cos\,\sin\,x$')
 
     # x3 = np.linspace(0, 32, 100000)
     # y3 = x3
@@ -356,15 +348,15 @@ def main():
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -2,
-                     last     = 2,
-                     step     = 1 / 4)
+                     first    = -4,
+                     last     = 4,
+                     step     = 1 / 2)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -3,
-                     last     = 3,
+                     first    = -6,
+                     last     = 6,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
