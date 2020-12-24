@@ -1,4 +1,4 @@
-#! /usr/local/bin/python3.8
+#! /usr/local/bin/python3.8 -B
 
 import fractions
 import matplotlib
@@ -20,27 +20,29 @@ matplotlib.rcParams['savefig.orientation'] = 'portrait'
 
 ###############################################################################
 
-def show_nice_list(items, columns = 3):
+def show_nice_list(items, columns = 3, align = 'center'):
     '''\
-Display a list in neat centred columns.
+Display a list in neat columns.
 
 Args:
-    items: list (each list element must have an `__str__' method)
+    items: iterable (each of its elements must have an `__str__' method)
     columns: int (number of columns to arrange `items' in)
+    align: str ('ljust' for left, 'center' for centre, 'rjust' for right)
 '''
 
-    # convert 1D list to 2D list
-    while len(items) % columns:
-        items.append('')
+    # convert iterable into a two-dimensional list
+    items = [str(item) for item in items]
+    if len(items) % columns != 0:
+        items.extend([''] * (columns - len(items) % columns))
     rows = len(items) // columns
-    items = [items[i :: rows] for i in range(rows)]
+    items = [items[i : i + columns] for i in range(0, len(items), columns)]
 
     # calculate the required width of all columns
     # width of a column is width of longest string in that column
-    widths = [max([len(str(row[i])) for row in items]) for i in range(columns)]
+    widths = [2 + max([len(row[i]) for row in items]) for i in range(columns)]
     for row in items:
         for r, width in zip(row, widths):
-            print(str(r).center(width + 2, ' '), end = '', flush = True)
+            print(getattr(r, align)(width, ' '), end = '', flush = True)
         print()
 
 ###############################################################################
@@ -62,7 +64,7 @@ Returns:
 
     # locate points of discontinuity (check where the derivative is large)
     y = np.array(y)
-    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > 0.1
+    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > 50
     y[points_of_discontinuity] = np.nan
 
     return y
@@ -147,11 +149,11 @@ Returns:
 
 class CustomPlot:
     '''\
-A class to easily plot two- and three-dimensional graphs.
+A class to easily plot two- and three-dimensional line graphs.
 
 Attributes:
-    dim: str (dimension of the plot, either '2d' or '3d')
-    aspect_ratio: float (ratio of scales on axes)
+    dim: str ('2d' for two-dimensional plots, '3d' for three-dimensional plots)
+    aspect_ratio: float (ratio of scales on the coordinate axes)
     fig: Matplotlib figure instance
     ax: Matplotlib subplot axes instance
 
@@ -209,7 +211,7 @@ plots the graph.
 '''
 
         try:
-            if len(args[0]) > 100:
+            if len(args[0]) > 1000:
                 args = tuple(sanitise_discontinuous(arg) for arg in args)
         except TypeError:
             pass
@@ -309,23 +311,22 @@ def main():
     except IndexError:
         dimension = '2d'
 
-    grapher = CustomPlot(dim = dimension, aspect_ratio = 1)
+    grapher = CustomPlot(dim = dimension, aspect_ratio = 1 / 1)
 
     ########################################
 
-    t = np.linspace(-9 * np.pi, 9 * np.pi, 100000)
+    t = np.linspace(-np.pi, np.pi, 100000)
     x1 = np.linspace(-32, 32, 100000)
-    y1 = np.sqrt(x1)
+    y1 = x1 * np.cos(x1) ** 2 / np.sin(x1)
     z1 = np.sin(x1)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\sqrt{x}$')
-    # grapher.plot([0], [1], linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'red', markersize = 4, fillstyle = 'none')
-    # grapher.ax.text(np.e, 1 / np.e + .2, r'$(e,e^{-1})$')
-    # grapher.ax.text(-np.e, -1 / np.e - .4, r'$(-e,-e^{-1})$')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\dfrac{x\,\cos^2x}{\sin\,x}$')
+    # grapher.plot([2 * np.cos(i * np.pi / 8) for i in range(1, 14, 4)], [2 * np.sin(i * np.pi / 8) for i in range(1, 14, 4)], linestyle = 'none', marker = 'o', markerfacecolor = 'black', markeredgecolor = 'black', markersize = 4, fillstyle = 'none', label = r'$z^4=16i$')
+    # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
     # x2 = np.linspace(-32, 32, 100000)
-    # y2 = x2 ** 2
+    # y2 = x2
     # z2 = np.sin(x2)
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=x^2$')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=x$')
 
     # x3 = np.linspace(0, 32, 100000)
     # y3 = x3
@@ -343,17 +344,17 @@ def main():
 
     grapher.configure(axis_labels = ('$x$', '$y$', '$z$'), title = None)
     grapher.axis_fix(axis     = 'x',
-                     symbolic = False,
+                     symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
                      first    = -2,
-                     last     = 6,
-                     step     = 1)
+                     last     = 2,
+                     step     = 1 / 4)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -1,
+                     first    = -3,
                      last     = 3,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
