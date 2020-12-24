@@ -168,35 +168,38 @@ Methods:
 
     ########################################
 
-    def __init__(self, dim = '2d', aspect_ratio = 0):
+    def __init__(self, dim = '2d', aspect_ratio = 0, xkcd = False):
         if dim not in {'2d', '3d'}:
             raise ValueError('Member \'dim\' of class \'CustomPlot\' must be either \'2d\' or \'3d\'.')
 
-        # the figure has been created after applying the plot style
+        # the figure has to be created after setting the plot style
         # this is necessary for the plot style to get applied correctly
-        if dim == '2d':
-            # plt.style.use(['classic', 'seaborn-poster'])
+        if xkcd:
+            plt.xkcd()
+        elif dim == '2d':
             plt.style.use(['bmh', 'seaborn-poster', 'candy.mplstyle'])
-            self.fig = plt.figure()
-            self.ax = self.fig.add_subplot(1, 1, 1)
         else:
             plt.style.use('classic')
-            self.fig = plt.figure()
+        self.fig = plt.figure()
+        if dim == '2d':
+            self.ax = self.fig.add_subplot(1, 1, 1)
+        else:
             self.ax = self.fig.add_subplot(1, 1, 1, projection = '3d')
-
+            
         self.dim = dim
         self.aspect_ratio = aspect_ratio
+        self.xkcd = xkcd
         self.fig.canvas.set_window_title(f'graph_{int(time.time())}')
 
     ########################################
 
     def __repr__(self):
-        return (f'CustomPlot(dim=\'{self.dim}\', aspect_ratio={self.aspect_ratio})')
+        return (f'CustomPlot(dim=\'{self.dim}\', aspect_ratio={self.aspect_ratio}, xkcd={self.xkcd})')
 
     ########################################
 
     def __str__(self):
-        return (f'CustomPlot(dim=\'{self.dim}\', aspect_ratio={self.aspect_ratio})')
+        return (f'CustomPlot(dim=\'{self.dim}\', aspect_ratio={self.aspect_ratio}, xkcd={self.xkcd})')
 
     ########################################
 
@@ -211,7 +214,7 @@ plots the graph.
 '''
 
         try:
-            if len(args[0]) > 1000:
+            if len(args[0]) > 1000 and not self.xkcd:
                 args = tuple(sanitise_discontinuous(arg) for arg in args)
         except TypeError:
             pass
@@ -231,7 +234,7 @@ Args:
 
         # set the relative scale of the coordinate axes
         # currently, because of a library bug, this works only in '2d'
-        if self.aspect_ratio != 0 and self.dim == '2d':
+        if self.aspect_ratio != 0 and self.dim == '2d' and not self.xkcd:
             self.ax.set_aspect(aspect = self.aspect_ratio, adjustable = 'box')
 
         self.ax.legend(loc = 'best')
@@ -244,17 +247,23 @@ Args:
 
         # if this is a two-dimensional plot, draw thick coordinate axes
         # this does not work as expected in three-dimensional plots
-        if self.dim == '2d':
+        if self.dim == '2d' and not self.xkcd:
             kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
             self.ax.axhline(**kwargs)
             self.ax.axvline(**kwargs)
 
         # enable grid
         # minor grid takes too much memory in three-dimensional plots
-        self.ax.grid(b = True, which = 'major', linewidth = 0.8)
-        if self.dim == '2d':
-            self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
-            self.ax.minorticks_on()
+        if not self.xkcd:
+            self.ax.grid(b = True, which = 'major', linewidth = 0.8)
+            if self.dim == '2d':
+                self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
+                self.ax.minorticks_on()
+
+        if self.xkcd:
+            self.ax.spines['right'].set_color('none')
+            self.ax.spines['top'].set_color('none')
+            self.ax.xaxis.set_ticks_position('bottom')
 
     ########################################
 
@@ -276,7 +285,7 @@ Args:
     step: float (grid gap)
 '''
 
-        if axis == 'z' and self.dim == '2d':
+        if self.xkcd or axis == 'z' and self.dim == '2d':
             return
 
         limits_set_function = getattr(self.ax, f'set_{axis}lim')
@@ -311,15 +320,15 @@ def main():
     except IndexError:
         dimension = '2d'
 
-    grapher = CustomPlot(dim = dimension, aspect_ratio = 1 / 1)
+    grapher = CustomPlot(dim = dimension, aspect_ratio = 1, xkcd = False)
 
     ########################################
 
     t = np.linspace(-np.pi, np.pi, 100000)
     x1 = np.linspace(-32, 32, 100000)
-    y1 = x1 * np.cos(x1) ** 2 / np.sin(x1)
+    y1 = np.sin(x1)
     z1 = np.sin(x1)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\dfrac{x\,\cos^2x}{\sin\,x}$')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\sin\,x$')
     # grapher.plot([2 * np.cos(i * np.pi / 8) for i in range(1, 14, 4)], [2 * np.sin(i * np.pi / 8) for i in range(1, 14, 4)], linestyle = 'none', marker = 'o', markerfacecolor = 'black', markeredgecolor = 'black', markersize = 4, fillstyle = 'none', label = r'$z^4=16i$')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
@@ -339,7 +348,7 @@ def main():
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
 
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
-    # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '',    where = [True if 1 < i < 2 else False for i in x1])
+    # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 1 < i < 2 else False for i in x1])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
     grapher.configure(axis_labels = ('$x$', '$y$', '$z$'), title = None)
