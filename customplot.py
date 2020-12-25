@@ -330,13 +330,13 @@ implemented in Matplotlib 3.3.3, so a workaround is used to achieve the same.
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 2, aspect_ratio = 1, xkcd = False)
+    grapher = CustomPlot(dim = 3, aspect_ratio = 1, xkcd = False)
 
     t = np.linspace(-np.pi, np.pi, 100000)
-    x1 = np.linspace(-32, 32, 100000)
-    y1 = np.cos(x1)
-    z1 = 0.5 ** x1 * np.sin(np.pi * x1)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\cos\,x$')
+    x1 = np.tan(t)
+    y1 = np.sin(t)
+    z1 = np.cos(t)
+    # grapher.plot(x1, y1, color = 'red', label = r'$\lbrace(\tan\,t,\sin\,t)\mid t\in(-\pi,\pi]\rbrace$')
     # grapher.plot([2 * np.cos(i * np.pi / 8) for i in range(1, 14, 4)], [2 * np.sin(i * np.pi / 8) for i in range(1, 14, 4)], linestyle = 'none', marker = 'o', markerfacecolor = 'black', markeredgecolor = 'black', markersize = 4, fillstyle = 'none', label = r'$z^4=16i$')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
@@ -359,28 +359,35 @@ def main():
     # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 1 < i < 2 else False for i in x1])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
+    X, Y = np.meshgrid(np.linspace(-8, 8, 1000), np.linspace(-8, 8, 1000))
+    Z = np.cos(X + Y) + X ** 2 / 6 - Y ** 2 / 6
+    surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'skyblue', antialiased = True, label = r'$z=\cos(x+y)+\dfrac{x^2}{6}-\dfrac{y^2}{6}$')
+    surf._facecolors2d = None
+    surf._edgecolors2d = None
+    # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
+
     grapher.configure(axis_labels = ('$x$', '$y$', '$z$'), title = None)
     grapher.axis_fix(axis     = 'x',
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -2,
-                     last     = 2,
-                     step     = 1 / 4)
+                     first    = -4,
+                     last     = 4,
+                     step     = 1)
     grapher.axis_fix(axis     = 'y',
-                     symbolic = False,
+                     symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -3,
-                     last     = 3,
+                     first    = -4,
+                     last     = 4,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -3,
-                     last     = 3,
-                     step     = 1)
+                     first    = -10,
+                     last     = 10,
+                     step     = 2)
     grapher.aspect_fix()
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
