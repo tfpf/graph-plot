@@ -231,11 +231,6 @@ Args:
     title: str (title of the graph)
 '''
 
-        # set the relative scale of the coordinate axes
-        # setting equal scales works only for two-dimensional plots
-        if self.aspect_ratio != 0 and self.dim == 2 and not self.xkcd:
-            self.ax.set_aspect(aspect = self.aspect_ratio, adjustable = 'box')
-
         self.ax.legend(loc = 'best')
         self.ax.set_xlabel(axis_labels[0])
         self.ax.set_ylabel(axis_labels[1])
@@ -301,15 +296,36 @@ Args:
             ticks_set_function(ticks)
             labels_set_function(labels)
             limits_set_function(v * first, v * last)
-            return
 
         # case 2: grid lines at the values provided in the arguments
-        if None not in {first, last, step}:
-            ticks_set_function(np.arange(first, last + step, step))
-        if None not in {first, last}:
-            limits_set_function(first, last)
-        self.fig.canvas.draw()
-        labels_set_function([f'${t.get_text()}$' for t in labels_get_function()])
+        else:
+            if None not in {first, last, step}:
+                ticks_set_function(np.arange(first, last + step, step))
+            if None not in {first, last}:
+                limits_set_function(first, last)
+            self.fig.canvas.draw()
+            labels_set_function([f'${t.get_text()}$' for t in labels_get_function()])
+
+    ########################################
+
+    def aspect_fix(self):
+        '''\
+Set the aspect ratio of the axes object. If this is a two-dimensional plot, the
+ratio of the scales on the axes will be set to `self.aspect_ratio' if it is
+non-zero.
+
+For three-dimensional plots, an aspect ratio does not make sense, because there
+are three axes. Hence, in this case, the scales on the axes will be made equal
+if `self.aspect_ratio' is non-zero. However, this functionality is not
+implemented in Matplotlib 3.3.3, so a workaround is used to achieve the same.
+'''
+
+        if self.aspect_ratio != 0 and not self.xkcd:
+            if self.dim == 2:
+                self.ax.set_aspect(aspect = self.aspect_ratio, adjustable = 'box')
+            else:
+                limits = np.array([getattr(self.ax, f'get_{axis}lim')() for axis in 'xyz'])
+                self.ax.set_box_aspect(np.ptp(limits, axis = 1))
 
 ###############################################################################
 
@@ -318,9 +334,9 @@ def main():
 
     t = np.linspace(-np.pi, np.pi, 100000)
     x1 = np.linspace(-32, 32, 100000)
-    y1 = np.sin(x1)
-    z1 = np.sin(x1)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\sin\,x$')
+    y1 = np.cos(x1)
+    z1 = 0.5 ** x1 * np.sin(np.pi * x1)
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\cos\,x$')
     # grapher.plot([2 * np.cos(i * np.pi / 8) for i in range(1, 14, 4)], [2 * np.sin(i * np.pi / 8) for i in range(1, 14, 4)], linestyle = 'none', marker = 'o', markerfacecolor = 'black', markeredgecolor = 'black', markersize = 4, fillstyle = 'none', label = r'$z^4=16i$')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
@@ -348,23 +364,24 @@ def main():
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -4,
-                     last     = 4,
-                     step     = 1 / 2)
+                     first    = -2,
+                     last     = 2,
+                     step     = 1 / 4)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -6,
-                     last     = 6,
+                     first    = -3,
+                     last     = 3,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -10,
-                     last     = 10,
-                     step     = 2)
+                     first    = -3,
+                     last     = 3,
+                     step     = 1)
+    grapher.aspect_fix()
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
     grapher.fig.tight_layout(pad = 2)
