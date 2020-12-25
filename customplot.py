@@ -151,7 +151,7 @@ class CustomPlot:
 A class to easily plot two- and three-dimensional line graphs.
 
 Attributes:
-    dim: str ('2d' for two-dimensional plots, '3d' for three-dimensional plots)
+    dim: int (2 for two-dimensional plots, 3 for three-dimensional plots)
     aspect_ratio: float (ratio of scales on the coordinate axes)
     fig: Matplotlib figure instance
     ax: Matplotlib subplot axes instance
@@ -167,20 +167,20 @@ Methods:
 
     ########################################
 
-    def __init__(self, dim = '2d', aspect_ratio = 0, xkcd = False):
-        if dim not in {'2d', '3d'}:
-            raise ValueError('Member \'dim\' of class \'CustomPlot\' must be either \'2d\' or \'3d\'.')
+    def __init__(self, dim = 2, aspect_ratio = 0, xkcd = False):
+        if dim not in {2, 3}:
+            raise ValueError('Member \'dim\' of class \'CustomPlot\' must be either 2 or 3.')
 
         # the figure has to be created after setting the plot style
         # this is necessary for the plot style to get applied correctly
         if xkcd:
             plt.xkcd()
-        elif dim == '2d':
+        elif dim == 2:
             plt.style.use(['bmh', 'seaborn-poster', 'candy.mplstyle'])
         else:
             plt.style.use('classic')
         self.fig = plt.figure()
-        if dim == '2d':
+        if dim == 2:
             self.ax = self.fig.add_subplot(1, 1, 1)
         else:
             self.ax = self.fig.add_subplot(1, 1, 1, projection = '3d')
@@ -193,12 +193,12 @@ Methods:
     ########################################
 
     def __repr__(self):
-        return (f'CustomPlot(dim=\'{self.dim}\', aspect_ratio={self.aspect_ratio}, xkcd={self.xkcd})')
+        return (f'CustomPlot(dim={self.dim}, aspect_ratio={self.aspect_ratio}, xkcd={self.xkcd})')
 
     ########################################
 
     def __str__(self):
-        return (f'CustomPlot(dim=\'{self.dim}\', aspect_ratio={self.aspect_ratio}, xkcd={self.xkcd})')
+        return (f'CustomPlot(dim={self.dim}, aspect_ratio={self.aspect_ratio}, xkcd={self.xkcd})')
 
     ########################################
 
@@ -232,21 +232,21 @@ Args:
 '''
 
         # set the relative scale of the coordinate axes
-        # currently, because of a library bug, this works only in '2d'
-        if self.aspect_ratio != 0 and self.dim == '2d' and not self.xkcd:
+        # setting equal scales works only for two-dimensional plots
+        if self.aspect_ratio != 0 and self.dim == 2 and not self.xkcd:
             self.ax.set_aspect(aspect = self.aspect_ratio, adjustable = 'box')
 
         self.ax.legend(loc = 'best')
         self.ax.set_xlabel(axis_labels[0])
         self.ax.set_ylabel(axis_labels[1])
-        if self.dim == '3d':
+        if self.dim == 3:
             self.ax.set_zlabel(axis_labels[2])
         if title is not None:
             self.ax.set_title(title)
 
         # if this is a two-dimensional plot, draw thick coordinate axes
         # this does not work as expected in three-dimensional plots
-        if self.dim == '2d' and not self.xkcd:
+        if self.dim == 2 and not self.xkcd:
             kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
             self.ax.axhline(**kwargs)
             self.ax.axvline(**kwargs)
@@ -255,7 +255,7 @@ Args:
         # minor grid takes too much memory in three-dimensional plots
         if not self.xkcd:
             self.ax.grid(b = True, which = 'major', linewidth = 0.8)
-            if self.dim == '2d':
+            if self.dim == 2:
                 self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
                 self.ax.minorticks_on()
 
@@ -284,7 +284,7 @@ Args:
     step: float (grid gap)
 '''
 
-        if self.xkcd or axis == 'z' and self.dim == '2d':
+        if self.xkcd or axis == 'z' and self.dim == 2:
             return
 
         limits_set_function = getattr(self.ax, f'set_{axis}lim')
@@ -314,7 +314,7 @@ Args:
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = '2d', aspect_ratio = 1, xkcd = False)
+    grapher = CustomPlot(dim = 2, aspect_ratio = 1, xkcd = False)
 
     t = np.linspace(-np.pi, np.pi, 100000)
     x1 = np.linspace(-32, 32, 100000)
