@@ -379,7 +379,7 @@ def main():
                      v        = np.pi,
                      first    = -6,
                      last     = 6,
-                     step     = 1)
+                     step     = 2)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
@@ -392,6 +392,7 @@ def main():
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
     grapher.fig.tight_layout(pad = 2)
     plt.show()
+    plt.close(grapher.fig)
 
 ###############################################################################
 
