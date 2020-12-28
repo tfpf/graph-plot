@@ -33,7 +33,6 @@ Args:
     items = [str(item) for item in items]
     if len(items) % columns != 0:
         items.extend([''] * (columns - len(items) % columns))
-    rows = len(items) // columns
     items = [items[i : i + columns] for i in range(0, len(items), columns)]
 
     # calculate the required width of all columns
@@ -63,7 +62,7 @@ Returns:
 
     # locate points of discontinuity (check where the derivative is large)
     y = np.array(y)
-    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > 50
+    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > 0.1
     y[points_of_discontinuity] = np.nan
 
     return y
@@ -330,20 +329,20 @@ implemented in Matplotlib 3.3.3, so a workaround is used to achieve the same.
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 3, aspect_ratio = 1, xkcd = False)
+    grapher = CustomPlot(dim = 2, aspect_ratio = 1, xkcd = False)
 
     t = np.linspace(-np.pi, np.pi, 100000)
-    x1 = np.tan(t)
-    y1 = np.sin(t)
+    x1 = np.linspace(-32, 32, 100000)
+    y1 = np.sin(x1)
     z1 = np.cos(t)
-    # grapher.plot(x1, y1, color = 'red', label = r'$\lbrace(\tan\,t,\sin\,t)\mid t\in(-\pi,\pi]\rbrace$')
-    # grapher.plot([2 * np.cos(i * np.pi / 8) for i in range(1, 14, 4)], [2 * np.sin(i * np.pi / 8) for i in range(1, 14, 4)], linestyle = 'none', marker = 'o', markerfacecolor = 'black', markeredgecolor = 'black', markersize = 4, fillstyle = 'none', label = r'$z^4=16i$')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\cos\,x$')
+    # grapher.plot(range(-8, 9), [2] * 17, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none', label = r'')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
     # x2 = np.linspace(-32, 32, 100000)
-    # y2 = np.cos(np.sin(x2))
+    # y2 = 4 * np.exp(-x2 / 2)
     # z2 = np.sin(x2)
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\cos\,\sin\,x$')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=4e^{-x/2}$')
 
     # x3 = np.linspace(0, 32, 100000)
     # y3 = x3
@@ -355,15 +354,15 @@ def main():
     # z4 = np.sin(x4)
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
 
-    # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
+    # grapher.ax.fill_between(x1, y1, y2,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 0 < i < 1 else False for i in x1])
     # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 1 < i < 2 else False for i in x1])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
-    X, Y = np.meshgrid(np.linspace(-8, 8, 1000), np.linspace(-8, 8, 1000))
-    Z = np.cos(X + Y) + X ** 2 / 6 - Y ** 2 / 6
-    surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'skyblue', antialiased = True, label = r'$z=\cos(x+y)+\dfrac{x^2}{6}-\dfrac{y^2}{6}$')
-    surf._facecolors2d = None
-    surf._edgecolors2d = None
+    # X, Y = np.meshgrid(np.linspace(-8, 8, 1000), np.linspace(-8, 8, 1000))
+    # Z = np.abs(X) + np.abs(Y)
+    # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'skyblue', antialiased = True, label = r'$z=|x|+|y|$')
+    # surf._facecolors2d = None
+    # surf._edgecolors2d = None
     # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
 
     grapher.configure(axis_labels = ('$x$', '$y$', '$z$'), title = None)
@@ -373,21 +372,21 @@ def main():
                      v        = np.pi,
                      first    = -4,
                      last     = 4,
-                     step     = 1)
+                     step     = 1 / 2)
     grapher.axis_fix(axis     = 'y',
-                     symbolic = True,
+                     symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -4,
-                     last     = 4,
+                     first    = -6,
+                     last     = 6,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -10,
-                     last     = 10,
-                     step     = 2)
+                     first    = 0,
+                     last     = 16,
+                     step     = 1)
     grapher.aspect_fix()
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
