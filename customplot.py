@@ -19,14 +19,14 @@ matplotlib.rcParams['savefig.orientation'] = 'portrait'
 
 ###############################################################################
 
-def show_nice_list(items, columns = 3, align = 'center'):
+def show_nice_list(items, columns = 3, align_method = 'center'):
     '''\
 Display a list in neat columns.
 
 Args:
     items: iterable (each of its elements must have an `__str__' method)
     columns: int (number of columns to arrange `items' in)
-    align: str ('ljust' for left, 'center' for centre, 'rjust' for right)
+    align_method: str (string method name: 'ljust', 'center' or 'rjust')
 '''
 
     # convert iterable into a two-dimensional list
@@ -36,11 +36,11 @@ Args:
     items = [items[i : i + columns] for i in range(0, len(items), columns)]
 
     # calculate the required width of all columns
-    # width of a column is width of longest string in that column
-    widths = [2 + max([len(row[i]) for row in items]) for i in range(columns)]
+    # width of a column is width of longest string in that column plus padding
+    widths = [max(len(row[i]) for row in items) + 2 for i in range(columns)]
     for row in items:
         for r, width in zip(row, widths):
-            print(getattr(r, align)(width, ' '), end = '', flush = True)
+            print(getattr(r, align_method)(width, ' '), end = '')
         print()
 
 ###############################################################################
@@ -50,11 +50,11 @@ def sanitise_discontinuous(y):
 At a point of jump discontinuity, a vertical line is drawn automatically. This
 vertical line joins the two points around the point of discontinuity.
 Traditionally, in maths, these vertical lines are not drawn. Hence, they need
-to be removed from the plot. If the value is set to NaN at these points, they
-will not be plotted.
+to be removed from the plot. This is achieved by setting the values at the
+points of discontinuity to NaN.
 
 Args:
-    y: np.array or list (values of the discontinuous function)
+    y: iterable (values of the discontinuous function)
 
 Returns:
     np.array with NaN at the points of discontinuity
@@ -71,11 +71,8 @@ Returns:
 
 def graph_ticks(first, last, step, symbol = r'\pi', symval = np.pi):
     r'''
-Create a list of tick values and labels at intervals of `step * np.pi'. I think
-it is best explained with examples. (To properly demonstrate the working, this
-docstring is being marked as a raw string. Otherwise, the backslashes will be
-interpreted as parts of escape sequences. You can test the functionality using
-the `doctest' module.)
+Create a list of tick values and labels at intervals of `step * np.pi'.
+
 >>> graph_ticks(-1, 5, 2)
 (['$-\\pi$', '$\\pi$', '$3\\pi$', '$5\\pi$'], array([-3.14159265,  3.14159265,  9.42477796, 15.70796327]))
 >>> graph_ticks(-1, -1 / 4, 1 / 4)
@@ -83,19 +80,17 @@ the `doctest' module.)
 >>> graph_ticks(-2, 2, 1)
 (['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$'], array([-6.28318531, -3.14159265,  0.        ,  3.14159265,  6.28318531]))
 
+The above results can be verified by using the `doctest' module. To properly
+represent the output so that `doctest' may correctly read them, this docstring
+has been marked as a raw string.
+
 What's required is a list of LaTeX-formatted strings for numbers going from one
-rational multiple of pi to another, and the `np.array' of corresponding values.
-Thus, a two-element tuple should be returned. (Note that LaTeX uses a backslash
-to indicate keywords! Remember to either escape the backslash or simply use raw
-strings. The latter approach was used just to keep all of those things simple.)
-As a side effect of using LaTeX strings as labels instead of whatever is chosen
-automatically, panning or zooming the graph does not update the grid lines like
-it does otherwise.
+rational multiple of pi to another, and an `np.array' of the respective values.
 
 Args:
-    first: float (grid lines start at `first * np.pi')
-    last: float (grid lines end at `last * np.pi')
-    step: float (grid lines are separated by `step * np.pi')
+    first: float (first item in the returned array shall be `first * symval')
+    last: float (last item in the returned array shall be `last * symval')
+    step: float (array items will increment in steps of `step * symval')
     symbol: str (the symbol to use instead of the symbol for pi)
     symval: float (numerical value of `symbol')
 
@@ -125,6 +120,7 @@ Returns:
         # then join those parts
         # this is the fastest way to build a string
         # https://waymoot.org/home/python_string/
+        # TODO independently verify this claim
         builder = ['$']
 
         # case 2: `coefficient' is non-zero
@@ -147,12 +143,19 @@ Returns:
 
 class CustomPlot:
     '''\
-A class to easily plot two- and three-dimensional line graphs.
+A wrapper around Matplotlib to plot publication-quality graphs.
+
+Instantiation Examples:
+    Customplot(dim=2, aspect_ratio=0, polar=True, xkcd=False)
+    Customplot(dim=2, aspect_ratio=6.11, polar=False, xkcd=False)
+    Customplot(dim=3, aspect_ratio=0.2, polar=False, xkcd=True)
+    Customplot(dim=3, aspect_ratio=0, polar=True, xkcd=True)
+    Customplot(dim=3, aspect_ratio=1, polar=False, xkcd=False)
 
 Attributes:
     dim: int (2 for two-dimensional plots, 3 for three-dimensional plots)
-    aspect_ratio: float (ratio of scales on the coordinate axes)
-    polar: bool (whether the plot is polar or cartesian)
+    aspect_ratio: float (ratio of y-scale to x-scale in a two-dimensional plot)
+    polar: bool (whether the plot is polar or Cartesian)
     xkcd: bool (whether to use the XKCD style or not)
     fig: Matplotlib figure instance
     ax: Matplotlib subplot axes instance
@@ -164,6 +167,7 @@ Methods:
     plot: wrapper for the actual plot function provided by Matplotlib
     configure: do makeup
     axis_fix: modify the ticks and labels on the axes so they look nice
+    aspect_fix: set the aspect ratio
 '''
 
     ########################################
@@ -217,7 +221,8 @@ Wrapper for plotting a graph.
 If the arguments are lists or arrays containing a large number of items,
 vertical lines at points of discontinuity are removed. Else, the arguments are
 left unchanged. Then, these arguments get passed to the function which actually
-plots the graph.
+plots the graph. Hence, the signature of this function is the same as that of
+the `plot' function of Matplotlib.
 '''
 
         try:
@@ -239,7 +244,10 @@ Args:
     title: str (title of the graph)
 '''
 
-        self.ax.legend(loc = 'best')
+        kwargs = {'loc': 'best'}
+        if self.polar:
+            kwargs['facecolor'] = 'lightgray'
+        self.ax.legend(**kwargs)
         if not self.polar:
             self.ax.set_xlabel(axis_labels[0])
             self.ax.set_ylabel(axis_labels[1])
@@ -336,8 +344,8 @@ Args:
     def aspect_fix(self):
         '''\
 Set the aspect ratio of the axes object. If this is a two-dimensional plot, the
-ratio of the scales on the axes will be set to `self.aspect_ratio' if it is
-non-zero.
+ratio of the scales on the axes will be set to `self.aspect_ratio', provided
+that it is non-zero.
 
 For three-dimensional plots, an aspect ratio does not make sense, because there
 are three axes. Hence, in this case, the scales on the axes will be made equal
@@ -359,9 +367,9 @@ def main():
 
     t = np.linspace(-np.pi, np.pi, 100000)
     x1 = np.linspace(0, 2 * np.pi, 100000)
-    y1 = 2 * np.sin(2 * x1)
+    y1 = 2 * np.cos(2 * x1)
     z1 = np.cos(t)
-    grapher.plot(x1, y1, color = 'red', label = r'$r=2\,\sin\,2\theta$')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=2\,\cos\,2x$')
     # grapher.plot(range(-8, 9), [2] * 17, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none', label = r'')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
@@ -404,7 +412,7 @@ def main():
                      s        = r'\pi',
                      v        = np.pi,
                      first    = 0,
-                     last     = 6,
+                     last     = 3,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
