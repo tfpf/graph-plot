@@ -118,9 +118,7 @@ Returns:
         # Python does not have a string builder data type
         # so, create a list to store the different parts of the string
         # then join those parts
-        # this is the fastest way to build a string
-        # https://waymoot.org/home/python_string/
-        # TODO independently verify this claim
+        # I found that this is faster than repeated string concatenation
         builder = ['$']
 
         # case 2: `coefficient' is non-zero
