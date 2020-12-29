@@ -152,6 +152,8 @@ A class to easily plot two- and three-dimensional line graphs.
 Attributes:
     dim: int (2 for two-dimensional plots, 3 for three-dimensional plots)
     aspect_ratio: float (ratio of scales on the coordinate axes)
+    polar: bool (whether the plot is polar or cartesian)
+    xkcd: bool (whether to use the XKCD style or not)
     fig: Matplotlib figure instance
     ax: Matplotlib subplot axes instance
 
@@ -166,9 +168,12 @@ Methods:
 
     ########################################
 
-    def __init__(self, dim = 2, aspect_ratio = 0, xkcd = False):
+    def __init__(self, dim = 2, aspect_ratio = 0, polar = False, xkcd = False):
         if dim not in {2, 3}:
             raise ValueError('Member \'dim\' of class \'CustomPlot\' must be either 2 or 3.')
+
+        if polar and dim != 2:
+            raise ValueError('Member \'dim\' of class \'CustomPlot\' must be 2 if \'polar\' is True.')
 
         # the figure has to be created after setting the plot style
         # this is necessary for the plot style to get applied correctly
@@ -179,13 +184,17 @@ Methods:
         else:
             plt.style.use('classic')
         self.fig = plt.figure()
-        if dim == 2:
+
+        if polar:
+            self.ax = self.fig.add_subplot(1, 1, 1, projection = 'polar')
+        elif dim == 2:
             self.ax = self.fig.add_subplot(1, 1, 1)
         else:
             self.ax = self.fig.add_subplot(1, 1, 1, projection = '3d')
 
         self.dim = dim
         self.aspect_ratio = aspect_ratio
+        self.polar = polar
         self.xkcd = xkcd
         self.fig.canvas.set_window_title(f'graph_{int(time.time())}')
 
@@ -231,8 +240,9 @@ Args:
 '''
 
         self.ax.legend(loc = 'best')
-        self.ax.set_xlabel(axis_labels[0])
-        self.ax.set_ylabel(axis_labels[1])
+        if not self.polar:
+            self.ax.set_xlabel(axis_labels[0])
+            self.ax.set_ylabel(axis_labels[1])
         if self.dim == 3:
             self.ax.set_zlabel(axis_labels[2])
         if title is not None:
@@ -240,7 +250,7 @@ Args:
 
         # if this is a two-dimensional plot, draw thick coordinate axes
         # this does not work as expected in three-dimensional plots
-        if self.dim == 2 and not self.xkcd:
+        if self.dim == 2 and not self.polar and not self.xkcd:
             kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
             self.ax.axhline(**kwargs)
             self.ax.axvline(**kwargs)
@@ -253,10 +263,15 @@ Args:
                 self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
                 self.ax.minorticks_on()
 
+        # this will not work if the user plots a polar graph in XKCD style
+        # hence, wrapping it in a `try' block
         if self.xkcd:
-            self.ax.spines['right'].set_color('none')
-            self.ax.spines['top'].set_color('none')
-            self.ax.xaxis.set_ticks_position('bottom')
+            try:
+                self.ax.spines['right'].set_color('none')
+                self.ax.spines['top'].set_color('none')
+                self.ax.xaxis.set_ticks_position('bottom')
+            except KeyError:
+                pass
 
     ########################################
 
@@ -292,6 +307,11 @@ Args:
                 raise ValueError('When \'symbolic\' is True, \'first\', \'last\' and \'step\' must not be None.')
 
             labels, ticks = graph_ticks(first, last, step, s, v)
+
+            # if this is a polar plot, ignore the last label and tick
+            # this is because an angle of 0 is the same as an angle of 2pi
+            if self.polar:
+                labels, ticks = labels[: -1], ticks[: -1]
             ticks_set_function(ticks)
             labels_set_function(labels)
             limits_set_function(v * first, v * last)
@@ -303,7 +323,13 @@ Args:
             if None not in {first, last}:
                 limits_set_function(first, last)
             self.fig.canvas.draw()
-            labels_set_function([f'${t.get_text()}$' for t in labels_get_function()])
+
+            # if this is a polar plot, the angle axis labels contain the degree symbol
+            # hence, remove it and add LaTeX's own degree symbol
+            if self.polar and axis == 'x':
+                labels_set_function([f'${t.get_text()[: -1]}' r'^{\circ}$' for t in labels_get_function()])
+            else:
+                labels_set_function([f'${t.get_text()}$' for t in labels_get_function()])
 
     ########################################
 
@@ -319,7 +345,7 @@ if `self.aspect_ratio' is non-zero. However, this functionality is not
 implemented in Matplotlib 3.3.3, so a workaround is used to achieve the same.
 '''
 
-        if self.aspect_ratio != 0 and not self.xkcd:
+        if self.aspect_ratio != 0 and not self.polar and not self.xkcd:
             if self.dim == 2:
                 self.ax.set_aspect(aspect = self.aspect_ratio, adjustable = 'box')
             else:
@@ -329,13 +355,13 @@ implemented in Matplotlib 3.3.3, so a workaround is used to achieve the same.
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 2, aspect_ratio = 1, xkcd = False)
+    grapher = CustomPlot(dim = 2, aspect_ratio = 1, polar = True, xkcd = False)
 
     t = np.linspace(-np.pi, np.pi, 100000)
-    x1 = np.linspace(-32, 32, 100000)
-    y1 = np.sin(x1)
+    x1 = np.linspace(0, 2 * np.pi, 100000)
+    y1 = 2 * np.sin(2 * x1)
     z1 = np.cos(t)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\cos\,x$')
+    grapher.plot(x1, y1, color = 'red', label = r'$r=2\,\sin\,2\theta$')
     # grapher.plot(range(-8, 9), [2] * 17, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none', label = r'')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
@@ -370,16 +396,16 @@ def main():
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -4,
-                     last     = 4,
-                     step     = 1 / 2)
+                     first    = 0,
+                     last     = 2,
+                     step     = 1 / 4)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -6,
+                     first    = 0,
                      last     = 6,
-                     step     = 2)
+                     step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
