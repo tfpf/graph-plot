@@ -1,21 +1,21 @@
 #! /usr/local/bin/python3.8 -B
 
 import fractions
-import matplotlib
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-# GUI and non-GUI backends for matplotlib
-# print(matplotlib.rcsetup.interactive_bk)
-# print(matplotlib.rcsetup.non_interactive_bk)
-matplotlib.use('TkAgg')
+# GUI and non-GUI backends for Matplotlib
+# print(mpl.rcsetup.interactive_bk)
+# print(mpl.rcsetup.non_interactive_bk)
+mpl.use('TkAgg')
 
-matplotlib.rcParams['figure.dpi']          = 120
-matplotlib.rcParams['savefig.dpi']         = 200
-matplotlib.rcParams['savefig.format']      = 'png'
-matplotlib.rcParams['savefig.directory']   = '/mnt/c/Users/vpaij/Pictures/'
-matplotlib.rcParams['savefig.orientation'] = 'portrait'
+mpl.rcParams['figure.dpi']          = 120
+mpl.rcParams['savefig.dpi']         = 200
+mpl.rcParams['savefig.format']      = 'png'
+mpl.rcParams['savefig.directory']   = '/mnt/c/Users/vpaij/Pictures/'
+mpl.rcParams['savefig.orientation'] = 'portrait'
 
 ###############################################################################
 
@@ -181,10 +181,8 @@ Methods:
         # this is necessary for the plot style to get applied correctly
         if xkcd:
             plt.xkcd()
-        elif dim == 2:
-            plt.style.use(['bmh', 'seaborn-poster', 'candy.mplstyle'])
         else:
-            plt.style.use('classic')
+            plt.style.use('candy.mplstyle')
         self.fig = plt.figure()
 
         if polar:
@@ -193,6 +191,8 @@ Methods:
             self.ax = self.fig.add_subplot(1, 1, 1)
         else:
             self.ax = self.fig.add_subplot(1, 1, 1, projection = '3d')
+            self.ax.tick_params(axis = 'both', labelsize = 'small', pad = 1)
+            self.ax.set_facecolor('white')
 
         self.dim = dim
         self.aspect_ratio = aspect_ratio
@@ -243,7 +243,7 @@ Args:
 '''
 
         kwargs = {'loc': 'best'}
-        if self.polar:
+        if self.polar or self.dim == 3:
             kwargs['facecolor'] = 'lightgray'
         self.ax.legend(**kwargs)
         if not self.polar:
@@ -264,10 +264,12 @@ Args:
         # enable grid
         # minor grid takes too much memory in three-dimensional plots
         if not self.xkcd:
-            self.ax.grid(b = True, which = 'major', linewidth = 0.8)
             if self.dim == 2:
-                self.ax.grid(b = True, which = 'minor', linewidth = 0.2)
+                self.ax.grid(b = True, which = 'major', linewidth = 0.8, linestyle = ':')
+                self.ax.grid(b = True, which = 'minor', linewidth = 0.1, linestyle = '-')
                 self.ax.minorticks_on()
+            else:
+                self.ax.grid(b = True, which = 'major', linewidth = 0.3, linestyle = '-')
 
         # this will not work if the user plots a polar graph in XKCD style
         # hence, wrapping it in a `try' block
@@ -361,20 +363,20 @@ implemented in Matplotlib 3.3.3, so a workaround is used to achieve the same.
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 2, aspect_ratio = 1, polar = True, xkcd = False)
+    grapher = CustomPlot(dim = 3, aspect_ratio = 1, polar = False, xkcd = False)
 
     t = np.linspace(-np.pi, np.pi, 100000)
-    x1 = np.linspace(0, 2 * np.pi, 100000)
-    y1 = 2 * np.cos(2 * x1)
-    z1 = np.cos(t)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=2\,\cos\,2x$')
+    x1 = np.linspace(-32, 32, 100000)
+    y1 = 2 * np.cos(x1)
+    z1 = np.exp(-x1 / 10)
+    grapher.plot(x1, y1, z1, color = 'red', label = r'$f(x,y,z)=0$')
     # grapher.plot(range(-8, 9), [2] * 17, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none', label = r'')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
     # x2 = np.linspace(-32, 32, 100000)
-    # y2 = 4 * np.exp(-x2 / 2)
+    # y2 = np.tan(x2) + 1 / np.cos(x2)
     # z2 = np.sin(x2)
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=4e^{-x/2}$')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\tan\,x+\sec\,x$')
 
     # x3 = np.linspace(0, 32, 100000)
     # y3 = x3
@@ -386,7 +388,7 @@ def main():
     # z4 = np.sin(x4)
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
 
-    # grapher.ax.fill_between(x1, y1, y2,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 0 < i < 1 else False for i in x1])
+    # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$')
     # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 1 < i < 2 else False for i in x1])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
@@ -402,22 +404,22 @@ def main():
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = 0,
+                     first    = -2,
                      last     = 2,
                      step     = 1 / 4)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = 0,
+                     first    = -3,
                      last     = 3,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = 0,
-                     last     = 16,
+                     first    = -2,
+                     last     = 2,
                      step     = 1)
     grapher.aspect_fix()
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
