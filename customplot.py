@@ -143,16 +143,8 @@ class CustomPlot:
     '''\
 A wrapper around Matplotlib to plot publication-quality graphs.
 
-Instantiation Examples:
-    Customplot(dim=2, aspect_ratio=0, polar=True, xkcd=False)
-    Customplot(dim=2, aspect_ratio=6.11, polar=False, xkcd=False)
-    Customplot(dim=3, aspect_ratio=0.2, polar=False, xkcd=True)
-    Customplot(dim=3, aspect_ratio=0, polar=True, xkcd=True)
-    Customplot(dim=3, aspect_ratio=1, polar=False, xkcd=False)
-
 Attributes:
     dim: int (2 for two-dimensional plots, 3 for three-dimensional plots)
-    aspect_ratio: float (ratio of y-scale to x-scale in a two-dimensional plot)
     polar: bool (whether the plot is polar or Cartesian)
     xkcd: bool (whether to use the XKCD style or not)
     fig: Matplotlib figure instance
@@ -170,7 +162,7 @@ Methods:
 
     ########################################
 
-    def __init__(self, dim = 2, aspect_ratio = 0, polar = False, xkcd = False):
+    def __init__(self, dim = 2, polar = False, xkcd = False):
         if dim not in {2, 3}:
             raise ValueError('Member \'dim\' of class \'CustomPlot\' must be either 2 or 3.')
 
@@ -195,7 +187,6 @@ Methods:
             self.ax.set_facecolor('white')
 
         self.dim = dim
-        self.aspect_ratio = aspect_ratio
         self.polar = polar
         self.xkcd = xkcd
         self.fig.canvas.set_window_title(f'graph_{int(time.time())}')
@@ -203,12 +194,12 @@ Methods:
     ########################################
 
     def __repr__(self):
-        return (f'CustomPlot(dim={self.dim}, aspect_ratio={self.aspect_ratio}, xkcd={self.xkcd})')
+        return (f'CustomPlot(dim={self.dim}, polar={self.polar}, xkcd={self.xkcd})')
 
     ########################################
 
     def __str__(self):
-        return (f'CustomPlot(dim={self.dim}, aspect_ratio={self.aspect_ratio}, xkcd={self.xkcd})')
+        return (f'CustomPlot(dim={self.dim}, polar={self.polar}, xkcd={self.xkcd})')
 
     ########################################
 
@@ -319,7 +310,10 @@ Args:
             # if this is a polar plot, ignore the last label and tick
             # this is because an angle of 0 is the same as an angle of 2pi
             if self.polar:
-                labels, ticks = labels[: -1], ticks[: -1]
+                if axis == 'x':
+                    labels, ticks = labels[: -1], ticks[: -1]
+                else:
+                    labels[0] = labels[-1] = ''
             ticks_set_function(ticks)
             labels_set_function(labels)
             limits_set_function(v * first, v * last)
@@ -332,30 +326,34 @@ Args:
                 limits_set_function(first, last)
             self.fig.canvas.draw()
 
-            # if this is a polar plot, the angle axis labels contain the degree symbol
+            # if this is a polar plot, the angular axis labels contain the degree symbol
             # hence, remove it and add LaTeX's own degree symbol
+            labels = [l.get_text() for l in labels_get_function()]
             if self.polar and axis == 'x':
-                labels_set_function([f'${t.get_text()[: -1]}' r'^{\circ}$' for t in labels_get_function()])
+                labels = [f'${l[: -1]}' r'^{\circ}$' for l in labels]
             else:
-                labels_set_function([f'${t.get_text()}$' for t in labels_get_function()])
+                labels = [f'${l}$' for l in labels]
+            if self.polar and axis == 'y':
+                labels[0] = labels[-1] = ''
+            labels_set_function(labels)
 
     ########################################
 
-    def aspect_fix(self):
+    def aspect_fix(self, aspect_ratio):
         '''\
-Set the aspect ratio of the axes object. If this is a two-dimensional plot, the
-ratio of the scales on the axes will be set to `self.aspect_ratio', provided
-that it is non-zero.
+Set the aspect ratio of the axes object. If this is a two-dimensional Cartesian
+plot, the ratio of the scales on the axes will be set to the given value (if it
+is non-zero). If this is two-dimensional polar plot, or if this is an XKCD-style
+plot, nothing happens.
 
 For three-dimensional plots, an aspect ratio does not make sense, because there
 are three axes. Hence, in this case, the scales on the axes will be made equal
-if `self.aspect_ratio' is non-zero. However, this functionality is not
-implemented in Matplotlib 3.3.3, so a workaround is used to achieve the same.
+if the given value is non-zero.
 '''
 
-        if self.aspect_ratio != 0 and not self.polar and not self.xkcd:
+        if aspect_ratio != 0 and not self.polar and not self.xkcd:
             if self.dim == 2:
-                self.ax.set_aspect(aspect = self.aspect_ratio, adjustable = 'box')
+                self.ax.set_aspect(aspect = aspect_ratio, adjustable = 'box')
             else:
                 limits = np.array([getattr(self.ax, f'get_{axis}lim')() for axis in 'xyz'])
                 self.ax.set_box_aspect(np.ptp(limits, axis = 1))
@@ -363,13 +361,34 @@ implemented in Matplotlib 3.3.3, so a workaround is used to achieve the same.
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 3, aspect_ratio = 1, polar = False, xkcd = False)
+    grapher = CustomPlot(dim = 2, polar = False, xkcd = False)
+    grapher.axis_fix(axis     = 'x',
+                     symbolic = True,
+                     s        = r'\pi',
+                     v        = np.pi,
+                     first    = -2,
+                     last     = 2,
+                     step     = 1 / 4)
+    grapher.axis_fix(axis     = 'y',
+                     symbolic = False,
+                     s        = r'\pi',
+                     v        = np.pi,
+                     first    = -3,
+                     last     = 3,
+                     step     = 1)
+    grapher.axis_fix(axis     = 'z',
+                     symbolic = False,
+                     s        = r'\pi',
+                     v        = np.pi,
+                     first    = -2,
+                     last     = 2,
+                     step     = 1)
 
     t = np.linspace(-np.pi, np.pi, 100000)
     x1 = np.linspace(-32, 32, 100000)
     y1 = 2 * np.cos(x1)
     z1 = np.exp(-x1 / 10)
-    grapher.plot(x1, y1, z1, color = 'red', label = r'$f(x,y,z)=0$')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=2\,\cos\,x$')
     # grapher.plot(range(-8, 9), [2] * 17, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none', label = r'')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
@@ -400,28 +419,7 @@ def main():
     # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
 
     grapher.configure(axis_labels = ('$x$', '$y$', '$z$'), title = None)
-    grapher.axis_fix(axis     = 'x',
-                     symbolic = True,
-                     s        = r'\pi',
-                     v        = np.pi,
-                     first    = -2,
-                     last     = 2,
-                     step     = 1 / 4)
-    grapher.axis_fix(axis     = 'y',
-                     symbolic = False,
-                     s        = r'\pi',
-                     v        = np.pi,
-                     first    = -3,
-                     last     = 3,
-                     step     = 1)
-    grapher.axis_fix(axis     = 'z',
-                     symbolic = False,
-                     s        = r'\pi',
-                     v        = np.pi,
-                     first    = -2,
-                     last     = 2,
-                     step     = 1)
-    grapher.aspect_fix()
+    grapher.aspect_fix(1)
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
     grapher.fig.tight_layout(pad = 2)
