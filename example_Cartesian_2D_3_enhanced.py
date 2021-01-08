@@ -13,7 +13,7 @@ grapher.axis_fix('y', first = -9, last = 4, step = 1)
 t = np.linspace(-np.pi, np.pi, 10000)
 x = 3 * np.cos(t) + 1
 y = 5 * np.sin(t) - 2
-grapher.plot(x, y, label = r'$\dfrac{(x-1)^2}{9}+\dfrac{(y+2)^2}{5}=1$')
+grapher.plot(x, y, label = r'$\dfrac{(x-1)^2}{9}+\dfrac{(y+2)^2}{25}=1$')
 
 grapher.configure()
 grapher.aspect_fix(1)
