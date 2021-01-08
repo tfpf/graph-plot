@@ -12,6 +12,3 @@ have grid lines drawn at multiples of pi. Grid spacing can be customised, too.
 
 You also must have some basic knowledge about these two modules.
 
-# Usage
-Read [example.pdf](example.pdf) for instructions on how to run this program.
-
