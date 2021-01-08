@@ -30,8 +30,8 @@ lines.scale_dashes    : True
 ###############################################################################
 
 patch.linewidth       : 0
-patch.facecolor       : gray
-patch.edgecolor       : gray
+patch.facecolor       : 666666
+patch.edgecolor       : 666666
 patch.force_edgecolor : False
 patch.antialiased     : True
 

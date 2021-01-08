@@ -237,7 +237,16 @@ Args:
         if self.polar or self.dim == 3:
             kwargs['facecolor'] = 'lightgray'
         self.ax.legend(**kwargs)
-        if not self.polar:
+        if self.polar:
+            R = self.ax.get_ylim()[1] * 1.5
+            kwargs = {'arrowstyle': 'Simple, tail_width = 0.5, head_width = 4, head_length = 8', 'clip_on': False}
+            angular = mpl.patches.FancyArrowPatch((-0.1, R), (0.1, R), connectionstyle = 'arc3, rad = 0.15', **kwargs)
+            self.ax.add_patch(angular)
+            self.ax.text(0.1, R, axis_labels[0], color = mpl.rcParams['axes.labelcolor'])
+            radial = mpl.patches.FancyArrowPatch((0, 0.95 * R), (0, 1.05 * R), **kwargs)
+            self.ax.add_patch(radial)
+            self.ax.text(0, 1.05 * R, axis_labels[1], color = mpl.rcParams['axes.labelcolor'])
+        else:
             self.ax.set_xlabel(axis_labels[0])
             self.ax.set_ylabel(axis_labels[1])
         if self.dim == 3:
@@ -361,20 +370,20 @@ if the given value is non-zero.
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 2, polar = False, xkcd = False)
+    grapher = CustomPlot(dim = 2, polar = True, xkcd = False)
     grapher.axis_fix(axis     = 'x',
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -2,
+                     first    = 0,
                      last     = 2,
-                     step     = 1 / 4)
+                     step     = 1 / 8)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -3,
-                     last     = 3,
+                     first    = 0,
+                     last     = 4,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
@@ -385,10 +394,10 @@ def main():
                      step     = 1)
 
     t = np.linspace(-np.pi, np.pi, 100000)
-    x1 = np.linspace(-32, 32, 100000)
-    y1 = 2 * np.cos(x1)
-    z1 = np.exp(-x1 / 10)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=2\,\cos\,x$')
+    x1 = np.linspace(0, 2 * np.pi, 100000)
+    y1 = 1 - np.cos(x1)
+    z1 = x1
+    grapher.plot(x1, y1, color = 'red', label = r'$r=1-\cos\,\theta$')
     # grapher.plot(range(-8, 9), [2] * 17, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none', label = r'')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
@@ -407,7 +416,7 @@ def main():
     # z4 = np.sin(x4)
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
 
-    # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$')
+    grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '')
     # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 1 < i < 2 else False for i in x1])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
@@ -418,7 +427,7 @@ def main():
     # surf._edgecolors2d = None
     # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
 
-    grapher.configure(axis_labels = ('$x$', '$y$', '$z$'), title = None)
+    grapher.configure(axis_labels = (r'$\theta$', r'$r$', r'$z$'), title = None)
     grapher.aspect_fix(1)
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
