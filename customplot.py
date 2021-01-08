@@ -250,7 +250,7 @@ Args:
             self.ax.xaxis.set_label_coords(0.11, 1.03 * R, transform = self.ax.transData)
             radial = mpl.patches.FancyArrowPatch((0, 0.95 * R), (0, 1.05 * R), **kwargs)
             self.ax.add_patch(radial)
-            self.ax.yaxis.set_label_coords(-0.01, 1.06 * R, transform = self.ax.transData)
+            self.ax.yaxis.set_label_coords(-0.04, 1.05 * R, transform = self.ax.transData)
         if self.dim == 3:
             self.ax.set_zlabel(axis_labels[2])
         if title is not None:
