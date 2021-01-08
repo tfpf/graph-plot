@@ -237,18 +237,20 @@ Args:
         if self.polar or self.dim == 3:
             kwargs['facecolor'] = 'lightgray'
         self.ax.legend(**kwargs)
+        self.ax.set_xlabel(axis_labels[0])
+        if self.polar:
+            self.ax.set_ylabel(axis_labels[1], rotation = 0)
+        else:
+            self.ax.set_ylabel(axis_labels[1])
         if self.polar:
             R = self.ax.get_ylim()[1] * 1.5
             kwargs = {'arrowstyle': 'Simple, tail_width = 0.5, head_width = 4, head_length = 8', 'clip_on': False}
             angular = mpl.patches.FancyArrowPatch((-0.1, R), (0.1, R), connectionstyle = 'arc3, rad = 0.15', **kwargs)
             self.ax.add_patch(angular)
-            self.ax.text(0.1, R, axis_labels[0], color = mpl.rcParams['axes.labelcolor'])
+            self.ax.xaxis.set_label_coords(0.11, 1.03 * R, transform = self.ax.transData)
             radial = mpl.patches.FancyArrowPatch((0, 0.95 * R), (0, 1.05 * R), **kwargs)
             self.ax.add_patch(radial)
-            self.ax.text(0, 1.05 * R, axis_labels[1], color = mpl.rcParams['axes.labelcolor'])
-        else:
-            self.ax.set_xlabel(axis_labels[0])
-            self.ax.set_ylabel(axis_labels[1])
+            self.ax.yaxis.set_label_coords(-0.01, 1.06 * R, transform = self.ax.transData)
         if self.dim == 3:
             self.ax.set_zlabel(axis_labels[2])
         if title is not None:
