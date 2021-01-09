@@ -359,10 +359,10 @@ figure.figsize   : 12.8, 8.8   ## figure size in inches
 ## the default savefig params can be different from the display params
 ## e.g., you may want a higher resolution, or to make the figure
 ## background white
-#savefig.dpi         : figure   ## figure dots per inch or 'figure'
+savefig.dpi         : figure   ## figure dots per inch or 'figure'
 #savefig.facecolor   : white    ## figure facecolor when saving
 #savefig.edgecolor   : white    ## figure edgecolor when saving
-#savefig.format      : png      ## png, ps, pdf, svg
+savefig.format      : png      ## png, ps, pdf, svg
 #savefig.bbox        : standard ## 'tight' or 'standard'.
                                 ## 'tight' is incompatible with pipe-based animation
                                 ## backends but will workd with temporary file based ones:

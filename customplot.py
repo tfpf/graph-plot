@@ -11,11 +11,8 @@ import time
 # print(mpl.rcsetup.non_interactive_bk)
 mpl.use('TkAgg')
 
-mpl.rcParams['figure.dpi']          = 120
-mpl.rcParams['savefig.dpi']         = 200
-mpl.rcParams['savefig.format']      = 'png'
-mpl.rcParams['savefig.directory']   = '/mnt/c/Users/vpaij/Pictures/'
-mpl.rcParams['savefig.orientation'] = 'portrait'
+mpl.rcParams['figure.dpi']        = 120
+mpl.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/'
 
 ###############################################################################
 
