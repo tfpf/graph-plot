@@ -230,10 +230,7 @@ Args:
     title: str (title of the graph)
 '''
 
-        kwargs = {'loc': 'best'}
-        if self.polar or self.dim == 3:
-            kwargs['facecolor'] = 'lightgray'
-        self.ax.legend(**kwargs)
+        # axis labels
         self.ax.set_xlabel(axis_labels[0])
         if self.polar:
             self.ax.set_ylabel(axis_labels[1], rotation = 0)
@@ -252,6 +249,14 @@ Args:
             self.ax.set_zlabel(axis_labels[2])
         if title is not None:
             self.ax.set_title(title)
+
+        # legend
+        kwargs = {'loc': 'best'}
+        if self.polar:
+            kwargs['bbox_to_anchor'] = (1.2, 1)
+        if self.polar or self.dim == 3:
+            kwargs['facecolor'] = 'lightgray'
+        self.ax.legend(**kwargs)
 
         # if this is a two-dimensional plot, draw thick coordinate axes
         # this does not work as expected in three-dimensional plots
@@ -382,7 +387,7 @@ def main():
                      s        = r'\pi',
                      v        = np.pi,
                      first    = 0,
-                     last     = 4,
+                     last     = 5,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
@@ -392,11 +397,11 @@ def main():
                      last     = 2,
                      step     = 1)
 
-    t = np.linspace(-np.pi, np.pi, 100000)
-    x1 = np.linspace(0, 2 * np.pi, 100000)
-    y1 = 1 - np.cos(x1)
+    t = np.linspace(-np.pi, np.pi, 10000)
+    x1 = np.linspace(0, 2 * np.pi, 10000)
+    y1 = x1
     z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$r=1-\cos\,\theta$')
+    grapher.plot(x1, y1, color = 'red', label = r'$r=\theta$')
     # grapher.plot(range(-8, 9), [2] * 17, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none', label = r'')
     # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
 
@@ -415,7 +420,7 @@ def main():
     # z4 = np.sin(x4)
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
 
-    grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '')
+    # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '')
     # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 1 < i < 2 else False for i in x1])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
