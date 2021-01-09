@@ -5,6 +5,7 @@ import numpy as np
 import customplot
 
 mpl.rcParams['savefig.directory'] = '.'
+mpl.rcParams['figure.dpi']        = 120
 
 grapher = customplot.CustomPlot()
 grapher.axis_fix('x', first = -3, last = 5, step = 1)
