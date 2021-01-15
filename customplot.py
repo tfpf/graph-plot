@@ -235,16 +235,17 @@ Args:
         if self.polar:
             self.ax.set_ylabel(axis_labels[1], rotation = 0)
         else:
-            self.ax.set_ylabel(axis_labels[1])
+            self.ax.set_ylabel(axis_labels[1], rotation = 90)
         if self.polar:
-            R = self.ax.get_ylim()[1] * 1.5
-            kwargs = {'arrowstyle': 'Simple, tail_width = 0.5, head_width = 4, head_length = 8', 'clip_on': False}
-            angular = mpl.patches.FancyArrowPatch((-0.1, R), (0.1, R), connectionstyle = 'arc3, rad = 0.15', **kwargs)
+            kwargs = {'arrowstyle': 'Simple, tail_width = 0.5, head_width = 4, head_length = 8',
+                      'clip_on':    False,
+                      'transform':  self.ax.transAxes}
+            angular = mpl.patches.FancyArrowPatch((1.5, 0.4), (1.5, 0.6), connectionstyle = 'arc3, rad = 0.15', **kwargs)
             self.ax.add_patch(angular)
-            self.ax.xaxis.set_label_coords(0.11, 1.03 * R, transform = self.ax.transData)
-            radial = mpl.patches.FancyArrowPatch((0, 0.95 * R), (0, 1.05 * R), **kwargs)
+            self.ax.xaxis.set_label_coords(1.52, 0.6)
+            radial = mpl.patches.FancyArrowPatch((1.45, 0.5), (1.55, 0.5), **kwargs)
             self.ax.add_patch(radial)
-            self.ax.yaxis.set_label_coords(-0.04, 1.05 * R, transform = self.ax.transData)
+            self.ax.yaxis.set_label_coords(1.55, 0.47)
         if self.dim == 3:
             self.ax.set_zlabel(axis_labels[2])
         if title is not None:
@@ -253,7 +254,7 @@ Args:
         # legend
         kwargs = {'loc': 'best'}
         if self.polar:
-            kwargs['bbox_to_anchor'] = (1.2, 1)
+            kwargs['bbox_to_anchor'] = (1.5, 1)
         if self.polar or self.dim == 3:
             kwargs['facecolor'] = 'lightgray'
         self.ax.legend(**kwargs)
@@ -399,23 +400,24 @@ def main():
 
     t = np.linspace(-np.pi, np.pi, 10000)
     x1 = np.linspace(0, 2 * np.pi, 10000)
-    y1 = x1
+    y1 = 1 - np.cos(x1)
     z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$r=\theta$')
+    grapher.plot(x1, y1, color = 'red', label = r'$r=1-\cos\,\theta$')
+    # grapher.plot(0, 1, color = 'black', marker = 'o', markerfacecolor = 'black', markersize = 4, label = r'')
     # grapher.plot(range(-8, 9), [2] * 17, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none', label = r'')
-    # grapher.ax.text(0.83, 0.739, r'$(0.739,0.739)$')
+    # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
-    # x2 = np.linspace(-32, 32, 100000)
-    # y2 = np.tan(x2) + 1 / np.cos(x2)
-    # z2 = np.sin(x2)
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\tan\,x+\sec\,x$')
+    # x2 = np.linspace(-32, 32, 10000)
+    # y2 = -2 * x2 + 1
+    # z2 = x2
+    # grapher.plot(x2, y2, color = 'blue', label = r'$2x+y=1$')
 
-    # x3 = np.linspace(0, 32, 100000)
+    # x3 = np.linspace(0, 32, 10000)
     # y3 = x3
     # z3 = np.sin(x3)
     # grapher.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
 
-    # x4 = np.linspace(-32, 32, 100000)
+    # x4 = np.linspace(-32, 32, 10000)
     # y4 = x4 / 8
     # z4 = np.sin(x4)
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
@@ -431,7 +433,7 @@ def main():
     # surf._edgecolors2d = None
     # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
 
-    grapher.configure(axis_labels = (r'$\theta$', r'$r$', r'$z$'), title = None)
+    grapher.configure(axis_labels = (r'$r$', r'$\theta$', r'$z$'), title = None)
     grapher.aspect_fix(1)
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
