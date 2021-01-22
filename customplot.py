@@ -171,7 +171,7 @@ Methods:
         if xkcd:
             plt.xkcd()
         else:
-            plt.style.use('candy.mplstyle')
+            plt.style.use('dandy.mplstyle')
         self.fig = plt.figure()
 
         if polar:
@@ -240,12 +240,12 @@ Args:
             kwargs = {'arrowstyle': 'Simple, tail_width = 0.5, head_width = 4, head_length = 8',
                       'clip_on':    False,
                       'transform':  self.ax.transAxes}
-            angular = mpl.patches.FancyArrowPatch((1.5, 0.4), (1.5, 0.6), connectionstyle = 'arc3, rad = 0.15', **kwargs)
+            angular = mpl.patches.FancyArrowPatch((1.3, 0.4), (1.3, 0.6), connectionstyle = 'arc3, rad = 0.15', **kwargs)
             self.ax.add_patch(angular)
-            self.ax.xaxis.set_label_coords(1.52, 0.6)
-            radial = mpl.patches.FancyArrowPatch((1.45, 0.5), (1.55, 0.5), **kwargs)
+            self.ax.xaxis.set_label_coords(1.32, 0.6)
+            radial = mpl.patches.FancyArrowPatch((1.25, 0.5), (1.35, 0.5), **kwargs)
             self.ax.add_patch(radial)
-            self.ax.yaxis.set_label_coords(1.55, 0.47)
+            self.ax.yaxis.set_label_coords(1.35, 0.47)
         if self.dim == 3:
             self.ax.set_zlabel(axis_labels[2])
         if title is not None:
@@ -254,7 +254,7 @@ Args:
         # legend
         kwargs = {'loc': 'best'}
         if self.polar:
-            kwargs['bbox_to_anchor'] = (1.5, 1)
+            kwargs['bbox_to_anchor'] = (1.3, 1)
         if self.polar or self.dim == 3:
             kwargs['facecolor'] = 'lightgray'
         self.ax.legend(**kwargs)
@@ -398,28 +398,27 @@ def main():
                      last     = 3,
                      step     = 1)
 
-    t = np.linspace(-np.pi, np.pi, 10000)
-    x1 = np.linspace(-6, 6, 10000)
-    y1 = np.sin(np.pi * x1 / 2)
+    t = np.linspace(0, np.pi / 2, 10000)
+    x1 = np.linspace(-32, 32, 10000)
+    y1 = x1
     z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\Im\{(-1)^x\}$')
-    # grapher.plot(0, 1, color = 'black', marker = 'o', markerfacecolor = 'black', markersize = 4, label = r'')
-    # grapher.plot(range(-8, 9), [2] * 17, linestyle = 'none', marker = 'o', markerfacecolor = 'white', markeredgecolor = 'blue', markersize = 4, fillstyle = 'none', label = r'')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\dfrac{1}{1/x}$')
+    grapher.plot(0, 0, color = 'red', linestyle = 'none', zorder = 100, marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
-    # x2 = np.linspace(-32, 32, 10000)
-    # y2 = -2 * x2 + 1
+    # x2 = np.linspace(-2, 2, 10000)
+    # y2 = np.sqrt(x2 + 2) - 2
     # z2 = x2
-    # grapher.plot(x2, y2, color = 'blue', label = r'$2x+y=1$')
+    # grapher.plot(x2, y2, color = 'red', label = r'')
 
-    # x3 = np.linspace(0, 32, 10000)
-    # y3 = x3
-    # z3 = np.sin(x3)
-    # grapher.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
+    # x3 = np.linspace(2, 32, 10000)
+    # y3 = 2 * np.exp(-(x3 - 2))
+    # z3 = x3
+    # grapher.plot(x3, y3, color = 'red', label = r'')
 
     # x4 = np.linspace(-32, 32, 10000)
     # y4 = x4 / 8
-    # z4 = np.sin(x4)
+    # z4 = x4
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
 
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '')
