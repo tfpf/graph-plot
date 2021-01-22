@@ -363,6 +363,9 @@ plot, nothing happens.
 For three-dimensional plots, an aspect ratio does not make sense, because there
 are three axes. Hence, in this case, the scales on the axes will be made equal
 if the given value is non-zero.
+
+Args:
+    aspect_ratio: float (ratio of scales on the vertical and horizontal axes)
 '''
 
         if aspect_ratio != 0 and not self.polar and not self.xkcd:
