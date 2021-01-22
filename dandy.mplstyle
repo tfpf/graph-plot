@@ -7,7 +7,7 @@ lines.linestyle : -
 # lines.color     : C0
 
 lines.marker          : None
-lines.markerfacecolor : auto
+lines.markerfacecolor : eeeeee
 lines.markeredgecolor : auto
 lines.markeredgewidth : 1
 lines.markersize      : 4
