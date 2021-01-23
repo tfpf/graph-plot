@@ -378,7 +378,7 @@ Args:
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 2, polar = False, xkcd = False)
+    grapher = CustomPlot(dim = 3, polar = False, xkcd = False)
     grapher.axis_fix(axis     = 'x',
                      symbolic = False,
                      s        = r'\pi',
@@ -401,12 +401,12 @@ def main():
                      last     = 3,
                      step     = 1)
 
-    t = np.linspace(0, np.pi / 2, 10000)
-    x1 = np.linspace(-32, 32, 10000)
-    y1 = x1
-    z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\dfrac{1}{1/x}$')
-    grapher.plot(0, 0, color = 'red', linestyle = 'none', zorder = 100, marker = 'o', markersize = 4, label = r'')
+    t = np.linspace(-0.5, 10, 10000)
+    x1 = 1 - 2 * t
+    y1 = 1 - 4 * t
+    z1 = 1 - 2 * t
+    grapher.plot(x1, y1, z1, color = 'red', zorder = -100, label = r'$\{(1-2t,1-4t,1-2t)\}$')
+    # grapher.plot(0, 0, color = 'red', linestyle = 'none', zorder = 100, marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
     # x2 = np.linspace(-2, 2, 10000)
@@ -428,11 +428,17 @@ def main():
     # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 1 < i < 2 else False for i in x1])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
+    T, P = np.meshgrid(np.linspace(0, np.pi, 100), np.linspace(0, 2 * np.pi, 100))
+    X = 2 * np.cos(T)
+    Y = np.sqrt(2) * np.sin(T) * np.cos(P)
+    Z = 2 * np.sin(T) * np.sin(P)
+    surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'lightgreen', antialiased = True, label = r'$x^2+2y^2+z^2=4$')
+    surf._facecolors2d = surf._edgecolors2d = None
+
     # X, Y = np.meshgrid(np.linspace(-8, 8, 1000), np.linspace(-8, 8, 1000))
     # Z = np.abs(X) + np.abs(Y)
     # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'skyblue', antialiased = True, label = r'$z=|x|+|y|$')
-    # surf._facecolors2d = None
-    # surf._edgecolors2d = None
+    # surf._facecolors2d = surf._edgecolors2d = None
     # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
 
     grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
