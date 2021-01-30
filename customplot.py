@@ -328,7 +328,8 @@ Args:
                 if axis == 'x':
                     labels, ticks = labels[: -1], ticks[: -1]
                 else:
-                    labels[0] = labels[-1] = ''
+                    # labels[0] = labels[-1] = ''
+                    pass
             ticks_set_function(ticks)
             labels_set_function(labels)
             limits_set_function(v * first, v * last)
