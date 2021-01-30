@@ -237,6 +237,7 @@ Args:
         else:
             self.ax.set_ylabel(axis_labels[1], rotation = 90)
         if self.polar:
+            self.ax.set_rlabel_position(0)
             kwargs = {'arrowstyle': 'Simple, tail_width = 0.5, head_width = 4, head_length = 8',
                       'clip_on':    False,
                       'transform':  self.ax.transAxes}
@@ -378,20 +379,20 @@ Args:
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 3, polar = False, xkcd = False)
+    grapher = CustomPlot(dim = 2, polar = True, xkcd = False)
     grapher.axis_fix(axis     = 'x',
-                     symbolic = False,
+                     symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -6,
-                     last     = 6,
-                     step     = 1)
+                     first    = 0,
+                     last     = 2,
+                     step     = 1 / 6)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
-                     s        = r'\pi',
-                     v        = np.pi,
-                     first    = -3,
-                     last     = 3,
+                     s        = r'a',
+                     v        = 1,
+                     first    = 0,
+                     last     = 5,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
@@ -401,39 +402,39 @@ def main():
                      last     = 3,
                      step     = 1)
 
-    t = np.linspace(-0.5, 10, 10000)
-    x1 = 1 - 2 * t
-    y1 = 1 - 4 * t
-    z1 = 1 - 2 * t
-    grapher.plot(x1, y1, z1, color = 'red', zorder = -100, label = r'$\{(1-2t,1-4t,1-2t)\}$')
+    # t = np.linspace(-0.5, 10, 10000)
+    x1 = np.linspace(0, 2 * np.pi, 10000)
+    y1 = 1 / np.cos(x1 / 2) ** 2
+    z1 = x1
+    grapher.plot(x1, y1, color = 'red', label = r'$r\cos^2\dfrac{\theta}{2}=a$')
     # grapher.plot(0, 0, color = 'red', linestyle = 'none', zorder = 100, marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
-    # x2 = np.linspace(-2, 2, 10000)
-    # y2 = np.sqrt(x2 + 2) - 2
+    # x2 = np.linspace(-np.pi / 2, np.pi / 2, 10000)
+    # y2 = x2
     # z2 = x2
-    # grapher.plot(x2, y2, color = 'red', label = r'')
+    # grapher.plot(x2, y2, color = 'blue', linestyle = ':', label = r'')
 
-    # x3 = np.linspace(2, 32, 10000)
-    # y3 = 2 * np.exp(-(x3 - 2))
+    # x3 = np.linspace(np.pi / 2, 3 * np.pi / 2, 10000)
+    # y2 = x2
     # z3 = x3
-    # grapher.plot(x3, y3, color = 'red', label = r'')
+    # grapher.plot(x3, y3, color = 'blue', linestyle = ':', label = r'')
 
     # x4 = np.linspace(-32, 32, 10000)
     # y4 = x4 / 8
     # z4 = x4
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
 
-    # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '')
-    # grapher.ax.fill_between(x1, y1, y3, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 1 < i < 2 else False for i in x1])
+    # grapher.ax.fill_between(x1, y1, y2,  facecolor = 'cyan', linewidth = 0, label = r'$R$')
+    # grapher.ax.fill_between(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < j else False for i, j in zip(y1, y2)])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
-    T, P = np.meshgrid(np.linspace(0, np.pi, 100), np.linspace(0, 2 * np.pi, 100))
-    X = 2 * np.cos(T)
-    Y = np.sqrt(2) * np.sin(T) * np.cos(P)
-    Z = 2 * np.sin(T) * np.sin(P)
-    surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'lightgreen', antialiased = True, label = r'$x^2+2y^2+z^2=4$')
-    surf._facecolors2d = surf._edgecolors2d = None
+    # T, P = np.meshgrid(np.linspace(0, np.pi, 100), np.linspace(0, 2 * np.pi, 100))
+    # X = 2 * np.cos(T)
+    # Y = np.sqrt(2) * np.sin(T) * np.cos(P)
+    # Z = 2 * np.sin(T) * np.sin(P)
+    # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'lightgreen', antialiased = True, label = r'$x^2+2y^2+z^2=4$')
+    # surf._facecolors2d = surf._edgecolors2d = None
 
     # X, Y = np.meshgrid(np.linspace(-8, 8, 1000), np.linspace(-8, 8, 1000))
     # Z = np.abs(X) + np.abs(Y)
@@ -441,7 +442,7 @@ def main():
     # surf._facecolors2d = surf._edgecolors2d = None
     # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
 
-    grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
+    grapher.configure(axis_labels = (r'$\theta$', r'$r$', r'$z$'), title = None)
     grapher.aspect_fix(1)
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
