@@ -59,7 +59,7 @@ Returns:
 
     # locate points of discontinuity (check where the derivative is large)
     y = np.array(y)
-    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > 0.1
+    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > 1
     y[points_of_discontinuity] = np.nan
 
     return y
@@ -328,8 +328,7 @@ Args:
                 if axis == 'x':
                     labels, ticks = labels[: -1], ticks[: -1]
                 else:
-                    # labels[0] = labels[-1] = ''
-                    pass
+                    labels[0] = labels[-1] = ''
             ticks_set_function(ticks)
             labels_set_function(labels)
             limits_set_function(v * first, v * last)
@@ -380,41 +379,41 @@ Args:
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 2, polar = True, xkcd = False)
+    grapher = CustomPlot(dim = 3, polar = False, xkcd = False)
     grapher.axis_fix(axis     = 'x',
-                     symbolic = True,
+                     symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = 0,
-                     last     = 2,
-                     step     = 1 / 6)
+                     first    = -3,
+                     last     = 7,
+                     step     = 0.5)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'a',
                      v        = 1,
-                     first    = 0,
-                     last     = 5,
-                     step     = 1)
+                     first    = -2.5,
+                     last     = 2.5,
+                     step     = 0.5)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
                      first    = -3,
                      last     = 3,
-                     step     = 1)
+                     step     = 0.5)
 
-    # t = np.linspace(-0.5, 10, 10000)
-    x1 = np.linspace(0, 2 * np.pi, 10000)
-    y1 = 1 / np.cos(x1 / 2) ** 2
-    z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$r\cos^2\dfrac{\theta}{2}=a$')
+    # t = np.linspace(0, 2 * np.pi, 10000)
+    # x1 = 2 + 2 * np.cos(t)
+    # y1 = 2 * np.sin(t)
+    # z1 = x1
+    # grapher.plot(x1, y1, color = 'red', label = r'$(x-2)^2+y^2=4$')
     # grapher.plot(0, 0, color = 'red', linestyle = 'none', zorder = 100, marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
-    # x2 = np.linspace(-np.pi / 2, np.pi / 2, 10000)
-    # y2 = x2
+    # x2 = np.linspace(0, 1 * np.pi, 10000)
+    # y2 = 4 * np.sin(x1)
     # z2 = x2
-    # grapher.plot(x2, y2, color = 'blue', linestyle = ':', label = r'')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$r=4\,\sin\,\theta$')
 
     # x3 = np.linspace(np.pi / 2, 3 * np.pi / 2, 10000)
     # y2 = x2
@@ -430,20 +429,23 @@ def main():
     # grapher.ax.fill_between(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < j else False for i, j in zip(y1, y2)])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
+    X, Z = np.meshgrid(np.linspace(0, 4, 100), np.linspace(-3, 3, 100))
+    Y = np.sqrt(4 - (X - 2) ** 2)
+    surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = '#009F00', shade = False, alpha = 0.9, antialiased = True, label = r'$(x-2)^2+y^2=4$'); surf._facecolors2d = surf._edgecolors2d = None
+    surf = grapher.ax.plot_surface(X, -Y, Z, linewidth = 0, color = '#009F00', shade = False, alpha = 0.9, antialiased = True); surf._facecolors2d = surf._edgecolors2d = None
+
     # T, P = np.meshgrid(np.linspace(0, np.pi, 100), np.linspace(0, 2 * np.pi, 100))
     # X = 2 * np.cos(T)
     # Y = np.sqrt(2) * np.sin(T) * np.cos(P)
     # Z = 2 * np.sin(T) * np.sin(P)
-    # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'lightgreen', antialiased = True, label = r'$x^2+2y^2+z^2=4$')
-    # surf._facecolors2d = surf._edgecolors2d = None
+    # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'lightgreen', antialiased = True, label = r'$x^2+2y^2+z^2=4$'); surf._facecolors2d = surf._edgecolors2d = None
 
     # X, Y = np.meshgrid(np.linspace(-8, 8, 1000), np.linspace(-8, 8, 1000))
     # Z = np.abs(X) + np.abs(Y)
-    # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'skyblue', antialiased = True, label = r'$z=|x|+|y|$')
-    # surf._facecolors2d = surf._edgecolors2d = None
+    # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'skyblue', antialiased = True, label = r'$z=|x|+|y|$'); surf._facecolors2d = surf._edgecolors2d = None
     # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
 
-    grapher.configure(axis_labels = (r'$\theta$', r'$r$', r'$z$'), title = None)
+    grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
     grapher.aspect_fix(1)
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
