@@ -379,21 +379,21 @@ Args:
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 3, polar = False, xkcd = False)
+    grapher = CustomPlot(dim = 2, polar = False, xkcd = False)
     grapher.axis_fix(axis     = 'x',
-                     symbolic = False,
+                     symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -3,
-                     last     = 7,
-                     step     = 0.5)
+                     first    = -2,
+                     last     = 2,
+                     step     = 1 / 4)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'a',
                      v        = 1,
-                     first    = -2.5,
-                     last     = 2.5,
-                     step     = 0.5)
+                     first    = -3,
+                     last     = 3,
+                     step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
@@ -402,11 +402,11 @@ def main():
                      last     = 3,
                      step     = 0.5)
 
-    # t = np.linspace(0, 2 * np.pi, 10000)
-    # x1 = 2 + 2 * np.cos(t)
-    # y1 = 2 * np.sin(t)
-    # z1 = x1
-    # grapher.plot(x1, y1, color = 'red', label = r'$(x-2)^2+y^2=4$')
+    # t = np.linspace(-32, 32, 10000); R = 1 / np.pi
+    x1 = np.linspace(-32, 32, 10000)
+    y1 = np.cos(x1)
+    z1 = x1
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\mathrm{cos}\,x$')
     # grapher.plot(0, 0, color = 'red', linestyle = 'none', zorder = 100, marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
@@ -429,10 +429,10 @@ def main():
     # grapher.ax.fill_between(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < j else False for i, j in zip(y1, y2)])
     # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
 
-    X, Z = np.meshgrid(np.linspace(0, 4, 100), np.linspace(-3, 3, 100))
-    Y = np.sqrt(4 - (X - 2) ** 2)
-    surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = '#009F00', shade = False, alpha = 0.9, antialiased = True, label = r'$(x-2)^2+y^2=4$'); surf._facecolors2d = surf._edgecolors2d = None
-    surf = grapher.ax.plot_surface(X, -Y, Z, linewidth = 0, color = '#009F00', shade = False, alpha = 0.9, antialiased = True); surf._facecolors2d = surf._edgecolors2d = None
+    # X, Z = np.meshgrid(np.linspace(0, 4, 100), np.linspace(-3, 3, 100))
+    # Y = np.sqrt(4 - (X - 2) ** 2)
+    # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = '#009F00', shade = False, alpha = 0.9, antialiased = True, label = r'$(x-2)^2+y^2=4$'); surf._facecolors2d = surf._edgecolors2d = None
+    # surf = grapher.ax.plot_surface(X, -Y, Z, linewidth = 0, color = '#009F00', shade = False, alpha = 0.9, antialiased = True); surf._facecolors2d = surf._edgecolors2d = None
 
     # T, P = np.meshgrid(np.linspace(0, np.pi, 100), np.linspace(0, 2 * np.pi, 100))
     # X = 2 * np.cos(T)

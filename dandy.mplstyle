@@ -118,14 +118,17 @@ text.hinting        : auto # none|auto|native|either
 text.hinting_factor : 8
 text.antialiased    : True # only affects Agg backend
 
-# mathtext.cal            : cursive
-# mathtext.rm             : sans
-# mathtext.tt             : monospace
-# mathtext.it             : sans:italic
-# mathtext.bf             : sans:bold
-# mathtext.sf             : sans
+# download Cochineal (perhaps from CTAN) and extract it to ~/.font
+# the delete Matplotlib's font cache
+# if you don't want to do those things, delete the following 9 lines
+# mathtext.cal            : Cochineal
+# mathtext.rm             : Cochineal
+# mathtext.tt             : Cochineal
+# mathtext.it             : Cochineal
+# mathtext.bf             : Cochineal
+# mathtext.sf             : Cochineal
 mathtext.fontset        : cm # dejavusans|dejavuserif|cm|stix|stixsans|custom
-# mathtext.fallback_to_cm : True
+# mathtext.fallback       : cm
 # mathtext.default        : it
 
 ###############################################################################
