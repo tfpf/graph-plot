@@ -92,10 +92,13 @@ hatch.linewidth : 1.0
 
 ###############################################################################
 # font
+# you can set a custom font instead of the default one
+# for instance, I have used Cochineal
+# I downloaded it and saved the OTF files as ~/.fonts/Cochineal/*.otf
+# finally, delete the font cache maintained by Matplotlib
 ###############################################################################
-
-font.family     : serif  # serif|sans-serif|cursive|fantasy|monospace
-font.style      : italic # normal|roman|italic|oblique
+font.family     : Cochineal  # serif|sans-serif|cursive|fantasy|monospace
+font.style      : normal # normal|roman|italic|oblique
 font.variant    : normal # normal|small-caps
 font.weight     : normal # 100|200|300|...|900|normal|bold|bolder|lighter
 font.stretch    : normal # ultra-condensed|extra-condensed|condensed|semi-condensed|normal|semi-expanded|expanded|extra-expanded|ultra-expanded|wider|narrower
@@ -109,27 +112,26 @@ font.monospace  : DejaVu Sans Mono, Bitstream Vera Sans Mono, Computer Modern Ty
 ###############################################################################
 # text
 ###############################################################################
-
 text.color          : black
 text.usetex         : False
-# text.latex.preamble :      
+# text.latex.preamble :
 # text.latex.preview  : False
 text.hinting        : auto # none|auto|native|either
 text.hinting_factor : 8
 text.antialiased    : True # only affects Agg backend
 
-# download Cochineal (perhaps from CTAN) and extract it to ~/.font
-# the delete Matplotlib's font cache
-# if you don't want to do those things, delete the following 9 lines
-# mathtext.cal            : Cochineal
-# mathtext.rm             : Cochineal
-# mathtext.tt             : Cochineal
-# mathtext.it             : Cochineal
-# mathtext.bf             : Cochineal
-# mathtext.sf             : Cochineal
-mathtext.fontset        : cm # dejavusans|dejavuserif|cm|stix|stixsans|custom
-# mathtext.fallback       : cm
-# mathtext.default        : it
+###############################################################################
+# text for mathematical expressions
+###############################################################################
+mathtext.cal            : Cochineal
+mathtext.rm             : Cochineal
+mathtext.tt             : Cochineal
+mathtext.it             : Cochineal:italic
+mathtext.bf             : Cochineal:bold
+mathtext.sf             : Cochineal
+mathtext.fontset        : custom # dejavusans|dejavuserif|cm|stix|stixsans|custom
+mathtext.fallback       : cm
+mathtext.default        : it
 
 ###############################################################################
 # axes
