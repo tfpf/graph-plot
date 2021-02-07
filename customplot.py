@@ -196,7 +196,7 @@ Methods:
     ########################################
 
     def __str__(self):
-        return (f'CustomPlot(dim={self.dim}, polar={self.polar}, xkcd={self.xkcd})')
+        return (f'<CustomPlot object at {hex(id(self))}>')
 
     ########################################
 
@@ -322,12 +322,13 @@ Args:
 
             labels, ticks = graph_ticks(first, last, step, s, v)
 
-            # if this is a polar plot, ignore the last label and tick
-            # this is because an angle of 0 is the same as an angle of 2pi
+            # see if this is a polar plot in which the angle goes from 0 to 2pi
+            # if yes, do not draw the label for 2pi (as it overlaps with 0)
+            # further, do not draw the first and last labels on the radial axis
             if self.polar:
-                if axis == 'x':
+                if axis == 'x' and first == 0 and last == 2:
                     labels, ticks = labels[: -1], ticks[: -1]
-                else:
+                elif axis == 'y':
                     labels[0] = labels[-1] = ''
             ticks_set_function(ticks)
             labels_set_function(labels)
@@ -339,18 +340,14 @@ Args:
                 ticks_set_function(np.arange(first, last + step, step))
             if None not in {first, last}:
                 limits_set_function(first, last)
-            self.fig.canvas.draw()
 
-            # if this is a polar plot, the angular axis labels contain the degree symbol
-            # hence, remove it and add LaTeX's own degree symbol
-            labels = [l.get_text() for l in labels_get_function()]
-            if self.polar and axis == 'x':
-                labels = [f'${l[: -1]}' r'^{\circ}$' for l in labels]
-            else:
-                labels = [f'${l}$' for l in labels]
+            # do the same thing as in the `symbolic' case for polar plots
+            # i.e. do not draw the first and last labels on the radial axis
+            self.fig.canvas.draw()
             if self.polar and axis == 'y':
+                labels = [l.get_text() for l in labels_get_function()]
                 labels[0] = labels[-1] = ''
-            labels_set_function(labels)
+                labels_set_function(labels)
 
     ########################################
 
@@ -389,8 +386,8 @@ def main():
                      step     = 1 / 4)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
-                     s        = r'a',
-                     v        = 1,
+                     s        = r'\pi',
+                     v        = np.pi,
                      first    = -3,
                      last     = 3,
                      step     = 1)
@@ -406,7 +403,7 @@ def main():
     x1 = np.linspace(-32, 32, 10000)
     y1 = np.cos(x1)
     z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\mathrm{cos}\,x$')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\cos\,x$')
     # grapher.plot(0, 0, color = 'red', linestyle = 'none', zorder = 100, marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
@@ -445,7 +442,7 @@ def main():
     # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'skyblue', antialiased = True, label = r'$z=|x|+|y|$'); surf._facecolors2d = surf._edgecolors2d = None
     # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
 
-    grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = 'The Cosine Function')
+    grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
     grapher.aspect_fix(1)
     # grapher.ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # grapher.ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
