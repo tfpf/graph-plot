@@ -208,7 +208,7 @@ If the arguments are lists or arrays containing a large number of items,
 vertical lines at points of discontinuity are removed. Else, the arguments are
 left unchanged. Then, these arguments get passed to the function which actually
 plots the graph. Hence, the signature of this function is the same as that of
-the `plot' function of Matplotlib.
+the `plot' function of Pyplot.
 '''
 
         try:
@@ -226,7 +226,7 @@ the `plot' function of Matplotlib.
 Do makeup.
 
 Args:
-    axis_labels: tuple (strings to use to label the coordinate axes
+    axis_labels: tuple (strings to use to label the coordinate axes)
     title: str (title of the graph)
 '''
 
@@ -237,7 +237,6 @@ Args:
         else:
             self.ax.set_ylabel(axis_labels[1], rotation = 90)
         if self.polar:
-            self.ax.set_rlabel_position(0)
             kwargs = {'arrowstyle': 'Simple, tail_width = 0.5, head_width = 4, head_length = 8',
                       'clip_on':    False,
                       'transform':  self.ax.transAxes}
@@ -247,8 +246,11 @@ Args:
             radial = mpl.patches.FancyArrowPatch((1.25, 0.5), (1.35, 0.5), **kwargs)
             self.ax.add_patch(radial)
             self.ax.yaxis.set_label_coords(1.35, 0.47)
+            self.ax.set_rlabel_position(0)
         if self.dim == 3:
             self.ax.set_zlabel(axis_labels[2])
+
+        # main title (this is displayed above the plot)
         if title is not None:
             self.ax.set_title(title)
 
@@ -256,7 +258,7 @@ Args:
         kwargs = {'loc': 'best'}
         if self.polar:
             kwargs['bbox_to_anchor'] = (1.3, 1)
-        if self.polar or self.dim == 3:
+        if not self.xkcd and (self.polar or self.dim == 3):
             kwargs['facecolor'] = 'lightgray'
         self.ax.legend(**kwargs)
 
@@ -277,15 +279,12 @@ Args:
             else:
                 self.ax.grid(b = True, which = 'major', linewidth = 0.3, linestyle = '-')
 
-        # this will not work if the user plots a polar graph in XKCD style
-        # hence, wrapping it in a `try' block
-        if self.xkcd:
-            try:
-                self.ax.spines['right'].set_color('none')
-                self.ax.spines['top'].set_color('none')
-                self.ax.xaxis.set_ticks_position('bottom')
-            except KeyError:
-                pass
+        # remove the top and right borders in case of an XKCD-style plot
+        # this will make it resemble Randall Munroe's graphs somewhat
+        if self.xkcd and not self.polar:
+            self.ax.spines['right'].set_color('none')
+            self.ax.spines['top'].set_color('none')
+            self.ax.xaxis.set_ticks_position('bottom')
 
     ########################################
 
@@ -310,10 +309,10 @@ Args:
         if self.xkcd or axis == 'z' and self.dim == 2:
             return
 
-        limits_set_function = getattr(self.ax, f'set_{axis}lim')
-        labels_get_function = getattr(self.ax, f'get_{axis}ticklabels')
-        labels_set_function = getattr(self.ax, f'set_{axis}ticklabels')
-        ticks_set_function  = getattr(self.ax, f'set_{axis}ticks')
+        labels_getter = getattr(self.ax, f'get_{axis}ticklabels')
+        labels_setter = getattr(self.ax, f'set_{axis}ticklabels')
+        limits_setter = getattr(self.ax, f'set_{axis}lim')
+        ticks_setter  = getattr(self.ax, f'set_{axis}ticks')
 
         # case 1: grid lines at rational multiples of `v'
         if symbolic:
@@ -324,30 +323,30 @@ Args:
 
             # see if this is a polar plot in which the angle goes from 0 to 2pi
             # if yes, do not draw the label for 2pi (as it overlaps with 0)
-            # further, do not draw the first and last labels on the radial axis
+            # further, do not put the first and last labels on the radial axis
             if self.polar:
                 if axis == 'x' and first == 0 and last == 2:
                     labels, ticks = labels[: -1], ticks[: -1]
                 elif axis == 'y':
                     labels[0] = labels[-1] = ''
-            ticks_set_function(ticks)
-            labels_set_function(labels)
-            limits_set_function(v * first, v * last)
+            ticks_setter(ticks)
+            labels_setter(labels)
+            limits_setter(v * first, v * last)
 
         # case 2: grid lines at the values provided in the arguments
         else:
             if None not in {first, last, step}:
-                ticks_set_function(np.arange(first, last + step, step))
+                ticks_setter(np.arange(first, last + step, step))
             if None not in {first, last}:
-                limits_set_function(first, last)
+                limits_setter(first, last)
 
             # do the same thing as in the `symbolic' case for polar plots
-            # i.e. do not draw the first and last labels on the radial axis
+            # i.e. do not put the first and last labels on the radial axis
             self.fig.canvas.draw()
             if self.polar and axis == 'y':
-                labels = [l.get_text() for l in labels_get_function()]
+                labels = [l.get_text() for l in labels_getter()]
                 labels[0] = labels[-1] = ''
-                labels_set_function(labels)
+                labels_setter(labels)
 
     ########################################
 
@@ -355,8 +354,8 @@ Args:
         '''\
 Set the aspect ratio of the axes object. If this is a two-dimensional Cartesian
 plot, the ratio of the scales on the axes will be set to the given value (if it
-is non-zero). If this is two-dimensional polar plot, or if this is an XKCD-style
-plot, nothing happens.
+is non-zero). If this is a two-dimensional polar plot, or if this is an
+XKCD-style plot, nothing happens.
 
 For three-dimensional plots, an aspect ratio does not make sense, because there
 are three axes. Hence, in this case, the scales on the axes will be made equal
@@ -378,18 +377,18 @@ Args:
 def main():
     grapher = CustomPlot(dim = 2, polar = False, xkcd = False)
     grapher.axis_fix(axis     = 'x',
-                     symbolic = True,
+                     symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
                      first    = -2,
-                     last     = 2,
-                     step     = 1 / 4)
+                     last     = 8,
+                     step     = 1)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -3,
-                     last     = 3,
+                     first    = -1,
+                     last     = 4,
                      step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
@@ -399,11 +398,11 @@ def main():
                      last     = 3,
                      step     = 0.5)
 
-    # t = np.linspace(-32, 32, 10000); R = 1 / np.pi
+    # t = np.linspace(0, 2 * np.pi, 10000)
     x1 = np.linspace(-32, 32, 10000)
-    y1 = np.cos(x1)
+    y1 = np.sqrt(1 + x1)
     z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\cos\,x$')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\sqrt{1+x}$')
     # grapher.plot(0, 0, color = 'red', linestyle = 'none', zorder = 100, marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
