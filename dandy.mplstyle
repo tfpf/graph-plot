@@ -231,7 +231,7 @@ ytick.direction     : in
 # ytick.major.right   : True
 # ytick.minor.left    : True
 # ytick.minor.right   : True
-ytick.alignment     : baseline
+ytick.alignment     : center
 
 ###############################################################################
 # grid
