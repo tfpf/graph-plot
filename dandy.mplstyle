@@ -1,7 +1,6 @@
 ###############################################################################
 # lines
 ###############################################################################
-
 lines.linewidth : 0.8
 lines.linestyle : -
 # lines.color     : C0
@@ -93,9 +92,10 @@ hatch.linewidth : 1.0
 ###############################################################################
 # font
 # you can set a custom font instead of the default one
-# for instance, I have used Cochineal
-# I downloaded it and saved the OTF files as ~/.fonts/Cochineal/*.otf
-# finally, delete the font cache maintained by Matplotlib
+# for instance, you could use Cochineal, like I have
+# download the font and save the OTF files in ~/.fonts/Cochineal/
+# then delete the Matplotlib font cache
+# if you don't know how to do that, Google it (the cache location is not fixed)
 ###############################################################################
 font.family     : Cochineal  # serif|sans-serif|cursive|fantasy|monospace
 font.style      : normal # normal|roman|italic|oblique
@@ -274,7 +274,7 @@ legend.columnspacing : 2.0
 #figure.titlesize : large      ## size of the figure title (Figure.suptitle())
 #figure.titleweight : normal   ## weight of the figure title
 figure.figsize   : 12.8, 8.8   ## figure size in inches
-#figure.dpi       : 100        ## figure dots per inch
+figure.dpi       : 120        ## figure dots per inch
 #figure.facecolor : white      ## figure facecolor
 #figure.edgecolor : white      ## figure edgecolor
 #figure.frameon : True         ## enable figure frame
@@ -375,8 +375,6 @@ savefig.format      : png      ## png, ps, pdf, svg
                                 ## use ffmpeg_file instead
 #savefig.pad_inches  : 0.1      ## Padding to be used when bbox is set to 'tight'
 #savefig.jpeg_quality: 95       ## when a jpeg is saved, the default quality parameter.
-#savefig.directory   : ~        ## default directory in savefig dialog box,
-                                ## leave empty to always use current working directory
 #savefig.transparent : False    ## setting that controls whether figures are saved with a
                                 ## transparent background by default
 #savefig.orientation : portrait	## Orientation of saved figure

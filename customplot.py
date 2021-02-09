@@ -6,12 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-# GUI and non-GUI backends for Matplotlib
-# print(mpl.rcsetup.interactive_bk)
-# print(mpl.rcsetup.non_interactive_bk)
-mpl.use('TkAgg')
-
-mpl.rcParams['figure.dpi']        = 120
 mpl.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/'
 
 ###############################################################################
@@ -59,7 +53,7 @@ Returns:
 
     # locate points of discontinuity (check where the derivative is large)
     y = np.array(y)
-    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > 1
+    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > 0.5
     y[points_of_discontinuity] = np.nan
 
     return y
@@ -377,19 +371,19 @@ Args:
 def main():
     grapher = CustomPlot(dim = 2, polar = False, xkcd = False)
     grapher.axis_fix(axis     = 'x',
-                     symbolic = False,
+                     symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -2,
-                     last     = 8,
-                     step     = 1)
+                     first    = -1,
+                     last     = 1,
+                     step     = 1 / 8)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -1,
-                     last     = 4,
-                     step     = 1)
+                     first    = -1.5,
+                     last     = 1.5,
+                     step     = 0.25)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
@@ -400,16 +394,16 @@ def main():
 
     # t = np.linspace(0, 2 * np.pi, 10000)
     x1 = np.linspace(-32, 32, 10000)
-    y1 = np.sqrt(1 + x1)
+    y1 = (1 - np.cos(x1)) / x1 ** 2
     z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\sqrt{1+x}$')
-    # grapher.plot(0, 0, color = 'red', linestyle = 'none', zorder = 100, marker = 'o', markersize = 4, label = r'')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\dfrac{1-\cos\,x}{x^2}$')
+    grapher.plot(0, 0.5, color = 'red', linestyle = 'none', marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
-    # x2 = np.linspace(0, 1 * np.pi, 10000)
-    # y2 = 4 * np.sin(x1)
+    # x2 = np.linspace(-32, 32, 10000)
+    # y2 = np.floor(np.sin(x2) + np.cos(x2))
     # z2 = x2
-    # grapher.plot(x2, y2, color = 'blue', label = r'$r=4\,\sin\,\theta$')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\lfloor\sin\,x+\cos\,x\rfloor$')
 
     # x3 = np.linspace(np.pi / 2, 3 * np.pi / 2, 10000)
     # y2 = x2
