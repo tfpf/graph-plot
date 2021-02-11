@@ -123,7 +123,7 @@ text.antialiased    : True # only affects Agg backend
 ###############################################################################
 # text for mathematical expressions
 ###############################################################################
-mathtext.cal            : Cochineal:bold:italic
+mathtext.cal            : Cascadia Code:bold
 mathtext.rm             : Cochineal
 mathtext.tt             : Cascadia Code
 mathtext.it             : Cochineal:italic
