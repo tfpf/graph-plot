@@ -4,7 +4,7 @@ publication-quality graphs.
 
 # Requirements
 * Python (version 3.8 or higher)
-* Matplotlib (version 3.0 or higher)
+* Matplotlib (version 3.3.3 or higher)
 * NumPy (version 1.17 or higher)
 
 # Usage
