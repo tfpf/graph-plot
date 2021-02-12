@@ -57,7 +57,7 @@ After this, any text in any new graph you plot will use MyAwesomeFont.
 
 ### DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI settings.
-You can see how this is used in the file `example.py`.
+You can see how this is used in the file `examples.py`.
 
 ### Essential Discontinuities
 The graph of  
