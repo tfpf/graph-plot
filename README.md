@@ -8,7 +8,16 @@ publication-quality graphs.
 * NumPy (version 1.17 or higher)
 
 # Usage
-There are a few examples provided. They should make everything clear.
+Clone or download this repository. Open a terminal window to the clone or
+download location. Several examples provided in `examples.py` should make
+everything clear. Run it
+```bash
+python3 examples.py
+```
+and tinker with the code if you'd like to.
+
+A good way to start plotting your own graphs might be to copy parts of the code
+in `examples.py` and make modifications to the copy.
 
 # Notes
 
@@ -51,13 +60,14 @@ If the plot doesn't look quite right, try playing around with the DPI settings.
 You can see how this is used in the file `example.py`.
 
 ### Essential Discontinuities
-In case your graph has essential discontinuities (also called infinite
-discontinuities), like those present in the graph of y = tan x, a superfluous
+The graph of 
+y = tan x 
+contains essential discontinuities (also called infinite discontinuities). A
 vertical line is automatically drawn at each point of discontinuity. This is
 simply a result of the plotting algorithm used by graph plotters.
 
-However, CustomPlot ensures that these superfluous lines are erased. As a
-side-effect, sometimes, functions with a very large magnitude of slope are also
-partially erased. If you face this problem, try increasing the value of
-`maximum_diff` in the file `customplot.py`.
+However, CustomPlot ensures that these superfluous vertical lines are erased.
+As a side-effect, sometimes, functions with a very large magnitude of slope are
+also partially erased. If you face this problem, increase the value of
+`maximum_diff` in the file `customplot.py` until you get satisfactory results.
 
