@@ -52,8 +52,9 @@ Returns:
 '''
 
     # locate points of discontinuity (check where the derivative is large)
+    maximum_diff = 0.5
     y = np.array(y)
-    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > 0.5
+    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > maximum_diff
     y[points_of_discontinuity] = np.nan
 
     return y
@@ -374,16 +375,16 @@ def main():
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -1,
-                     last     = 1,
-                     step     = 1 / 8)
+                     first    = 0,
+                     last     = 4,
+                     step     = 1 / 4)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -1.5,
-                     last     = 1.5,
-                     step     = 0.25)
+                     first    = -3,
+                     last     = 3,
+                     step     = 1)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
@@ -394,16 +395,16 @@ def main():
 
     # t = np.linspace(0, 2 * np.pi, 10000)
     x1 = np.linspace(-32, 32, 10000)
-    y1 = (1 - np.cos(x1)) / x1 ** 2
+    y1 = np.sin(x1)
     z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\dfrac{1-\cos\,x}{x^2}$')
-    grapher.plot(0, 0.5, color = 'red', linestyle = 'none', marker = 'o', markersize = 4, label = r'')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\sin\,x$')
+    # grapher.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
     # x2 = np.linspace(-32, 32, 10000)
-    # y2 = np.floor(np.sin(x2) + np.cos(x2))
+    # y2 = x2 * np.exp(-x2)
     # z2 = x2
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=\lfloor\sin\,x+\cos\,x\rfloor$')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=xe^{-x}$')
 
     # x3 = np.linspace(np.pi / 2, 3 * np.pi / 2, 10000)
     # y2 = x2
@@ -415,9 +416,9 @@ def main():
     # z4 = x4
     # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
 
-    # grapher.ax.fill_between(x1, y1, y2,  facecolor = 'cyan', linewidth = 0, label = r'$R$')
-    # grapher.ax.fill_between(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < j else False for i, j in zip(y1, y2)])
-    # grapher.ax.fill_between(x1, y1, 0,  facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if i < 0 else False for i in x1])
+    # grapher.ax.fill_between(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = r'$R$')
+    # grapher.ax.fill_between(x1, 1, 2, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 0 < i < 0.5 else False for i in x1])
+    # grapher.ax.fill_between(x1, y1, 1, facecolor = 'cyan', linewidth = 0, label = '', where = [True if 0.5 < i < 1 else False for i in x1])
 
     # X, Z = np.meshgrid(np.linspace(0, 4, 100), np.linspace(-3, 3, 100))
     # Y = np.sqrt(4 - (X - 2) ** 2)
