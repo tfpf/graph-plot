@@ -60,8 +60,8 @@ If the plot doesn't look quite right, try playing around with the DPI settings.
 You can see how this is used in the file `example.py`.
 
 ### Essential Discontinuities
-The graph of 
-y = tan x 
+The graph of  
+y = tan x  
 contains essential discontinuities (also called infinite discontinuities). A
 vertical line is automatically drawn at each point of discontinuity. This is
 simply a result of the plotting algorithm used by graph plotters.
