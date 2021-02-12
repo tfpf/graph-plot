@@ -48,7 +48,7 @@ After this, any text in any new graph you plot will use MyAwesomeFont.
 
 ### DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI settings.
-You can find it in the file `dandy.mplstyle` (search for `figure.dpi`).
+You can see how this is used in the file `example.py`.
 
 ### Essential Discontinuities
 In case your graph has essential discontinuities (also called infinite
