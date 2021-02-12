@@ -11,7 +11,7 @@ publication-quality graphs.
 Clone or download this repository. Open a terminal window to the clone or
 download location. Several examples provided in `examples.py` should make
 everything clear. Run it
-```bash
+```shell
 python3 examples.py
 ```
 and tinker with the code if you'd like to.
