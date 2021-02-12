@@ -90,7 +90,7 @@ Returns:
     tuple of a list of labels and an array of values indicated by said labels
 '''
 
-    coefficients = np.arange(first, last + step, step)
+    coefficients = np.arange(first, last + step / 2, step)
 
     # pre-allocate space for the list because its length is known
     # this is approximately twice as fast as appending repeatedly
@@ -331,7 +331,7 @@ Args:
         # case 2: grid lines at the values provided in the arguments
         else:
             if None not in {first, last, step}:
-                ticks_setter(np.arange(first, last + step, step))
+                ticks_setter(np.arange(first, last + step / 2, step))
             if None not in {first, last}:
                 limits_setter(first, last)
 
