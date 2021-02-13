@@ -27,6 +27,9 @@ set this program up to use Cochineal and Cascadia Code. If you don't have these
 fonts installed, Matplotlib will fall back to the default fonts and issue a
 warning. (Functionality remains unaffected.)
 
+I highly recommend using a good custom font, because part of what makes these
+plots look good (in my opinion) is the Cochineal font.
+
 Let's say you want to use a font called MyAwesomeFont. This is what you have to
 do.
 * Download MyAwesomeFont. It will probably be available as a package containing
