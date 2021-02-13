@@ -91,11 +91,6 @@ hatch.linewidth : 1.0
 
 ###############################################################################
 # font
-# you can set a custom font instead of the default one
-# for instance, you could use Cochineal, like I have
-# download the font and save the OTF files in ~/.fonts/Cochineal/
-# then delete the Matplotlib font cache
-# if you don't know how to do that, Google it (the cache location is not fixed)
 ###############################################################################
 font.family     : Cochineal  # serif|sans-serif|cursive|fantasy|monospace
 font.style      : normal # normal|roman|italic|oblique
