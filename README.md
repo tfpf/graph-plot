@@ -32,7 +32,7 @@ your plot.
 Let's say you want to use Libre Baskerville. Here are the steps.
 * Download the font files for Libre Baskerville. (It is a Google font. So, it
 will probably be freely available as a package containing four or more files
-with the extension `.ttf` (or perhaps `.otf`).
+with the extension `.ttf`, or perhaps `.otf`).
 * Create a directory `~/.fonts/LibreBaskerville` and put those files there.
 * Find out where Matplotlib stores its cache.
 ```python
