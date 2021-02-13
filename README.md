@@ -77,10 +77,10 @@ mathtext.fontset: cm
 ### DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI parameter
 before adjusting anything else. In the file `dandy.mplstyle`, search for
-`figure.dpi` and change the number next to it.
+`figure.dpi` and change the value next to it.
 
-In my experience, 120 DPI looks good on a 1080p screen, while 96 DPI looks good
-on a 768p screen.
+In my experience, a value of 120 produces pretty graphs on a 1080p screen,
+while a 768p screen requires a value of 96 or so.
 
 ### Essential Discontinuities and Jump Discontinuities
 There are two types of discontinuities most graph plotters struggle with:
