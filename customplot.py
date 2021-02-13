@@ -29,6 +29,7 @@ Args:
     # calculate the required width of all columns
     # width of a column is width of longest string in that column plus padding
     widths = [max(len(row[i]) for row in items) + 2 for i in range(columns)]
+
     for row in items:
         for r, width in zip(row, widths):
             print(getattr(r, align_method)(width, ' '), end = '')
@@ -52,7 +53,7 @@ Returns:
 '''
 
     # locate points of discontinuity (check where the derivative is large)
-    maximum_diff = 0.5
+    maximum_diff = 2
     y = np.array(y)
     points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > maximum_diff
     y[points_of_discontinuity] = np.nan
@@ -175,12 +176,19 @@ Methods:
             self.ax = self.fig.add_subplot(1, 1, 1)
         else:
             self.ax = self.fig.add_subplot(1, 1, 1, projection = '3d')
-            self.ax.tick_params(axis = 'both', labelsize = 'small', pad = 1)
+            kwargs = {'which':     'major',
+                      'labelsize': 'small',
+                      'length':    4,
+                      'direction': 'in'}
+            self.ax.tick_params(axis = 'x', pad = 1, **kwargs)
+            self.ax.tick_params(axis = 'y', pad = 1, **kwargs)
+            self.ax.tick_params(axis = 'z', pad = 1, **kwargs)
             self.ax.set_facecolor('white')
 
         self.dim = dim
         self.polar = polar
         self.xkcd = xkcd
+
         self.fig.canvas.set_window_title(f'graph_{int(time.time())}')
 
     ########################################
@@ -226,11 +234,20 @@ Args:
 '''
 
         # axis labels
-        self.ax.set_xlabel(axis_labels[0])
-        if self.polar or self.dim == 3:
-            self.ax.set_ylabel(axis_labels[1], rotation = 0)
+        # in three-dimensional plots, the axis labels and tick labels overlap
+        # hence, a blank line is added before the axis label
+        if self.dim == 2:
+            self.ax.set_xlabel(axis_labels[0])
+            if self.polar:
+                self.ax.set_ylabel(axis_labels[1], rotation = 0)
+            else:
+                self.ax.set_ylabel(axis_labels[1], rotation = 90)
         else:
-            self.ax.set_ylabel(axis_labels[1], rotation = 90)
+            for i, axis in enumerate('xyz'):
+                getattr(self.ax, f'set_{axis}label')(f'\n{axis_labels[i]}', linespacing = 3)
+
+        # for polar plots, show a visual of the angular and radial axes
+        # this is required because the labels cannot be drawn on the figure
         if self.polar:
             kwargs = {'arrowstyle': 'Simple, tail_width = 0.5, head_width = 4, head_length = 8',
                       'clip_on':    False,
@@ -242,8 +259,6 @@ Args:
             self.ax.add_patch(radial)
             self.ax.yaxis.set_label_coords(1.35, 0.47)
             self.ax.set_rlabel_position(0)
-        if self.dim == 3:
-            self.ax.set_zlabel(axis_labels[2])
 
         # main title (this is displayed above the plot)
         if title is not None:
@@ -290,6 +305,11 @@ limits on the axis must necessarily be set after setting the axis ticks. This
 is because floating point precision issues might introduce an extra tick beyond
 the last point (`last') to be displayed. This extra tick is eliminated by
 simply specifying in the axis limit that the axis must end at `last'.
+
+In three-dimensional plots, these limits are not respected. Matplotlib adds a
+small delta to all axis limits. (The relevant code can be found in the
+`_get_coord_info' method of `mpl_toolkits'.) To have strict axis limits, you
+must modify the source code itself.
 
 Args:
     axis: str (which axis to modify: 'x', 'y' or 'z')
@@ -370,14 +390,14 @@ Args:
 ###############################################################################
 
 def main():
-    grapher = CustomPlot(dim = 2, polar = False, xkcd = False)
+    grapher = CustomPlot(dim = 3, polar = False, xkcd = False)
     grapher.axis_fix(axis     = 'x',
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = 0,
+                     first    = -4,
                      last     = 4,
-                     step     = 1 / 4)
+                     step     = 0.5)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
@@ -391,13 +411,13 @@ def main():
                      v        = np.pi,
                      first    = -3,
                      last     = 3,
-                     step     = 0.5)
+                     step     = 1)
 
     # t = np.linspace(0, 2 * np.pi, 10000)
-    x1 = np.linspace(-32, 32, 10000)
-    y1 = np.sin(x1)
-    z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\sin\,x$')
+    x1 = np.linspace(-4 * np.pi, 4 * np.pi, 10000)
+    y1 = np.cos(x1)
+    z1 = np.sin(x1)
+    grapher.ax.plot(x1, y1, z1, color = 'red', label = r'$f(x,y,z)=0$')
     # grapher.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
