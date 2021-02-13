@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-mpl.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/'
-
 ###############################################################################
 
 def show_nice_list(items, columns = 3, align_method = 'center'):
@@ -235,7 +233,7 @@ Args:
 
         # axis labels
         # in three-dimensional plots, the axis labels and tick labels overlap
-        # hence, a blank line is added before the axis label
+        # hence, a blank line is added before each axis label
         if self.dim == 2:
             self.ax.set_xlabel(axis_labels[0])
             if self.polar:
@@ -390,6 +388,8 @@ Args:
 ###############################################################################
 
 def main():
+    mpl.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/'
+
     grapher = CustomPlot(dim = 3, polar = False, xkcd = False)
     grapher.axis_fix(axis     = 'x',
                      symbolic = True,
@@ -417,7 +417,7 @@ def main():
     x1 = np.linspace(-4 * np.pi, 4 * np.pi, 10000)
     y1 = np.cos(x1)
     z1 = np.sin(x1)
-    grapher.ax.plot(x1, y1, z1, color = 'red', label = r'$f(x,y,z)=0$')
+    grapher.plot(x1, y1, z1, color = 'red', label = r'$f(x,y,z)=0$')
     # grapher.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o', markersize = 4, label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
