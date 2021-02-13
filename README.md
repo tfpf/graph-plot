@@ -75,8 +75,8 @@ You can see how this is used in the file `examples.py`.
 
 ### Essential Discontinuities and Jump Discontinuities
 There are two types of discontinuities most graph plotters struggle with:
-* essential discontinuitues (like those in the graph of y = tan x); and
-* jump discontinuitues (like those in the graph of y = sgn x).
+* essential discontinuities (like those in the graph of y = tan x); and
+* jump discontinuities (like those in the graph of y = sgn x).
 
 A vertical line is automatically drawn at each point of discontinuity. This is
 simply a result of the plotting algorithm used by graph plotters.
