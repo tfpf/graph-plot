@@ -8,10 +8,6 @@ import customplot
 # currently, it is set to '.' (which means the current directory)
 mpl.rcParams['savefig.directory'] = '.'
 
-# this is the resolution of the graph (in dots per inch)
-# if the graph looks ugly, try playing around with this value
-mpl.rcParams['figure.dpi'] = 96
-
 ###############################################################################
 # two-dimensional Cartesian plot
 ###############################################################################
