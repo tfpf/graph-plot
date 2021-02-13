@@ -41,9 +41,9 @@ print(matplotlib.get_cachedir())
 ```
 * Delete all font-related cache files in that location.
 * Open the file `dandy.mplstyle` and search for `Cochineal`. Replace it,
-wherever it appears, with `Libre Baskerville` (Note the space between `Libre`
-and `Baskerville`). In other words, the contents of `dandy.mplstyle` should be
-something like this. (Only the relevant lines are shown.)
+wherever it appears, with `Libre Baskerville`. In other words, the contents of
+`dandy.mplstyle` should be something like this. (Only the relevant lines are
+shown.)
 ```python
 ...
 font.family: Libre Baskerville
@@ -59,8 +59,8 @@ mathtext.sf : Libre Baskerville
 
 After this, any text in any new graph you plot will use Libre Baskerville. If
 you feel confident, you can experiment with different fonts (i.e. a monospace
-font for the `mathtext.tt`, a calligraphy font for `mathtext.cal` and a
-sans-serif for `mathtext.sf`).
+font for `mathtext.tt`, a calligraphy font for `mathtext.cal` and a sans-serif
+font for `mathtext.sf`).
 
 Alternatively, if you don't want to use a custom font and are okay with the
 defaults, but also want to remove the warnings issued because of missing fonts,
@@ -76,7 +76,8 @@ mathtext.fontset: cm
 
 ### DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI settings.
-You can see how this is used in the file `examples.py`.
+Changing the DPI parameter of a graph is demonstrated in the file
+`examples.py`.
 
 ### Essential Discontinuities and Jump Discontinuities
 There are two types of discontinuities most graph plotters struggle with:
