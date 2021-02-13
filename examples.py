@@ -163,6 +163,31 @@ plt.show()
 plt.close(grapher.fig)
 
 ###############################################################################
+# three-dimensional Cartesian plot of a curve with trigonometric grid spacing
+###############################################################################
+grapher = customplot.CustomPlot(dim = 3)
+grapher.axis_fix('x', symbolic = True, first = -4, last = 4, step = 0.5)
+grapher.axis_fix('y', first = -3, last = 3, step = 1)
+grapher.axis_fix('z', first = -3, last = 3, step = 1)
+
+x = np.linspace(-4 * np.pi, 4 * np.pi, 10000)
+y = np.cos(x)
+z = np.sin(x)
+grapher.plot(x, y, z, label = r'$y+iz=e^{ix}$')
+
+# set the main title of the graph and do other basic appearance enhancements
+# if you do not provide the `title' argument, no title will be added
+grapher.configure(title = 'This is a spring!')
+
+# as this is a three-dimensional plot, an aspect ratio does not make sense
+# if the value is any non-zero number, the scales on the axes are made equal
+# however, as in case of two-dimensional plots, this line is optional
+grapher.aspect_fix(1)
+
+plt.show()
+plt.close(grapher.fig)
+
+###############################################################################
 # three-dimensional Cartesian plot of a surface
 ###############################################################################
 grapher = customplot.CustomPlot(dim = 3)
