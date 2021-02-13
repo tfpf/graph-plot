@@ -75,9 +75,9 @@ mathtext.fontset: cm
 ```
 
 ### DPI Settings
-If the plot doesn't look quite right, try playing around with the DPI settings.
-Changing the DPI parameter of a graph is demonstrated in the file
-`examples.py`.
+If the plot doesn't look quite right, try playing around with the DPI parameter
+before adjusting anything else. In the file `dandy.mplstyle`, search for
+`figure.dpi` and change the number next to it.
 
 ### Essential Discontinuities and Jump Discontinuities
 There are two types of discontinuities most graph plotters struggle with:
