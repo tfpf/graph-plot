@@ -22,7 +22,7 @@ in `examples.py` and make modifications to the copy.
 # Notes
 
 ### Custom Fonts
-It is possible to use a font of your choice in the plot. For instance, I have
+Matplotlib allows using fonts of your choice in the plot. For instance, I have
 set this program up to use Cochineal. If you don't have this font installed,
 Matplotlib will fall back to the default fonts and issue a warning.
 (Functionality remains unaffected.) I highly recommend using a good custom
