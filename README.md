@@ -23,7 +23,9 @@ in `examples.py` and make modifications to the copy.
 
 ### Custom Fonts
 It is possible to use a font of your choice in the plot. For instance, I have
-set this program up to use Cochineal and Cascadia Code.
+set this program up to use Cochineal and Cascadia Code. If you don't have these
+fonts installed, Matplotlib will fall back to the default fonts and issue a
+warning. (Functionality remains unaffected.)
 
 Let's say you want to use a font called MyAwesomeFont. This is what you have to
 do.
@@ -55,15 +57,28 @@ mathtext.sf : MyAwesomeFont
 
 After this, any text in any new graph you plot will use MyAwesomeFont.
 
+On the other hand, if you don't want to use a custom font and are okay with the
+defaults, but also want to remove the warnings issued because of missing fonts,
+ignore the previous instructions and modify `dandy.mplstyle` to look something
+like this.
+```
+...
+font.family: serif
+...
+mathtext.fontset: cm
+...
+```
+
 ### DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI settings.
 You can see how this is used in the file `examples.py`.
 
-### Essential Discontinuities
-The graph of  
-y = tan x  
-contains essential discontinuities (also called infinite discontinuities). A
-vertical line is automatically drawn at each point of discontinuity. This is
+### Essential Discontinuities and Jump Discontinuities
+There are two types of discontinuities most graph plotters struggle with:
+* essential discontinuitues (like those in the graph of y = tan x); and
+* jump discontinuitues (like those in the graph of y = sgn x).
+
+A vertical line is automatically drawn at each point of discontinuity. This is
 simply a result of the plotting algorithm used by graph plotters.
 
 However, CustomPlot ensures that these superfluous vertical lines are erased.
