@@ -23,18 +23,17 @@ in `examples.py` and make modifications to the copy.
 
 ### Custom Fonts
 It is possible to use a font of your choice in the plot. For instance, I have
-set this program up to use Cochineal and Cascadia Code. If you don't have these
-fonts installed, Matplotlib will fall back to the default fonts and issue a
-warning. (Functionality remains unaffected.)
+set this program up to use Cochineal. If you don't have this font installed,
+Matplotlib will fall back to the default fonts and issue a warning.
+(Functionality remains unaffected.) I highly recommend using a good custom
+font, because (in my opinion) it can significantly improve the appearance of
+your plot.
 
-I highly recommend using a good custom font, because part of what makes these
-plots look good (in my opinion) is the Cochineal font.
-
-Let's say you want to use a font called MyAwesomeFont. This is what you have to
-do.
-* Download MyAwesomeFont. It will probably be available as a package containing
-four or more files with the extension `.otf` (or perhaps `.ttf`).
-* Put these files in `~/.fonts/MyAwesomeFont` (do not modify the files).
+Let's say you want to use Libre Baskerville. Here are the steps.
+* Download the font files for Libre Baskerville. (It is a Google font. So, it
+will probably be freely available as a package containing four or more files
+with the extension `.ttf` (or perhaps `.otf`).
+* Create a directory `~/.fonts/LibreBaskerville` and put those files there.
 * Find out where Matplotlib stores its cache.
 ```python
 import matplotlib
@@ -42,29 +41,29 @@ print(matplotlib.get_cachedir())
 ```
 * Delete all font-related cache files in that location.
 * Open the file `dandy.mplstyle` and search for `Cochineal`. Replace it,
-wherever it appears, with `MyAwesomeFont`. Also replace `Cascadia Code` with
-`MyAwesomeFont`. In other words, the contents of `dandy.mplstyle` should be
-something like this.
-```
+wherever it appears, with `Libre Baskerville`. In other words, the contents of
+`dandy.mplstyle` should be something like this. (Only the relevant lines are
+shown.)
+```python
 ...
-font.family: MyAwesomeFont
+font.family: Libre Baskerville
 ...
-mathtext.cal: MyAwesomeFont
-mathtext.rm : MyAwesomeFont
-mathtext.tt : MyAwesomeFont
-mathtext.it : MyAwesomeFont:italic
-mathtext.bf : MyAwesomeFont:bold
-mathtext.sf : MyAwesomeFont
+mathtext.cal: Libre Baskerville:bold:italic
+mathtext.rm : Libre Baskerville
+mathtext.tt : Libre Baskerville
+mathtext.it : Libre Baskerville:italic
+mathtext.bf : Libre Baskerville:bold
+mathtext.sf : Libre Baskerville
 ...
 ```
 
-After this, any text in any new graph you plot will use MyAwesomeFont.
+After this, any text in any new graph you plot will use Libre Baskerville.
 
-On the other hand, if you don't want to use a custom font and are okay with the
+Alternatively, if you don't want to use a custom font and are okay with the
 defaults, but also want to remove the warnings issued because of missing fonts,
 ignore the previous instructions and modify `dandy.mplstyle` to look something
-like this.
-```
+like this. (Once again, only the relevant lines are shown.)
+```python
 ...
 font.family: serif
 ...
