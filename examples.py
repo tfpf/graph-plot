@@ -14,7 +14,7 @@ mpl.rcParams['savefig.directory'] = '.'
 with plt.style.context('dandy.mplstyle'):
 
     # create an instance of the `CustomPlot' class inside a style context
-    # this ensures that the style is applied only this particular plot
+    # this ensures that the style is applied only to this particular plot
     grapher = customplot.CustomPlot()
 
     # set the locations of the grid lines on the x-axis
@@ -46,7 +46,7 @@ with plt.style.context('dandy.mplstyle'):
 with plt.style.context('dandy.mplstyle'):
 
     # create an instance of the `CustomPlot' class inside a style context
-    # this ensures that the style is applied only this particular plot
+    # this ensures that the style is applied only to this particular plot
     grapher = customplot.CustomPlot()
 
     # set the locations of the grid lines on the x-axis
@@ -175,13 +175,10 @@ with plt.style.context('dandy.mplstyle'):
     y = (3 / 4) ** x * np.cos(np.pi * x)
     z = (3 / 4) ** x * np.sin(np.pi * x)
     grapher.plot(x, y, z, color = 'gray', label = r'$y+iz=(-0.75)^x$')
-
-    # set the main title of the graph and do other basic appearance enhancements
-    # if you do not provide the `title' argument, no title will be added
     grapher.configure(title = 'This is a helix!')
 
     # as this is a three-dimensional plot, an aspect ratio does not make sense
-    # if the value is any non-zero number, the scales on the axes are made equal
+    # hence, if the value is any non-zero number, the plot is drawn to scale
     # however, as in case of two-dimensional plots, this line is optional
     grapher.aspect_fix(1)
 
@@ -201,13 +198,10 @@ with plt.style.context('dandy.mplstyle'):
     y = np.cos(x)
     z = np.sin(x)
     grapher.plot(x, y, z, label = r'$y+iz=e^{ix}$')
-
-    # set the main title of the graph and do other basic appearance enhancements
-    # if you do not provide the `title' argument, no title will be added
     grapher.configure(title = 'This is a spring!')
 
     # as this is a three-dimensional plot, an aspect ratio does not make sense
-    # if the value is any non-zero number, the scales on the axes are made equal
+    # hence, if the value is any non-zero number, the plot is drawn to scale
     # however, as in case of two-dimensional plots, this line is optional
     grapher.aspect_fix(1)
 
