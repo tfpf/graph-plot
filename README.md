@@ -21,19 +21,23 @@ in `examples.py` and make modifications to the copy.
 
 # Notes
 
-### Custom Fonts
+### Fonts
 Matplotlib allows using fonts of your choice in the plot. For instance, I have
-set this program up to use Cochineal. If you don't have this font installed,
-Matplotlib will fall back to the default fonts and issue a warning.
-(Functionality remains unaffected.) I highly recommend using a good custom
+set this program up to use Cochineal. I highly recommend using a good custom
 font, because (in my opinion) it can significantly improve the appearance of
 your plot.
 
-Let's say you want to use Libre Baskerville. Here are the steps.
+In case you want nothing to do with fonts, you can ignore this section
+entirely. Matplotlib will warn you that Cochineal is not installed (if it
+isn't), and fall back to the default font. (Functionality remains unaffected.)
+
+###### Using a Custom Font
+Let's say you want to use Libre Baskerville.
 * Download the font files for Libre Baskerville. (It is a Google font. So, it
 will probably be freely available as a package containing four or more files
 with the extension `.ttf`, or perhaps `.otf`).
-* Create a directory `~/.fonts/LibreBaskerville` and put those files there.
+* Create a new directory `~/.fonts/LibreBaskerville` and put the
+above-mentioned font files in that directory.
 * Find out where Matplotlib stores its cache.
 ```python
 import matplotlib
@@ -62,15 +66,14 @@ you feel confident, you can experiment with different fonts (i.e. a monospace
 font for `mathtext.tt`, a calligraphy font for `mathtext.cal` and a sans-serif
 font for `mathtext.sf`).
 
-Alternatively, if you don't want to use a custom font and are okay with the
-defaults, but also want to remove the warnings issued because of missing fonts,
-ignore the previous instructions and modify `dandy.mplstyle` to look something
-like this. (Once again, only the relevant lines are shown.)
+###### Using a Built-in Font
+You have a choice of fonts available out of the box. My suggestion is to use a
+serif font. (Once again, only the relevant lines are shown.)
 ```python
 ...
 font.family: serif
 ...
-mathtext.fontset: cm
+mathtext.fontset: dejavuserif
 ...
 ```
 
@@ -82,7 +85,7 @@ before adjusting anything else. In the file `dandy.mplstyle`, search for
 In my experience, a value of 120 produces pretty graphs on a 1080p screen,
 while a 768p screen requires a value of 96 or so.
 
-### Essential Discontinuities and Jump Discontinuities
+### Essential and Jump Discontinuities
 There are two types of discontinuities most graph plotters struggle with:
 * essential discontinuities (like those in the graph of _y_ = tan _x_); and
 * jump discontinuities (like those in the graph of _y_ = sgn _x_).
