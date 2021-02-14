@@ -68,7 +68,8 @@ font for `mathtext.sf`).
 
 ### Using a Built-in Font
 You have a choice of fonts available out of the box. My suggestion is to use a
-serif font. (Once again, only the relevant lines are shown.)
+serif font. To do so, modify the file `dandy.mplstyle` like this. (Once again,
+only the relevant lines are shown.)
 ```python
 ...
 font.family: serif
