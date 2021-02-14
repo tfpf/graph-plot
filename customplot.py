@@ -160,14 +160,7 @@ Methods:
         if polar and dim != 2:
             raise ValueError('Member \'dim\' of class \'CustomPlot\' must be 2 if \'polar\' is True.')
 
-        # the figure has to be created after setting the plot style
-        # this is necessary for the plot style to get applied correctly
-        if xkcd:
-            plt.xkcd()
-        else:
-            plt.style.use('dandy.mplstyle')
         self.fig = plt.figure()
-
         if polar:
             self.ax = self.fig.add_subplot(1, 1, 1, projection = 'polar')
         elif dim == 2:
@@ -378,7 +371,7 @@ Args:
     aspect_ratio: float (ratio of scales on the vertical and horizontal axes)
 '''
 
-        if aspect_ratio != 0 and not self.polar and not self.xkcd:
+        if aspect_ratio != 0 and not self.polar:
             if self.dim == 2:
                 self.ax.set_aspect(aspect = aspect_ratio, adjustable = 'box')
             else:
@@ -389,22 +382,23 @@ Args:
 
 def main():
     mpl.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/'
+    plt.style.use('dandy.mplstyle')
 
-    grapher = CustomPlot(dim = 3, polar = False, xkcd = False)
+    grapher = CustomPlot(dim = 2, polar = False, xkcd = False)
     grapher.axis_fix(axis     = 'x',
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -4,
-                     last     = 4,
-                     step     = 0.5)
+                     first    = -0.25,
+                     last     = 0.75,
+                     step     = 0.0625)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -3,
-                     last     = 3,
-                     step     = 1)
+                     first    = -2,
+                     last     = -0.5,
+                     step     = 0.125)
     grapher.axis_fix(axis     = 'z',
                      symbolic = False,
                      s        = r'\pi',
@@ -414,11 +408,11 @@ def main():
                      step     = 1)
 
     # t = np.linspace(0, 2 * np.pi, 10000)
-    x1 = np.linspace(-4 * np.pi, 4 * np.pi, 10000)
-    y1 = np.cos(x1)
+    x1 = np.linspace(-10, 10, 10000)
+    y1 = (1 - np.tan(x1)) / (np.sin(x1) - np.cos(x1))
     z1 = np.sin(x1)
-    grapher.plot(x1, y1, z1, color = 'red', label = r'$f(x,y,z)=0$')
-    # grapher.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o', markersize = 4, label = r'')
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\dfrac{1-\tan\,\theta}{\sin\,\theta-\cos\,\theta}$')
+    grapher.plot(np.pi / 4, -np.sqrt(2), color = 'red', linestyle = 'none', marker = 'o', label = r'')
     # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
 
     # x2 = np.linspace(-32, 32, 10000)
