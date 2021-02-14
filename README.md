@@ -31,7 +31,7 @@ In case you want nothing to do with fonts, you can ignore this section
 entirely. Matplotlib will warn you that Cochineal is not installed (if it
 isn't), and fall back to the default font. (Functionality remains unaffected.)
 
-###### Using a Custom Font
+##### Using a Custom Font
 Let's say you want to use Libre Baskerville.
 * Download the font files for Libre Baskerville. (It is a Google font. So, it
 will probably be freely available as a package containing four or more files
@@ -66,7 +66,7 @@ you feel confident, you can experiment with different fonts (i.e. a monospace
 font for `mathtext.tt`, a calligraphy font for `mathtext.cal` and a sans-serif
 font for `mathtext.sf`).
 
-###### Using a Built-in Font
+##### Using a Built-in Font
 You have a choice of fonts available out of the box. My suggestion is to use a
 serif font. (Once again, only the relevant lines are shown.)
 ```python
