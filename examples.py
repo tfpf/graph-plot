@@ -95,7 +95,7 @@ with plt.style.context('dandy.mplstyle'):
 ###############################################################################
 with plt.xkcd():
     grapher = customplot.CustomPlot(xkcd = True)
-    grapher.plot([0, 1, 8], [0, 1, 8], color = 'black', label = 'variation of number of husbands with time')
+    grapher.plot([0, 1, 8], [0, 1, 8], color = 'black', label = 'marriage prediction')
 
     # since this is not a traditional graph, the axis labels must be changed
     grapher.configure(axis_labels = ('days', 'number of husbands'), title = 'my hobby: extrapolating')
@@ -104,7 +104,6 @@ with plt.xkcd():
     grapher.ax.set_xticks([0, 1, 8])
     grapher.ax.set_xticklabels(['yesterday', 'today', 'after a week'])
 
-    grapher.aspect_fix(1)
     plt.show()
     plt.close(grapher.fig)
 
