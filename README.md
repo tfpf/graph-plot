@@ -21,7 +21,7 @@ in `examples.py` and make modifications to the copy.
 
 # Notes
 
-### Fonts
+## Fonts
 Matplotlib allows using fonts of your choice in the plot. For instance, I have
 set this program up to use Cochineal. I highly recommend using a good custom
 font, because (in my opinion) it can significantly improve the appearance of
@@ -31,7 +31,7 @@ In case you want nothing to do with fonts, you can ignore this section
 entirely. Matplotlib will warn you that Cochineal is not installed (if it
 isn't), and fall back to the default font. (Functionality remains unaffected.)
 
-#### Using a Custom Font
+### Using a Custom Font
 Let's say you want to use Libre Baskerville.
 * Download the font files for Libre Baskerville. (It is a Google font. So, it
 will probably be freely available as a package containing four or more files
@@ -66,7 +66,7 @@ you feel confident, you can experiment with different fonts (i.e. a monospace
 font for `mathtext.tt`, a calligraphy font for `mathtext.cal` and a sans-serif
 font for `mathtext.sf`).
 
-#### Using a Built-in Font
+### Using a Built-in Font
 You have a choice of fonts available out of the box. My suggestion is to use a
 serif font. (Once again, only the relevant lines are shown.)
 ```python
@@ -77,7 +77,18 @@ mathtext.fontset: dejavuserif
 ...
 ```
 
-### DPI Settings
+## XKCD-style Plots
+An XKCD-style graph plot looks best when it uses the Humor Sans font. You can
+either install it via the command line
+```shell
+sudo apt install fonts-humor-sans
+```
+
+or do it manually, as described in the previous section: by downloading the
+font files, putting them in `~/.fonts/HumorSans`, and deleting the Matplotlib
+font cache.
+
+## DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI parameter
 before adjusting anything else. In the file `dandy.mplstyle`, search for
 `figure.dpi` and change the value next to it.
@@ -85,7 +96,7 @@ before adjusting anything else. In the file `dandy.mplstyle`, search for
 In my experience, a value of 120 produces pretty graphs on a 1080p screen,
 while a 768p screen requires a value of 96 or so.
 
-### Essential and Jump Discontinuities
+## Essential and Jump Discontinuities
 There are two types of discontinuities most graph plotters struggle with:
 * essential discontinuities (like those in the graph of _y_ = tan _x_); and
 * jump discontinuities (like those in the graph of _y_ = sgn _x_).
