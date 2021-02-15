@@ -27,6 +27,8 @@ with plt.style.context('dandy.mplstyle'):
 
     x = np.linspace(0, 8, 10000)
     y = np.sqrt(x)
+
+    # `grapher.plot' works exactly like the `plt.plot' function of Pyplot
     grapher.plot(x, y, color = 'red', label = r'$y=\sqrt{x}$')
 
     # set the main title of the graph and do other appearance enhancements
@@ -60,6 +62,8 @@ with plt.style.context('dandy.mplstyle'):
 
     x = np.linspace(-2 * np.pi, 2 * np.pi, 10000)
     y = np.cos(x)
+
+    # `grapher.plot' works exactly like the `plt.plot' function of Pyplot
     grapher.plot(x, y, color = 'green', label = r'$y=\cos\,x$')
 
     # set the main title of the graph and do other appearance enhancements
@@ -105,6 +109,7 @@ with plt.xkcd():
     grapher.configure(axis_labels = ('days', 'number of husbands'), title = 'my hobby: extrapolating')
 
     # some more modifications to emphasise the jocular nature of this plot
+    # `ax' (Matplotlib axes object) can be accessed via `grapher'
     grapher.ax.set_xticks([0, 1, 8])
     grapher.ax.set_xticklabels(['yesterday', 'today', 'next week (predicted)'])
 
@@ -224,6 +229,9 @@ with plt.style.context('dandy.mplstyle'):
     y = np.linspace(-6 * np.pi, 6 * np.pi, 1000)
     X, Y = np.meshgrid(x, y)
     Z = 1.5 * np.cos(X / 2) * np.sin(Y / 5)
+
+    # `grapher.plot' is for plots of curves, whereas this is a surface
+    # hence, the `plot_surface' method of the axes object has to be called
     surf = grapher.ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=1.5\cdot\cos\,0.5x\cdot\sin\,0.2y$')
 
     # this line is required because of a library bug
