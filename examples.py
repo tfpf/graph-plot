@@ -29,7 +29,7 @@ with plt.style.context('dandy.mplstyle'):
     y = np.sqrt(x)
     grapher.plot(x, y, color = 'red', label = r'$y=\sqrt{x}$')
 
-    # set the main title of the graph and do other basic appearance enhancements
+    # set the main title of the graph and do other appearance enhancements
     # if you do not provide the `title' argument, no title will be added
     grapher.configure(title = 'This is the square root function!')
 
@@ -62,7 +62,7 @@ with plt.style.context('dandy.mplstyle'):
     y = np.cos(x)
     grapher.plot(x, y, color = 'green', label = r'$y=\cos\,x$')
 
-    # set the main title of the graph and do other basic appearance enhancements
+    # set the main title of the graph and do other appearance enhancements
     # if you do not provide the `title' argument, no title will be added
     grapher.configure(title = 'This is a trigonometric function!')
 
