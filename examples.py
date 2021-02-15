@@ -87,6 +87,7 @@ with plt.style.context('dandy.mplstyle'):
     grapher.plot(x, y, label = r'$\dfrac{(x-1)^2}{9}+\dfrac{(y+2)^2}{25}=1$')
     grapher.configure(title = 'This is an ellipse!')
     grapher.aspect_fix(1)
+
     plt.show()
     plt.close(grapher.fig)
 
@@ -95,14 +96,17 @@ with plt.style.context('dandy.mplstyle'):
 ###############################################################################
 with plt.xkcd():
     grapher = customplot.CustomPlot(xkcd = True)
-    grapher.plot([0, 1, 8], [0, 1, 8], color = 'black', label = 'marriage prediction')
 
-    # since this is not a traditional graph, the axis labels must be changed
+    x = [0, 1, 8]
+    y = [0, 1, 8]
+    grapher.plot(x, y, color = 'black', marker = 'o', mfc = 'black', markersize = 10, label = 'marriage rate')
+
+    # since this is not a conventional graph, the axis labels must be changed
     grapher.configure(axis_labels = ('days', 'number of husbands'), title = 'my hobby: extrapolating')
 
-    # some more setup to emphasise the jocular nature of this plot
+    # some more modifications to emphasise the jocular nature of this plot
     grapher.ax.set_xticks([0, 1, 8])
-    grapher.ax.set_xticklabels(['yesterday', 'today', 'after a week'])
+    grapher.ax.set_xticklabels(['yesterday', 'today', 'next week (predicted)'])
 
     plt.show()
     plt.close(grapher.fig)
