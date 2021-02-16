@@ -79,15 +79,14 @@ mathtext.fontset: dejavuserif
 ```
 
 ## XKCD-style Plots
-An XKCD-style graph plot looks best when it uses the Humor Sans font. You can
-either install it via the command line
+There is an example of an XKCD-style graph plot in `examples.py`. It looks best
+when it uses the Humor Sans font, which can be installed via the command line.
 ```shell
 sudo apt install fonts-humor-sans
 ```
 
-or do it manually, as described in the previous section: by downloading the
-font files, putting them in `~/.fonts/HumorSans`, and deleting the Matplotlib
-font cache.
+Once installed, delete the Matplotlib font cache, as described in the previous
+section.
 
 ## DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI parameter
