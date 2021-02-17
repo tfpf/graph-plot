@@ -111,3 +111,6 @@ As a side-effect, sometimes, functions with a very large magnitude of slope are
 also partially erased. If you face this problem, increase the value of
 `maximum_diff` in the file `customplot.py` until you get satisfactory results.
 
+Conversely, if you find unwanted vertical lines in your plot, try decreasing
+it.
+
