@@ -4,7 +4,7 @@ publication-quality graphs.
 
 # Requirements
 | Name       | Minimum Version |
-| :--------: | :-------------- |
+| :--------: | :-------------: |
 | Python     | 3.8             |
 | Matplotlib | 3.3.3           |
 | NumPy      | 1.17            |
