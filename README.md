@@ -3,14 +3,16 @@ A wrapper around Matplotlib; it can be used to plot beautiful,
 publication-quality graphs.
 
 # Requirements
-* Python (version 3.8 or higher)
-* Matplotlib (version 3.3.3 or higher)
-* NumPy (version 1.17 or higher)
+| Name       | Minimum Version |
+| :--------: | :-------------- |
+| Python     | 3.8             |
+| Matplotlib | 3.3.3           |
+| NumPy      | 1.17            |
 
 # Usage
 Clone or download this repository. Open a terminal window to the clone or
-download location. Several examples provided in `examples.py` should make
-everything clear. Run it
+download location. Several examples have been provided in `examples.py`;
+hopefully, they will make everything clear. Run the script
 ```shell
 python3 examples.py
 ```
