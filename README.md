@@ -1,6 +1,9 @@
 # CustomPlot
-A wrapper around Matplotlib; it can be used to plot beautiful,
+A wrapper around Matplotlib. It can be used to plot beautiful,
 publication-quality graphs.
+
+I mainly wrote this to plot graphs of functions, but you can plot anything,
+really.
 
 # Requirements
 | Name       | Minimum Version |
@@ -8,6 +11,8 @@ publication-quality graphs.
 | Python     | 3.8             |
 | Matplotlib | 3.3.3           |
 | NumPy      | 1.17            |
+
+These requirements are not strict. Slightly older versions should also be okay.
 
 # Usage
 Clone or download this repository. Open a terminal window to the clone or
@@ -27,7 +32,7 @@ in `examples.py` and make modifications to the copy.
 Matplotlib allows using fonts of your choice in the plot. For instance, I have
 set this program up to use Cochineal. I highly recommend using a good custom
 font, because (in my opinion) it can significantly improve the appearance of
-your plot.
+your plot (have a look at the [gallery](gallery/)).
 
 In case you want nothing to do with fonts, you can ignore this section
 entirely. Matplotlib will warn you that Cochineal is not installed (if it
@@ -112,5 +117,5 @@ also partially erased. If you face this problem, increase the value of
 `maximum_diff` in the file `customplot.py` until you get satisfactory results.
 
 Conversely, if you find unwanted vertical lines in your plot, try decreasing
-it.
+said value.
 
