@@ -9,7 +9,7 @@ anything, really.
 
 ![Lemniscate of Bernoulli](gallery/graph_1613668377.png)
 
-![Folium of Descartes](gallery/graph_1613666925.png)
+![Export Revenue of India](gallery/graph_1613671963.png)
 
 # Requirements
 | Name       | Minimum Version |
