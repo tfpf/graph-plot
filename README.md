@@ -32,7 +32,9 @@ in `examples.py` and make modifications to the copy.
 Matplotlib allows using fonts of your choice in the plot. For instance, I have
 set this program up to use Cochineal. I highly recommend using a good custom
 font, because (in my opinion) it can significantly improve the appearance of
-your plot (have a look at the [gallery](gallery/)).
+your plot.
+
+![Astroid](gallery/graph_1613665560.png)
 
 In case you want nothing to do with fonts, you can ignore this section
 entirely. Matplotlib will warn you that Cochineal is not installed (if it
