@@ -2,8 +2,14 @@
 A wrapper around Matplotlib. It can be used to plot beautiful,
 publication-quality graphs.
 
-I mainly wrote this to plot graphs of functions, but you can plot anything,
-really.
+I mainly wrote this to plot graphs of maths functions, but you can use it for
+anything, really.
+
+![Astroid](gallery/graph_1613665560.png)
+
+![Lemniscate of Bernoulli](gallery/graph_1613668377.png)
+
+![Folium of Descartes](gallery/graph_1613666925.png)
 
 # Requirements
 | Name       | Minimum Version |
@@ -29,12 +35,9 @@ in `examples.py` and make modifications to the copy.
 # Notes
 
 ## Fonts
-Matplotlib allows using fonts of your choice in the plot. For instance, I have
-set this program up to use Cochineal. I highly recommend using a good custom
-font, because (in my opinion) it can significantly improve the appearance of
-your plot.
-
-![Astroid](gallery/graph_1613665560.png)
+Using a good custom font can significantly improve the appearance of your plot.
+(Take a look at the [gallery](gallery/). The font used in those plots is
+Cochineal.)
 
 In case you want nothing to do with fonts, you can ignore this section
 entirely. Matplotlib will warn you that Cochineal is not installed (if it
@@ -76,9 +79,9 @@ font for `mathtext.tt`, a calligraphy font for `mathtext.cal` and a sans-serif
 font for `mathtext.sf`).
 
 ### Using a Built-in Font
-You have a choice of fonts available out of the box. My suggestion is to use a
-serif font. To do so, modify the file `dandy.mplstyle` like this. (Once again,
-only the relevant lines are shown.)
+You have a choice of fonts available out of the box. My suggestion is to use
+the serif font. To do so, modify the file `dandy.mplstyle` like this. (Once
+again, only the relevant lines are shown.)
 ```python
 ...
 font.family: serif
