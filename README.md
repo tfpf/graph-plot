@@ -1,15 +1,15 @@
 # CustomPlot
 A wrapper around Matplotlib. It can be used to plot beautiful,
-publication-quality graphs.
-
-I mainly wrote this to plot graphs of maths functions, but you can use it for
-anything, really.
+publication-quality graphs. I mainly wrote this to plot graphs of maths
+functions. But with minimal extra effort, you can use it for anything, really.
 
 ![Astroid](gallery/graph_1613665560.png)
 
-![Lemniscate of Bernoulli](gallery/graph_1613668377.png)
+![Lemniscate](gallery/graph_1613668377.png)
 
-![Export Revenue of India](gallery/graph_1613671963.png)
+![Potentiometric Titration](gallery/graph_1613679377.png)
+
+![Export Revenue](gallery/graph_1613671963.png)
 
 # Requirements
 | Name       | Minimum Version |
