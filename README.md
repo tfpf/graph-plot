@@ -11,6 +11,10 @@ functions. But with minimal extra effort, you can use it for anything, really.
 
 ![Export Revenue](gallery/graph_1613671963.png)
 
+CustomPlot cannot replace Matplotlib or Pyplot. It just automates some settings
+which make the plot look appealing. For sufficiently complicated plots, you may
+have to use some functions of Matplotlib or Pyplot directly.
+
 # Requirements
 | Name       | Minimum Version |
 | :--------: | :-------------: |
