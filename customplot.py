@@ -37,11 +37,11 @@ Args:
 
 def sanitise_discontinuous(y):
     '''\
-At a point of jump discontinuity, a vertical line is drawn automatically. This
-vertical line joins the two points around the point of discontinuity.
-Traditionally, in maths, these vertical lines are not drawn. Hence, they need
-to be removed from the plot. This is achieved by setting the values at the
-points of discontinuity to NaN.
+At a point of essential or jump discontinuity, Matplotlib draws a vertical line
+automatically. This vertical line joins the two points around the
+discontinuity. Traditionally, in maths, such lines are not drawn. Hence, they
+need to be removed from the plot. This is achieved by setting the function
+values at the points of discontinuity to NaN.
 
 Args:
     y: iterable (values of the discontinuous function)
@@ -51,7 +51,7 @@ Returns:
 '''
 
     # locate points of discontinuity (check where the derivative is large)
-    maximum_diff = 2
+    maximum_diff = 5
     y = np.array(y)
     points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > maximum_diff
     y[points_of_discontinuity] = np.nan
@@ -62,7 +62,8 @@ Returns:
 
 def graph_ticks(first, last, step, symbol = r'\pi', symval = np.pi):
     r'''
-Create a list of tick values and labels at intervals of `step * np.pi'.
+Create a list of LaTeX-formatted strings and an array of floats for values
+from one rational multiple of π to another.
 
 >>> graph_ticks(-1, 5, 2)
 (['$-\\pi$', '$\\pi$', '$3\\pi$', '$5\\pi$'], array([-3.14159265,  3.14159265,  9.42477796, 15.70796327]))
@@ -71,19 +72,12 @@ Create a list of tick values and labels at intervals of `step * np.pi'.
 >>> graph_ticks(-2, 2, 1)
 (['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$'], array([-6.28318531, -3.14159265,  0.        ,  3.14159265,  6.28318531]))
 
-The above results can be verified by using the `doctest' module. To properly
-represent the output so that `doctest' may correctly read them, this docstring
-has been marked as a raw string.
-
-What's required is a list of LaTeX-formatted strings for numbers going from one
-rational multiple of pi to another, and an `np.array' of the respective values.
-
 Args:
     first: float (first item in the returned array shall be `first * symval')
     last: float (last item in the returned array shall be `last * symval')
     step: float (array items will increment in steps of `step * symval')
-    symbol: str (the symbol to use instead of the symbol for pi)
-    symval: float (numerical value of `symbol')
+    symbol: str (LaTeX code of the symbol to use instead of π)
+    symval: float (numerical value represented by `symbol')
 
 Returns:
     tuple of a list of labels and an array of values indicated by said labels
@@ -145,7 +139,7 @@ Methods:
     __init__
     __repr__
     __str__
-    plot: wrapper for the actual plot function provided by Matplotlib
+    plot: wrapper around the `plot' method of `ax'
     configure: do makeup
     axis_fix: modify the ticks and labels on the axes so they look nice
     aspect_fix: set the aspect ratio
@@ -196,13 +190,15 @@ Methods:
 
     def plot(self, *args, **kwargs):
         '''\
-Wrapper for plotting a graph.
+Plot a graph.
 
-If the arguments are lists or arrays containing a large number of items,
-vertical lines at points of discontinuity are removed. Else, the arguments are
-left unchanged. Then, these arguments get passed to the function which actually
-plots the graph. Hence, the signature of this function is the same as that of
-the `plot' function of Pyplot.
+This method does the same thing as the `plot' function of Pyplot (`plt.plot'),
+but with one small difference: if the arguments are lists or arrays containing
+a large number of items, vertical lines at points of discontinuity are removed
+(else, the arguments are left unchanged).
+
+The signature of this method is the same as that of the `plot' function of
+Pyplot.
 '''
 
         try:
@@ -217,7 +213,8 @@ the `plot' function of Pyplot.
 
     def configure(self, axis_labels = ('$x$', '$y$', '$z$'), title = None):
         '''\
-Do makeup.
+Label the coordinate axes. Give the plot a title. Add a legend. Draw grid
+lines.
 
 Args:
     axis_labels: tuple (strings to use to label the coordinate axes)
@@ -291,22 +288,19 @@ Args:
 
     def axis_fix(self, axis = None, symbolic = False, s = r'\pi', v = np.pi, first = None, last = None, step = None):
         '''\
-Modify the labels and ticks on the specified axis of coordinates. Note that the
-limits on the axis must necessarily be set after setting the axis ticks. This
-is because floating point precision issues might introduce an extra tick beyond
-the last point (`last') to be displayed. This extra tick is eliminated by
-simply specifying in the axis limit that the axis must end at `last'.
+Set the ticks on the specified axis of coordinates. Limit this axis to the
+range of values given.
 
 In three-dimensional plots, these limits are not respected. Matplotlib adds a
-small delta to all axis limits. (The relevant code can be found in the
-`_get_coord_info' method of `mpl_toolkits'.) To have strict axis limits, you
-must modify the source code itself.
+small delta to the axis range. (The relevant code can be found in the
+`_get_coord_info' method of the three-dimensional axes object in
+`mpl_toolkits'.) To have strict axis limits, you must modify the source code.
 
 Args:
     axis: str (which axis to modify: 'x', 'y' or 'z')
     symbolic: bool (whether ticks are at rational multiples of `v')
-    s: str (symbol to use instead of the symbol for pi)
-    v: float (numerical value of `s')
+    s: str (LaTeX code of the symbol to use instead of π)
+    v: float (numerical value represented by `s')
     first: float (grid start point)
     last: float (grid end point)
     step: float (grid gap)
@@ -327,8 +321,8 @@ Args:
 
             labels, ticks = graph_ticks(first, last, step, s, v)
 
-            # see if this is a polar plot in which the angle goes from 0 to 2pi
-            # if yes, do not draw the label for 2pi (as it overlaps with 0)
+            # see if this is a polar plot in which the angle goes from 0 to 2π
+            # if yes, do not draw the label for 2π (as it overlaps with 0)
             # further, do not put the first and last labels on the radial axis
             if self.polar:
                 if axis == 'x' and first == 0 and last == 2:
@@ -360,15 +354,14 @@ Args:
         '''\
 Set the aspect ratio of the axes object. If this is a two-dimensional Cartesian
 plot, the ratio of the scales on the axes will be set to the given value (if it
-is non-zero). If this is a two-dimensional polar plot, or if this is an
-XKCD-style plot, nothing happens.
+is non-zero). If this is a two-dimensional polar plot, nothing happens.
 
 For three-dimensional plots, an aspect ratio does not make sense, because there
 are three axes. Hence, in this case, the scales on the axes will be made equal
 if the given value is non-zero.
 
 Args:
-    aspect_ratio: float (ratio of scales on the vertical and horizontal axes)
+    aspect_ratio: float (ratio of x-axis scale to y-axis scale)
 '''
 
         if aspect_ratio != 0 and not self.polar:
@@ -389,41 +382,41 @@ def main():
                      symbolic = True,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -0.25,
-                     last     = 0.75,
-                     step     = 0.0625)
-    grapher.axis_fix(axis     = 'y',
-                     symbolic = False,
-                     s        = r'\pi',
-                     v        = np.pi,
                      first    = -2,
-                     last     = -0.5,
-                     step     = 0.125)
-    grapher.axis_fix(axis     = 'z',
+                     last     = 2,
+                     step     = 0.25)
+    grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
                      first    = -3,
                      last     = 3,
                      step     = 1)
+    grapher.axis_fix(axis     = 'z',
+                     symbolic = False,
+                     s        = r'\pi',
+                     v        = np.pi,
+                     first    = -5,
+                     last     = 8,
+                     step     = 1)
 
     # t = np.linspace(0, 2 * np.pi, 10000)
-    x1 = np.linspace(-10, 10, 10000)
-    y1 = (1 - np.tan(x1)) / (np.sin(x1) - np.cos(x1))
-    z1 = np.sin(x1)
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\dfrac{1-\tan\,\theta}{\sin\,\theta-\cos\,\theta}$')
-    grapher.plot(np.pi / 4, -np.sqrt(2), color = 'red', linestyle = 'none', marker = 'o', label = r'')
-    # grapher.ax.text(0.1, 1.1, r'$(0,1)$')
+    x1 = np.linspace(-20, 20, 10000)
+    y1 = np.tan(x1)
+    z1 = x1
+    grapher.plot(x1, y1, color = 'red', label = r'$y=\tan\,x$')
+    # grapher.plot([-np.e, np.e], [-1 / np.e, 1 / np.e], color = 'red', linestyle = 'none', mfc = 'red', marker = 'o', label = r'')
+    # grapher.ax.text(2.5, 0.5, r'$(e,1/e)$', size = 'large')
 
-    # x2 = np.linspace(-32, 32, 10000)
-    # y2 = x2 * np.exp(-x2)
+    # x2 = np.linspace(-20, 20, 10000)
+    # y2 = 5 ** x2
     # z2 = x2
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=xe^{-x}$')
+    # grapher.plot(x2, y2, color = 'blue', label = r'$y=5^x$')
 
-    # x3 = np.linspace(np.pi / 2, 3 * np.pi / 2, 10000)
-    # y2 = x2
+    # x3 = np.linspace(-20, 20, 10000)
+    # y3 = np.tan(x3)
     # z3 = x3
-    # grapher.plot(x3, y3, color = 'blue', linestyle = ':', label = r'')
+    # grapher.plot(x3, y3, color = 'green', label = r'$y=\tan\,x$')
 
     # x4 = np.linspace(-32, 32, 10000)
     # y4 = x4 / 8
@@ -445,9 +438,10 @@ def main():
     # Z = 2 * np.sin(T) * np.sin(P)
     # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'lightgreen', antialiased = True, label = r'$x^2+2y^2+z^2=4$'); surf._facecolors2d = surf._edgecolors2d = None
 
-    # X, Y = np.meshgrid(np.linspace(-8, 8, 1000), np.linspace(-8, 8, 1000))
-    # Z = np.abs(X) + np.abs(Y)
-    # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'skyblue', antialiased = True, label = r'$z=|x|+|y|$'); surf._facecolors2d = surf._edgecolors2d = None
+    # X, Y = np.meshgrid(np.linspace(0, 8, 1000), np.linspace(-5, 5, 1000))
+    # Z = np.log(X) - Y
+    # Z[Z < -5] = -5
+    # surf = grapher.ax.plot_surface(X, Y, Z, linewidth = 0, color = 'skyblue', antialiased = True, label = r'$z=\log\,x-y$'); surf._facecolors2d = surf._edgecolors2d = None
     # grapher.fig.colorbar(surf, shrink = 0.5, aspect = 5)
 
     grapher.configure(axis_labels = (r'$x$', r'$y$', r'$z$'), title = None)
