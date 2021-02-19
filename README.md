@@ -1,12 +1,13 @@
 # CustomPlot
 A wrapper around Matplotlib. It can be used to plot beautiful,
 publication-quality graphs. I mainly wrote this to plot graphs of maths
-functions. But with minimal extra effort, you can use it for anything, really.
-
+functions. But with some extra effort,  
 ![Astroid](gallery/graph_1613665560.png)  
 ![Lemniscate](gallery/graph_1613668377.png)  
 ![Potentiometric Titration](gallery/graph_1613679377.png)  
+![Refractometry](gallery/graph_1613768309.png)  
 ![Export Revenue](gallery/graph_1613671963.png)  
+you can plot almost anything!
 
 CustomPlot cannot replace Matplotlib or Pyplot. It just automates some settings
 which make the plot look appealing. For sufficiently complicated plots, you may
@@ -16,7 +17,7 @@ have to use some functions of Matplotlib or Pyplot directly.
 | Name       | Minimum Version |
 | :--------: | :-------------: |
 | Python     | 3.8             |
-| Matplotlib | 3.3.3           |
+| Matplotlib | 3.3.4           |
 | NumPy      | 1.17            |
 
 These requirements are not strict. Slightly older versions should also be okay.
