@@ -253,12 +253,13 @@ Args:
             self.ax.set_title(title)
 
         # legend
-        kwargs = {'loc': 'best'}
-        if self.polar:
-            kwargs['bbox_to_anchor'] = (1.3, 1)
-        if not self.xkcd and (self.polar or self.dim == 3):
-            kwargs['facecolor'] = 'lightgray'
-        self.ax.legend(**kwargs)
+        if self.ax.get_legend_handles_labels() != ([], []):
+            kwargs = {'loc': 'best'}
+            if self.polar:
+                kwargs['bbox_to_anchor'] = (1.3, 1)
+            if not self.xkcd and (self.polar or self.dim == 3):
+                kwargs['facecolor'] = 'lightgray'
+            self.ax.legend(**kwargs)
 
         # if this is a two-dimensional plot, draw thick coordinate axes
         # this does not work as expected in three-dimensional plots
@@ -379,12 +380,12 @@ def main():
 
     grapher = CustomPlot(dim = 2, polar = False, xkcd = False)
     grapher.axis_fix(axis     = 'x',
-                     symbolic = True,
+                     symbolic = False,
                      s        = r'\pi',
                      v        = np.pi,
-                     first    = -2,
-                     last     = 2,
-                     step     = 0.25)
+                     first    = -6,
+                     last     = 6,
+                     step     = 1)
     grapher.axis_fix(axis     = 'y',
                      symbolic = False,
                      s        = r'\pi',
@@ -402,26 +403,26 @@ def main():
 
     # t = np.linspace(0, 2 * np.pi, 10000)
     x1 = np.linspace(-20, 20, 10000)
-    y1 = np.tan(x1)
+    y1 = x1 / 2
     z1 = x1
-    grapher.plot(x1, y1, color = 'red', label = r'$y=\tan\,x$')
-    # grapher.plot([-np.e, np.e], [-1 / np.e, 1 / np.e], color = 'red', linestyle = 'none', mfc = 'red', marker = 'o', label = r'')
-    # grapher.ax.text(2.5, 0.5, r'$(e,1/e)$', size = 'large')
+    grapher.plot(x1, y1, color = 'red', label = r'$x-2y=0$')
+    # grapher.plot(x1, y1, color = 'red', linestyle = 'none', marker = 'o', label = 'Observed Variation in Refractive Index of Water-Alcohol Mixture')
+    # grapher.ax.text(8.05, 0.337, r'equivalence point', size = 'large')
 
-    # x2 = np.linspace(-20, 20, 10000)
-    # y2 = 5 ** x2
+    # x2 = [8, 8.1]
+    # y2 = [0.12, 0.27]
     # z2 = x2
-    # grapher.plot(x2, y2, color = 'blue', label = r'$y=5^x$')
+    # grapher.plot(x2, y2, color = 'C0', label = r'')
 
-    # x3 = np.linspace(-20, 20, 10000)
-    # y3 = np.tan(x3)
+    # x3 = [8.2, 8.3]
+    # y3 = [0.25, 0.09]
     # z3 = x3
-    # grapher.plot(x3, y3, color = 'green', label = r'$y=\tan\,x$')
+    # grapher.plot(x3, y3, color = 'C0', label = r'')
 
-    # x4 = np.linspace(-32, 32, 10000)
-    # y4 = x4 / 8
+    # x4 = [8.1, 8.14, 8.2]
+    # y4 = [0.27, 0.33, 0.25]
     # z4 = x4
-    # grapher.plot(x4, y4, color = 'purple', label = r'$8x-y=0$')
+    # grapher.plot(x4, y4, color = 'C0', linestyle = ':', label = r'')
 
     # grapher.ax.fill_between(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = r'$R$')
     # grapher.ax.fill_between(x1, 1, 2, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 0 < i < 0.5 else False for i in x1])
