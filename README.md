@@ -26,13 +26,20 @@ These requirements are not strict. Slightly older versions should also be okay.
 Clone or download this repository. Open a terminal window to the clone or
 download location. Several examples have been provided in `examples.py`;
 hopefully, they will make everything clear. Run the script
-```shell
+```lang-shell
 python3 examples.py
 ```
 and tinker with the code if you'd like to.
 
 A good way to start plotting your own graphs might be to copy parts of the code
 in `examples.py` and make modifications to the copy.
+
+You can also try running it with Cython (if you have it installed).
+```lang-makefile
+make run
+```
+
+This feature is experimental and has not been tested much.
 
 # Notes
 
@@ -53,7 +60,7 @@ with the extension `.ttf`, or perhaps `.otf`).
 * Create a new directory `~/.fonts/LibreBaskerville` and put the
 above-mentioned font files in that directory.
 * Find out where Matplotlib stores its cache.
-```python
+```lang-python
 import matplotlib
 print(matplotlib.get_cachedir())
 ```
@@ -62,7 +69,7 @@ print(matplotlib.get_cachedir())
 wherever it appears, with `Libre Baskerville`. In other words, the contents of
 `dandy.mplstyle` should be something like this. (Only the relevant lines are
 shown.)
-```python
+```lang-python
 ...
 font.family: Libre Baskerville
 ...
@@ -84,7 +91,7 @@ font for `mathtext.sf`).
 You have a choice of fonts available out of the box. My suggestion is to use
 the serif font. To do so, modify the file `dandy.mplstyle` like this. (Once
 again, only the relevant lines are shown.)
-```python
+```lang-python
 ...
 font.family: serif
 ...
