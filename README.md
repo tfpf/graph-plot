@@ -3,11 +3,11 @@ A wrapper around Matplotlib. It can be used to plot beautiful,
 publication-quality graphs. I mainly wrote this to plot graphs of maths
 functions. But with some extra effort, you can plot almost anything!
 
-![Astroid](gallery/astroid.png)  
-![Lemniscate](gallery/lemniscate.png)  
-![Potentiometric Titration](gallery/potentiometry.png)  
-![Refractometry](gallery/refractometry.png)  
-![Export Revenue](gallery/exports.png)  
+![Astroid](gallery/03_astroid.png)  
+![Lemniscate](gallery/05_lemniscate.png)  
+![Potentiometric Titration](gallery/07_potentiometry.png)  
+![Export Revenue](gallery/09_exports.png)  
+![Oxygen Parameters](gallery/10_oxygen_parameters.png)
 
 CustomPlot cannot replace Matplotlib or Pyplot. It just automates some settings
 which make the plot look appealing. For sufficiently complicated plots, you may
