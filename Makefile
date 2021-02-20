@@ -1,13 +1,13 @@
 SHELL   = /bin/sh
-PC      = python3.8 -m cython
+PC      = python3 -m cython
 PFLAGS  = -3 --embed
 CC      = gcc
-CFLAGS  = -O3 -fPIE $(shell python3.8-config --cflags)
-LDFLAGS = -lpython3.8 $(shell python3.8-config --ldflags)
+CFLAGS  = -O3 -fPIE $(shell python3-config --cflags)
+LDFLAGS = -lpython3 $(shell python3-config --ldflags)
 
-PythonSource = customplot.py
-CSource      = customplot.c
-Binary       = customplot
+PythonSource = examples.py
+CSource      = examples.c
+Binary       = examples
 
 
 .PHONY: comp exec run
