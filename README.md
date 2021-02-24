@@ -1,4 +1,4 @@
-# CustomPlot
+# customplot
 A wrapper around Matplotlib. It can be used to plot beautiful,
 publication-quality graphs. I mainly wrote this to plot graphs of maths
 functions. But with some extra effort, you can plot almost anything!
@@ -9,12 +9,13 @@ functions. But with some extra effort, you can plot almost anything!
 ![Export Revenue](gallery/09_exports.png)  
 ![Oxygen Parameters](gallery/10_oxygen_parameters.png)
 
-CustomPlot cannot replace Matplotlib or Pyplot. It just automates some settings
-which make the plot look appealing. For sufficiently complicated plots, you may
-have to use some functions of Matplotlib or Pyplot directly.
+It cannot, however, replace Matplotlib or Pyplot. It just automates some
+settings which make the plot look appealing. For sufficiently complicated
+plots, you may have to use some functions of Matplotlib or Pyplot directly.
 
 Only `rectilinear`, `polar` and `3d` projections of Matplotlib axes are
-supported.
+supported. Other projections can also be used, but their beautification may not
+happen automatically.
 
 # Requirements
 | Name       | Minimum Version |
@@ -51,9 +52,8 @@ This feature is experimental and has not been tested much.
 # Notes
 
 ## Fonts
-Using a good custom font can significantly improve the appearance of your plot.
-(Take a look at the [gallery](gallery/). The font used in those plots is
-Cochineal.)
+Using a good font can significantly improve the appearance of your plot. (Take
+a look at the [gallery](gallery/). The font used in those plots is Cochineal.)
 
 In case you want nothing to do with fonts, you can ignore this section
 entirely. Matplotlib will warn you that Cochineal is not installed (if it
@@ -120,13 +120,8 @@ There are two types of discontinuities most graph plotters struggle with:
 * jump discontinuities (like those in the graph of _y_ = sgn _x_).
 
 A vertical line is automatically drawn at each point of discontinuity. This is
-simply a result of the plotting algorithm used by graph plotters.
-
-However, CustomPlot ensures that these superfluous vertical lines are erased.
-As a side-effect, sometimes, functions with a very large magnitude of slope are
-also partially erased. If you face this problem, increase the value of
-`maximum_diff` in the file `customplot.py` until you get satisfactory results.
-
-Conversely, if you find unwanted vertical lines in your plot, try decreasing
-said value.
+simply a result of the plotting algorithm used by graph plotters. If this
+happens in your plot, try using the `sanitise_discontinuous` function (you can
+find the code in `customplot.py`). Use a value of `maximum_diff` which gives
+you satisfactory results.
 
