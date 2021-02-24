@@ -13,7 +13,8 @@ CustomPlot cannot replace Matplotlib or Pyplot. It just automates some settings
 which make the plot look appealing. For sufficiently complicated plots, you may
 have to use some functions of Matplotlib or Pyplot directly.
 
-Only `rectilinear`, `polar` and `3d` projections are supported.
+Only `rectilinear`, `polar` and `3d` projections of Matplotlib axes are
+supported.
 
 # Requirements
 | Name       | Minimum Version |
@@ -32,6 +33,10 @@ hopefully, they will make everything clear. Run the script
 python3 examples.py
 ```
 and tinker with the code if you'd like to.
+
+Multiple plots in a single figure (subplots) sometimes don't look pretty
+because elements from adjacent plots overlap with each other. This is a known
+issue, and may or may not be fixed.
 
 A good way to start plotting your own graphs might be to copy parts of the code
 in `examples.py` and make modifications to the copy.
