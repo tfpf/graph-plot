@@ -13,6 +13,8 @@ CustomPlot cannot replace Matplotlib or Pyplot. It just automates some settings
 which make the plot look appealing. For sufficiently complicated plots, you may
 have to use some functions of Matplotlib or Pyplot directly.
 
+Only `rectilinear`, `polar` and `3d` projections are supported.
+
 # Requirements
 | Name       | Minimum Version |
 | :--------: | :-------------: |
@@ -98,16 +100,6 @@ font.family: serif
 mathtext.fontset: dejavuserif
 ...
 ```
-
-## XKCD-style Plots
-There is an example of an XKCD-style graph plot in `examples.py`. It looks best
-when it uses the Humor Sans font, which can be installed via the command line.
-```shell
-sudo apt install fonts-humor-sans
-```
-
-Once installed, delete the Matplotlib font cache, as described in the previous
-section.
 
 ## DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI parameter
