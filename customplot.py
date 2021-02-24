@@ -123,7 +123,7 @@ Returns:
 
 ###############################################################################
 
-def limit(ax = None, coordaxis = None, symbolic = False, s = r'\pi', v = np.pi, first = None, last = None, step = None):
+def limit(ax, coordaxis = None, symbolic = False, s = r'\pi', v = np.pi, first = None, last = None, step = None):
     '''\
 Limit the axis of coordinates to the range given. Draw grid lines as specified.
 
@@ -188,7 +188,7 @@ Args:
 
 ###############################################################################
 
-def polish(ax = None, labels = ('$x$', '$y$', '$z$'), title = None, suptitle = None):
+def polish(ax, labels = ('$x$', '$y$', '$z$'), title = None, suptitle = None):
     '''\
 Label the coordinate axes. Give the plot a title. Add a legend. Draw grid
 lines.
@@ -275,7 +275,7 @@ Args:
 
 ###############################################################################
 
-def aspect(ax = None, ratio = 0):
+def aspect(ax, ratio = 0):
     '''\
 Set the aspect ratio. If this is a two-dimensional Cartesian plot, the ratio of
 the scales on the axes will be set to the given value (if it is non-zero). If
