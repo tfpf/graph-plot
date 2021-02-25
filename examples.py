@@ -45,6 +45,42 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
+# two-dimensional Cartesian plot (discontinuous function)
+###############################################################################
+with plt.style.context('dandy.mplstyle'):
+
+    # create a Matplotlib axes instance
+    ax = plt.figure().add_subplot()
+
+    # set the locations of the grid lines on the x-axis
+    # grid lines will be drawn at: []
+    customplot.limit(ax, 'x', first = -8, last = 8, step = 1)
+
+    # set the locations of the grid lines on the y-axis
+    # grid lines will be drawn at: []
+    customplot.limit(ax, 'y', first = -4, last = 4, step = 1)
+
+    x = np.linspace(-8, 8, 10000)
+    y = np.heaviside(x, 0.5)
+
+    # remove the vertical line present at the point of discontinuity
+    y = customplot.sanitise_discontinuous(y, maximum_diff = 0.1)
+
+    ax.plot(x, y, color = 'red', label = r'$y=u(x)$')
+
+    # markings around the point of discontinuity
+    ax.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o')
+    ax.plot(0, 1, color = 'red', linestyle = 'none', marker = 'o')
+    ax.plot(0, 0.5, color = 'red', linestyle = 'none', marker = 'o', mfc = 'red')
+
+    customplot.polish(ax, title = 'This is the unit step function!')
+
+    # set the graph aspect ratio (ratio of the scales on the x-axis and y-axis)
+    customplot.aspect(ax, ratio = 1)
+
+    plt.show()
+
+###############################################################################
 # two-dimensional Cartesian plot (trigonometric grid spacing)
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):

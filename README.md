@@ -121,7 +121,7 @@ There are two types of discontinuities most graph plotters struggle with:
 
 A vertical line is automatically drawn at each point of discontinuity. This is
 simply a result of the plotting algorithm used by graph plotters. If this
-happens in your plot, try using the `sanitise_discontinuous` function (you can
-find the code in `customplot.py`). Use a value of `maximum_diff` which gives
-you satisfactory results.
+happens in your plot, try using the `sanitise_discontinuous` function with a
+suitable value of `maximum_diff`. (A demonstration can be found in
+`examples.py`.)
 
