@@ -28,8 +28,8 @@ These requirements are not strict. Slightly older versions should also be okay.
 
 # Usage
 Clone or download this repository. Open a terminal window to the clone or
-download location. Several examples have been provided in `examples.py`;
-hopefully, they will make everything clear.
+download location. Several examples have been provided; hopefully, they will
+make everything clear.
 ```shell
 python3 examples.py
 ```
@@ -42,10 +42,6 @@ make run
 
 A good way to start plotting your own graphs might be to copy parts of the code
 in `examples.py` and make modifications to the copy.
-
-Sometimes, subplots (multiple plots in a single figure) don't look pretty
-because elements from adjacent plots overlap with each other. This is a known
-issue, and may or may not be fixed.
 
 # Notes
 
@@ -103,6 +99,12 @@ font.family: serif
 mathtext.fontset: dejavuserif
 ...
 ```
+
+## Subplots
+Sometimes, subplots (multiple plots in a single figure) don't look pretty
+because elements from adjacent plots overlap with each other. To get around
+this problem, you can interactively adjust the spacing by using the 'Configure
+subplots' option in the menu bar at the bottom.
 
 ## DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI parameter
