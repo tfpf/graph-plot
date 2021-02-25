@@ -53,11 +53,11 @@ with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot()
 
     # set the locations of the grid lines on the x-axis
-    # grid lines will be drawn at: []
+    # grid lines will be drawn at: [-8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
     customplot.limit(ax, 'x', first = -8, last = 8, step = 1)
 
     # set the locations of the grid lines on the y-axis
-    # grid lines will be drawn at: []
+    # grid lines will be drawn at: [-4, -3, -2, -1, 0, 1, 2, 3, 4]
     customplot.limit(ax, 'y', first = -4, last = 4, step = 1)
 
     x = np.linspace(-8, 8, 10000)
@@ -100,7 +100,7 @@ with plt.style.context('dandy.mplstyle'):
     ax.plot(x, y, color = 'green', label = r'$y=\cos\,x$')
 
     customplot.polish(ax, title = 'This is a trigonometric function!')
-    customplot.aspect(ax, 1)
+    customplot.aspect(ax, ratio = 1)
 
     plt.show()
 
@@ -118,7 +118,7 @@ with plt.style.context('dandy.mplstyle'):
     ax.plot(x, y, label = r'$\dfrac{(x-1)^2}{9}+\dfrac{(y+2)^2}{25}=1$')
 
     customplot.polish(ax, title = 'This is an ellipse!')
-    customplot.aspect(ax, 1)
+    customplot.aspect(ax, ratio = 1)
 
     plt.show()
 
@@ -222,9 +222,10 @@ with plt.style.context('dandy.mplstyle'):
 
     customplot.polish(ax, title = 'This is a helix!')
 
-    # if the aspect ratio is 1, the scales on all three axes are made equal
-    # otherwise, it is ignored
-    customplot.aspect(ax, 1)
+    # for three-dimensional plots, an aspect ratio does not make sense
+    # because there are three coordinate axes
+    # so, if any non-zero value is given, the scales on the axes are made equal
+    customplot.aspect(ax, ratio = 1)
 
     plt.show()
 
@@ -244,9 +245,10 @@ with plt.style.context('dandy.mplstyle'):
 
     customplot.polish(ax, title = 'This is a spring!')
 
-    # if the aspect ratio is 1, the scales on all three axes are made equal
-    # otherwise, it is ignored
-    customplot.aspect(ax, 1)
+    # for three-dimensional plots, an aspect ratio does not make sense
+    # because there are three coordinate axes
+    # so, if any non-zero value is given, the scales on the axes are made equal
+    customplot.aspect(ax, ratio = 1)
 
     plt.show()
 
@@ -269,7 +271,7 @@ with plt.style.context('dandy.mplstyle'):
     surf._facecolors2d = surf._edgecolors2d = None
 
     customplot.polish(ax, title = 'This is an interference pattern!')
-    customplot.aspect(ax, 1)
+    customplot.aspect(ax, ratio = 1)
 
     plt.show()
 
