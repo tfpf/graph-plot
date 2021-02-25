@@ -29,25 +29,23 @@ These requirements are not strict. Slightly older versions should also be okay.
 # Usage
 Clone or download this repository. Open a terminal window to the clone or
 download location. Several examples have been provided in `examples.py`;
-hopefully, they will make everything clear. Run the script
+hopefully, they will make everything clear.
 ```shell
 python3 examples.py
 ```
-and tinker with the code if you'd like to.
 
-Multiple plots in a single figure (subplots) sometimes don't look pretty
-because elements from adjacent plots overlap with each other. This is a known
-issue, and may or may not be fixed.
-
-A good way to start plotting your own graphs might be to copy parts of the code
-in `examples.py` and make modifications to the copy.
-
-You can also try running it with Cython (if you have it installed).
+Alternatively, you can run it with Cython (if you have it installed). This
+feature is experimental and has not been tested much.
 ```makefile
 make run
 ```
 
-This feature is experimental and has not been tested much.
+A good way to start plotting your own graphs might be to copy parts of the code
+in `examples.py` and make modifications to the copy.
+
+Sometimes, subplots (multiple plots in a single figure) don't look pretty
+because elements from adjacent plots overlap with each other. This is a known
+issue, and may or may not be fixed.
 
 # Notes
 
