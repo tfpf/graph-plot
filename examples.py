@@ -187,20 +187,20 @@ with plt.style.context('dandy.mplstyle'):
     customplot.limit(axs[0], 'y', first = 0, last = 4, step = 1)
     t = np.linspace(0, 2 * np.pi, 10000)
     r = 2 * np.sin(3 * t)
-    axs[0].plot(t, r, label = r'$r=2\,\sin\,3t$')
+    axs[0].plot(t, r, color = 'red', label = r'$r=2\,\sin\,3t$')
     customplot.polish(axs[0], labels = ('$t$', '$r$'), title = 'This is a flower!')
 
     customplot.limit(axs[1], 'x', first = 0, last = 8, step = 1)
     customplot.limit(axs[1], 'y', first = 0, last = 4, step = 1)
     x = np.linspace(0, 8, 10000)
     y = x / 2
-    axs[1].plot(x, y, label = r'$x-2y=0$')
+    axs[1].plot(x, y, color = 'green', label = r'$x-2y=0$')
     customplot.polish(axs[1], title = 'This is a line!')
 
     customplot.limit(axs[2], 'x', first = 0, last = 8, step = 0.5)
     customplot.limit(axs[2], 'y', first = -1, last = 1, step = 0.5)
-    x = np.linspace(0, 8, 10000)
-    y = np.random.randn(10000) / 10
+    x = np.linspace(0, 8, 1000)
+    y = np.random.randn(len(x)) / 10
     axs[2].plot(x, y, label = r'Noise')
     customplot.polish(axs[2], title = 'This is a random signal!')
 

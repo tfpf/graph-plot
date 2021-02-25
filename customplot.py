@@ -123,6 +123,22 @@ Returns:
 
 ###############################################################################
 
+def get_ax_size(ax):
+    '''\
+Obtain the size of the Matplotlib axes in inches.
+
+Args:
+    ax: Matplotlib axes instances
+
+Returns:
+    tuple of the width and height of `ax' in inches
+'''
+
+    bbox = ax.get_window_extent().transformed(ax.figure.dpi_scale_trans.inverted())
+    return bbox.width, bbox.height
+
+###############################################################################
+
 def limit(ax, coordaxis = None, symbolic = False, s = r'\pi', v = np.pi, first = None, last = None, step = None):
     '''\
 Limit the axis of coordinates to the range given. Draw grid lines as specified.
@@ -225,18 +241,49 @@ Args:
         else:
             ax.set_ylabel(labels[1], rotation = 90)
 
-    # for polar plots, show a visual of the angular and radial axes
-    # this is required because the labels cannot be drawn on the figure
+    # for polar plots, show the angular and radial axes using arrow patches
+    # the sizes of these arrow patches must not depend on the figure size
     if ax.name == 'polar':
-        kwargs = {'arrowstyle': 'Simple, tail_width = 0.5, head_width = 4, head_length = 8',
-                  'clip_on':    False,
-                  'transform':  ax.transAxes}
-        angular = mpl.patches.FancyArrowPatch((1.3, 0.4), (1.3, 0.6), connectionstyle = 'arc3, rad = 0.15', **kwargs)
+
+        # centre of the arrows in axes coordinates
+        # i.e. [0, 0] is the lower left of the axes, and [1, 1], upper right
+        x = 1.25
+        y = 0.5
+
+        # obtain the size of the Matplotlib axes
+        # use this to control the sizes of the arrows
+        ax_width_inches, ax_height_inches = get_ax_size(ax)
+
+        # angular axis arrow patch calculations
+        arrow_height_inches = 1
+        ht = arrow_height_inches / ax_height_inches
+        xlabel_offset_inches = 0.175
+        wd = xlabel_offset_inches / ax_width_inches
+        kwargs = {'posA':            (x, y - ht / 2),
+                  'posB':            (x, y + ht / 2),
+                  'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
+                  'connectionstyle': 'arc3, rad = 0.15',
+                  'clip_on':         False,
+                  'transform':       ax.transAxes}
+        angular = mpl.patches.FancyArrowPatch(**kwargs)
         ax.add_patch(angular)
-        ax.xaxis.set_label_coords(1.32, 0.6)
-        radial = mpl.patches.FancyArrowPatch((1.25, 0.5), (1.35, 0.5), **kwargs)
+        ax.xaxis.set_label_coords(x + wd, y + ht / 2)
+
+        # radial axis arrow patch calculations
+        arrow_length_inches = 0.6
+        wd = arrow_length_inches / ax_width_inches
+        ylabel_offset_inches = -0.25
+        ht = ylabel_offset_inches / ax_height_inches
+        kwargs = {'posA':            (x - wd / 2, y),
+                  'posB':            (x + wd / 2, y),
+                  'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
+                  'clip_on':         False,
+                  'transform':       ax.transAxes}
+        radial = mpl.patches.FancyArrowPatch(**kwargs)
         ax.add_patch(radial)
-        ax.yaxis.set_label_coords(1.35, 0.47)
+        ax.yaxis.set_label_coords(x + wd / 2, y + ht)
+
+        # angle along which the ticks on the radial axis will be labelled
         ax.set_rlabel_position(0)
 
     # titles
@@ -252,7 +299,8 @@ Args:
     if ax.get_legend_handles_labels() != ([], []):
         kwargs = {'loc': 'best'}
         if ax.name == 'polar':
-            kwargs['bbox_to_anchor'] = (1.3, 1)
+            kwargs['loc'] = 'lower left'
+            kwargs['bbox_to_anchor'] = (1, 1)
         if ax.name in {'polar', '3d'}:
             kwargs['facecolor'] = 'lightgray'
         ax.legend(**kwargs)
@@ -341,7 +389,6 @@ def main():
 
     ax.figure.tight_layout(pad = 2)
     plt.show()
-    plt.close(ax.figure)
 
 ###############################################################################
 
