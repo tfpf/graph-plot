@@ -2,7 +2,6 @@
 
 import fractions
 import matplotlib as mpl
-import matplotlib.figure as mpl_fig
 import matplotlib.pyplot as plt
 import numpy as np
 import time
@@ -125,10 +124,10 @@ Returns:
 
 def get_ax_size(ax):
     '''\
-Obtain the size of the Matplotlib axes in inches.
+Obtain the size of a Matplotlib axes instance in inches.
 
 Args:
-    ax: Matplotlib axes instances
+    ax: Matplotlib axes instance
 
 Returns:
     tuple of the width and height of `ax' in inches
@@ -176,13 +175,14 @@ Args:
         labels, ticks = graph_ticks(first, last, step, s, v)
 
         # in polar plots, the anglular axis may go from 0 to 2π
-        # if which case, do not draw the label for 2π (as it overlaps with 0)
+        # in which case, do not draw the label for 2π (as it overlaps with 0)
         # further, do not put the first and last labels on the radial axis
         if ax.name == 'polar':
             if coordaxis == 'x' and first == 0 and last == 2:
                 labels, ticks = labels[: -1], ticks[: -1]
             elif coordaxis == 'y':
                 labels[0] = labels[-1] = ''
+
         ticks_setter(ticks)
         labels_setter(labels)
         limits_setter(v * first, v * last)
