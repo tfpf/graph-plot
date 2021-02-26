@@ -122,7 +122,7 @@ Returns:
 
 ###############################################################################
 
-def get_ax_size(ax):
+def get_ax_size_inches(ax):
     '''\
 Obtain the size of a Matplotlib axes instance in inches.
 
@@ -204,6 +204,62 @@ Args:
 
 ###############################################################################
 
+def draw_polar_axes_patches(ax):
+    '''\
+Show the angular and radial coordinate axes of a polar plot using arrow
+patches. The sizes of these arrow patches must be independent of the size of
+the size of the figure. Hence, this function is called automatically when the
+figure is resized, and previously added patches are removed before adding new
+ones.
+
+Args:
+    ax: Matplotlib axes instance
+'''
+
+    # remove the previous patches (if any)
+    for patch in ax.patches:
+        patch.remove()
+    ax.patches = []
+
+    # centre of the arrow patches in axes coordinates
+    # i.e. [0, 0] is the lower left of the axes, and [1, 1], upper right
+    x, y = [1.25, 0.5]
+
+    # obtain the size of the Matplotlib axes
+    # use this to control the sizes of the arrows
+    ax_width_inches, ax_height_inches = get_ax_size_inches(ax)
+
+    # angular axis arrow patch calculations
+    arrow_height_inches = 1
+    ht = arrow_height_inches / ax_height_inches
+    xlabel_offset_inches = 0.175
+    wd = xlabel_offset_inches / ax_width_inches
+    kwargs = {'posA':            (x, y - ht / 2),
+              'posB':            (x, y + ht / 2),
+              'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
+              'connectionstyle': 'arc3, rad = 0.15',
+              'clip_on':         False,
+              'transform':       ax.transAxes}
+    angular = mpl.patches.FancyArrowPatch(**kwargs)
+    ax.add_patch(angular)
+    ax.xaxis.set_label_coords(x + wd, y + ht / 2)
+
+    # radial axis arrow patch calculations
+    arrow_length_inches = 0.6
+    wd = arrow_length_inches / ax_width_inches
+    ylabel_offset_inches = -0.25
+    ht = ylabel_offset_inches / ax_height_inches
+    kwargs = {'posA':            (x - wd / 2, y),
+              'posB':            (x + wd / 2, y),
+              'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
+              'clip_on':         False,
+              'transform':       ax.transAxes}
+    radial = mpl.patches.FancyArrowPatch(**kwargs)
+    ax.add_patch(radial)
+    ax.yaxis.set_label_coords(x + wd / 2, y + ht)
+
+###############################################################################
+
 def polish(ax, labels = ('$x$', '$y$', '$z$'), title = None, suptitle = None):
     '''\
 Label the coordinate axes. Give the plot a title. Add a legend. Draw grid
@@ -241,50 +297,11 @@ Args:
         else:
             ax.set_ylabel(labels[1], rotation = 90)
 
-    # for polar plots, show the angular and radial axes using arrow patches
-    # the sizes of these arrow patches must not depend on the figure size
+    # polar plot coordinate axes diagram and tick label positioning
     if ax.name == 'polar':
-
-        # centre of the arrows in axes coordinates
-        # i.e. [0, 0] is the lower left of the axes, and [1, 1], upper right
-        x = 1.25
-        y = 0.5
-
-        # obtain the size of the Matplotlib axes
-        # use this to control the sizes of the arrows
-        ax_width_inches, ax_height_inches = get_ax_size(ax)
-
-        # angular axis arrow patch calculations
-        arrow_height_inches = 1
-        ht = arrow_height_inches / ax_height_inches
-        xlabel_offset_inches = 0.175
-        wd = xlabel_offset_inches / ax_width_inches
-        kwargs = {'posA':            (x, y - ht / 2),
-                  'posB':            (x, y + ht / 2),
-                  'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
-                  'connectionstyle': 'arc3, rad = 0.15',
-                  'clip_on':         False,
-                  'transform':       ax.transAxes}
-        angular = mpl.patches.FancyArrowPatch(**kwargs)
-        ax.add_patch(angular)
-        ax.xaxis.set_label_coords(x + wd, y + ht / 2)
-
-        # radial axis arrow patch calculations
-        arrow_length_inches = 0.6
-        wd = arrow_length_inches / ax_width_inches
-        ylabel_offset_inches = -0.25
-        ht = ylabel_offset_inches / ax_height_inches
-        kwargs = {'posA':            (x - wd / 2, y),
-                  'posB':            (x + wd / 2, y),
-                  'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
-                  'clip_on':         False,
-                  'transform':       ax.transAxes}
-        radial = mpl.patches.FancyArrowPatch(**kwargs)
-        ax.add_patch(radial)
-        ax.yaxis.set_label_coords(x + wd / 2, y + ht)
-
-        # angle along which the ticks on the radial axis will be labelled
         ax.set_rlabel_position(0)
+        # draw_polar_axes_patches(ax)
+        ax.figure.canvas.mpl_connect('resize_event', lambda event: draw_polar_axes_patches(ax))
 
     # titles
     if title is not None:
