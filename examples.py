@@ -9,7 +9,7 @@ import customplot
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot()
 
-    x = np.linspace(0, 8, 10000)
+    x = np.linspace(0, 20, 10000)
     y = np.sqrt(x)
     ax.plot(x, y, label = r'$y=\sqrt{x}$')
 
@@ -33,13 +33,14 @@ with plt.style.context('dandy.mplstyle'):
     # grid lines will be drawn at: [-2, -1, 0, 1, 2, 3, 4]
     customplot.limit(ax, 'y', first = -2, last = 4, step = 1)
 
-    x = np.linspace(0, 8, 10000)
+    x = np.linspace(0, 20, 10000)
     y = np.sqrt(x)
     ax.plot(x, y, color = 'red', label = r'$y=\sqrt{x}$')
 
     customplot.polish(ax, title = 'This is the square root function!')
 
     # set the graph aspect ratio (ratio of the scales on the x-axis and y-axis)
+    # it is recommended to set this to 1 (so shapes are not misrepresented)
     customplot.aspect(ax, ratio = 1)
 
     plt.show()
@@ -76,6 +77,7 @@ with plt.style.context('dandy.mplstyle'):
     customplot.polish(ax, title = 'This is the unit step function!')
 
     # set the graph aspect ratio (ratio of the scales on the x-axis and y-axis)
+    # it is recommended to set this to 1 (so shapes are not misrepresented)
     customplot.aspect(ax, ratio = 1)
 
     plt.show()
@@ -141,6 +143,7 @@ with plt.style.context('dandy.mplstyle'):
 
     # since this is a polar plot, the axis labels must be changed
     # the dollar signs ensure that the labels are written in a maths font
+    # also, the aspect ratio is meaningless here, so it is not set
     customplot.polish(ax, labels = ('$t$', '$r$'), title = 'This is a cardioid!')
 
     plt.show()
@@ -170,6 +173,7 @@ with plt.style.context('dandy.mplstyle'):
 
     # since this is a polar plot, the axis labels must be changed
     # the dollar signs ensure that the labels are written in a maths font
+    # also, the aspect ratio is meaningless here, so it is not set
     customplot.polish(ax, labels = ('$t$', '$r$'), title = 'This is a spiral!')
 
     plt.show()
@@ -196,6 +200,7 @@ with plt.style.context('dandy.mplstyle'):
     y = x / 2
     axs[1].plot(x, y, color = 'green', label = r'$x-2y=0$')
     customplot.polish(axs[1], title = 'This is a line!')
+    customplot.aspect(axs[1], ratio = 1)
 
     customplot.limit(axs[2], 'x', first = 0, last = 8, step = 0.5)
     customplot.limit(axs[2], 'y', first = -1, last = 1, step = 0.5)
@@ -203,6 +208,7 @@ with plt.style.context('dandy.mplstyle'):
     y = np.random.randn(len(x)) / 10
     axs[2].plot(x, y, label = r'Noise')
     customplot.polish(axs[2], title = 'This is a random signal!')
+    customplot.aspect(axs[2], ratio = 1)
 
     plt.show()
 
@@ -222,7 +228,7 @@ with plt.style.context('dandy.mplstyle'):
 
     customplot.polish(ax, title = 'This is a helix!')
 
-    # for three-dimensional plots, an aspect ratio does not make sense
+    # for three-dimensional plots, an aspect ratio is not useful
     # because there are three coordinate axes
     # so, if any non-zero value is given, the scales on the axes are made equal
     customplot.aspect(ax, ratio = 1)
@@ -245,7 +251,7 @@ with plt.style.context('dandy.mplstyle'):
 
     customplot.polish(ax, title = 'This is a spring!')
 
-    # for three-dimensional plots, an aspect ratio does not make sense
+    # for three-dimensional plots, an aspect ratio is not useful
     # because there are three coordinate axes
     # so, if any non-zero value is given, the scales on the axes are made equal
     customplot.aspect(ax, ratio = 1)
