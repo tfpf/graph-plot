@@ -204,7 +204,7 @@ Args:
 
 ###############################################################################
 
-def draw_polar_axes_patches(ax):
+def draw_polar_axes_patches(ax, labels):
     '''\
 Show the angular and radial coordinate axes of a polar plot using arrow
 patches. The sizes of these arrow patches must be independent of the size of
@@ -215,6 +215,7 @@ ones.
 
 Args:
     ax: Matplotlib axes instance
+    labels: tuple (strings to label the axes of coordinates)
 '''
 
     # when the figure containing `ax' is resized, `ax' is also resized
@@ -263,6 +264,10 @@ Args:
     ax.add_patch(radial)
     ax.yaxis.set_label_coords(x + wd / 2, y + ht)
 
+    # axis labels
+    ax.set_xlabel(labels[0])
+    ax.set_ylabel(labels[1], rotation = 0)
+
 ###############################################################################
 
 def polish(ax, labels = ('$x$', '$y$', '$z$'), title = None, suptitle = None):
@@ -288,27 +293,25 @@ Args:
         ax.tick_params(axis = 'z', pad = 1, **kwargs)
         ax.set_facecolor('white')
 
+    # improvements for polar plots
+    if ax.name == 'polar':
+        ax.set_rlabel_position(0)
+        # draw_polar_axes_patches(ax, labels)
+        if 'resize_event' not in ax.figure.canvas.callbacks.callbacks:
+            callback = lambda event: draw_polar_axes_patches(ax, labels)
+            ax.figure.canvas.mpl_connect('resize_event', callback)
+
     # axis labels for three-dimensional plots
     # a blank line is added to prevent axis and tick labels from overlapping
     if ax.name == '3d':
         for label, coordaxis in zip(labels, 'xyz'):
             getattr(ax, f'set_{coordaxis}label')(f'\n{label}', linespacing = 3)
 
-    # axis labels for two-dimensional plots
-    elif ax.name in {'rectilinear', 'polar'}:
+    # axis labels for two-dimensional Cartesian plots
+    # the labels for polar plots are set in `draw_polar_axes_patches'
+    elif ax.name == 'rectilinear':
         ax.set_xlabel(labels[0])
-        if ax.name == 'polar':
-            ax.set_ylabel(labels[1], rotation = 0)
-        else:
-            ax.set_ylabel(labels[1], rotation = 90)
-
-    # polar plot tick label positioning and coordinate axes diagram
-    if ax.name == 'polar':
-        ax.set_rlabel_position(0)
-        # draw_polar_axes_patches(ax)
-        if 'resize_event' not in ax.figure.canvas.callbacks.callbacks:
-            callback = lambda event: draw_polar_axes_patches(ax)
-            ax.figure.canvas.mpl_connect('resize_event', callback)
+        ax.set_ylabel(labels[1], rotation = 90)
 
     # titles
     if title is not None:
