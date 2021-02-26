@@ -220,7 +220,7 @@ Args:
 
     # when the figure containing `ax' is resized, `ax' is also resized
     # delay for some time to allow this to happen
-    plt.pause(0.5)
+    # plt.pause(0.5)
 
     # remove the previously added patches (if any)
     for patch in ax.patches:
