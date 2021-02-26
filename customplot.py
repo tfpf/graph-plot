@@ -208,7 +208,8 @@ def draw_polar_axes_patches(ax):
     '''\
 Show the angular and radial coordinate axes of a polar plot using arrow
 patches. The sizes of these arrow patches must be independent of the size of
-the size of the figure. Hence, this function is called automatically when the
+the figure. Hence, this function connected to the resize event of the
+appropriate Matplotlib figure instance. It is called automatically when the
 figure is resized, and previously added patches are removed before adding new
 ones.
 
@@ -216,7 +217,11 @@ Args:
     ax: Matplotlib axes instance
 '''
 
-    # remove the previous patches (if any)
+    # when the figure containing `ax' is resized, `ax' is also resized
+    # delay for some time to allow this to happen
+    plt.pause(0.5)
+
+    # remove the previously added patches (if any)
     for patch in ax.patches:
         patch.remove()
     ax.patches = []
@@ -297,11 +302,13 @@ Args:
         else:
             ax.set_ylabel(labels[1], rotation = 90)
 
-    # polar plot coordinate axes diagram and tick label positioning
+    # polar plot tick label positioning and coordinate axes diagram
     if ax.name == 'polar':
         ax.set_rlabel_position(0)
         # draw_polar_axes_patches(ax)
-        ax.figure.canvas.mpl_connect('resize_event', lambda event: draw_polar_axes_patches(ax))
+        if 'resize_event' not in ax.figure.canvas.callbacks.callbacks:
+            callback = lambda event: draw_polar_axes_patches(ax)
+            ax.figure.canvas.mpl_connect('resize_event', callback)
 
     # titles
     if title is not None:
