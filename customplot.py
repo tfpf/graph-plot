@@ -220,7 +220,7 @@ Args:
 
     # when the figure containing `ax' is resized, `ax' is also resized
     # delay for some time to allow this to happen
-    # plt.pause(0.5)
+    plt.pause(0.5)
 
     # remove the previously added patches (if any)
     for patch in ax.patches:
@@ -229,7 +229,7 @@ Args:
 
     # centre of the arrow patches in axes coordinates
     # i.e. [0, 0] is the lower left of the axes, and [1, 1], upper right
-    x, y = [1.25, 0.5]
+    x, y = [1.3, 0.5]
 
     # obtain the size of the Matplotlib axes
     # use this to control the sizes of the arrows
@@ -255,8 +255,8 @@ Args:
     wd = arrow_length_inches / ax_width_inches
     ylabel_offset_inches = -0.25
     ht = ylabel_offset_inches / ax_height_inches
-    kwargs = {'posA':            (x - wd / 2, y),
-              'posB':            (x + wd / 2, y),
+    kwargs = {'posA':            (x - wd / 3, y),
+              'posB':            (x + 2 * wd / 3, y),
               'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
               'clip_on':         False,
               'transform':       ax.transAxes}
@@ -302,10 +302,10 @@ Args:
             ax.figure.canvas.mpl_connect('resize_event', callback)
 
     # axis labels for three-dimensional plots
-    # a blank line is added to prevent axis and tick labels from overlapping
+    # padding is used to prevent them from overlapping with tick labels
     if ax.name == '3d':
         for label, coordaxis in zip(labels, 'xyz'):
-            getattr(ax, f'set_{coordaxis}label')(f'\n{label}', linespacing = 3)
+            getattr(ax, f'set_{coordaxis}label')(f'{label}', labelpad = 10)
 
     # axis labels for two-dimensional Cartesian plots
     # the labels for polar plots are set in `draw_polar_axes_patches'
@@ -376,38 +376,46 @@ def main():
     mpl.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/'
     plt.style.use('dandy.mplstyle')
 
-    ax = plt.figure().add_subplot(1, 1, 1)
+    ax = plt.figure().add_subplot(1, 1, 1,
+                                  # projection = 'polar',
+                                  projection = '3d',
+                                 )
     limit(ax, 'x', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -8,
-                   last     = 8,
-                   step     = 1)
+                   first    = -4,
+                   last     = 4,
+                   step     = 0.5)
     limit(ax, 'y', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -2,
-                   last     = 6,
-                   step     = 1)
+                   first    = -1.5,
+                   last     = 2.5,
+                   step     = 0.5)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -1,
-                   last     = 2,
+                   first    = -4,
+                   last     = 7,
                    step     = 1)
 
-    x1 = np.linspace(-20, 20, 10000)
-    y1 = (x1 ** 2) ** (1 / 3)
-    z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$y=x^{2/3}$')
+    # x1 = np.linspace(-4, 8, 10000)
+    # y1 = np.exp(x1) / (1 + np.exp(x1))
+    # z1 = x1
+    # ax.plot(x1, y1, color = 'red', label = r'$y=\dfrac{e^x}{1+e^x}$')
     # ax.plot(0, 0, color = 'red', mfc = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0, 0, r'origin', size = 'large')
 
+    X, Y = np.meshgrid(np.linspace(-2, 10, 100), np.linspace(-2, 10, 100))
+    Z = 0.5 ** X + 0.5 ** Y
+    surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=0.5^x+0.5^y$')
+    surf._edgecolors2d = surf._facecolors2d = None
+
     # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$R$')
-    ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 0 < i < 2 else False for i in x1])
+    # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 0 < i < 2 else False for i in x1])
     # ax.fill_between(x1, y1, 1, facecolor = 'cyan', linewidth = 0, label = '', where = [True if 0.5 < i < 1 else False for i in x1])
 
-    polish(ax, (r'$x$', r'$y$', r'$z$'), 'Fractional Power', None)
+    polish(ax, (r'$x$', r'$y$', r'$z$'), None, None)
     aspect(ax, 1)
 
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
