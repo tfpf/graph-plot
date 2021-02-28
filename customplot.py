@@ -159,7 +159,7 @@ Args:
     step: float (tick spacing)
 '''
 
-    if coordaxis == 'z' and ax.name == 'rectilinear':
+    if coordaxis == 'z' and ax.name != '3d':
         return
 
     labels_getter = getattr(ax, f'get_{coordaxis}ticklabels')
@@ -288,9 +288,9 @@ Args:
                   'labelsize': 'small',
                   'length':    4,
                   'direction': 'in'}
-        ax.tick_params(axis = 'x', pad = 1, **kwargs)
-        ax.tick_params(axis = 'y', pad = 1, **kwargs)
-        ax.tick_params(axis = 'z', pad = 1, **kwargs)
+        ax.xaxis.set_tick_params(pad = 1, **kwargs)
+        ax.yaxis.set_tick_params(pad = 1, **kwargs)
+        ax.zaxis.set_tick_params(pad = 1, **kwargs)
         ax.set_facecolor('white')
 
     # improvements for polar plots
@@ -302,10 +302,10 @@ Args:
             ax.figure.canvas.mpl_connect('resize_event', callback)
 
     # axis labels for three-dimensional plots
-    # padding is used to prevent them from overlapping with tick labels
+    # new line character is used because `labelpad' does not work properly
     if ax.name == '3d':
         for label, coordaxis in zip(labels, 'xyz'):
-            getattr(ax, f'set_{coordaxis}label')(f'{label}', labelpad = 10)
+            getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad = 10)
 
     # axis labels for two-dimensional Cartesian plots
     # the labels for polar plots are set in `draw_polar_axes_patches'
@@ -373,49 +373,54 @@ if the given value is non-zero.
 ###############################################################################
 
 def main():
-    mpl.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/'
+    mpl.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/graphs/'
     plt.style.use('dandy.mplstyle')
 
     ax = plt.figure().add_subplot(1, 1, 1,
-                                  # projection = 'polar',
-                                  projection = '3d',
+                                  projection = 'polar',
+                                  # projection = '3d',
                                  )
-    limit(ax, 'x', symbolic = False,
+    limit(ax, 'x', symbolic = True,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -4,
-                   last     = 4,
-                   step     = 0.5)
+                   first    = 0,
+                   last     = 2,
+                   step     = 0.125)
     limit(ax, 'y', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -1.5,
-                   last     = 2.5,
-                   step     = 0.5)
+                   first    = 0,
+                   last     = 4,
+                   step     = 1)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -4,
-                   last     = 7,
+                   first    = -2,
+                   last     = 2,
                    step     = 1)
 
-    # x1 = np.linspace(-4, 8, 10000)
-    # y1 = np.exp(x1) / (1 + np.exp(x1))
-    # z1 = x1
-    # ax.plot(x1, y1, color = 'red', label = r'$y=\dfrac{e^x}{1+e^x}$')
+    x1 = np.linspace(0, 2 * np.pi, 10000)
+    y1 = 1 - np.cos(x1)
+    z1 = x1
+    ax.plot(x1, y1, color = 'red', label = r'$r=1-\cos\,\theta$')
     # ax.plot(0, 0, color = 'red', mfc = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0, 0, r'origin', size = 'large')
 
-    X, Y = np.meshgrid(np.linspace(-2, 10, 100), np.linspace(-2, 10, 100))
-    Z = 0.5 ** X + 0.5 ** Y
-    surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=0.5^x+0.5^y$')
-    surf._edgecolors2d = surf._facecolors2d = None
+    # x2 = np.linspace(-20, 20, 10000)
+    # y2 = -2 * np.cos((np.pi - x2) / 3)
+    # z2 = x2
+    # ax.plot(x2, y2, color = 'C0', label = r'$y=-2\,\cos\;\dfrac{\pi-x}{3}$')
 
-    # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$R$')
+    # X, Y = np.meshgrid(np.linspace(-2 * np.pi, 2 * np.pi, 100), np.linspace(-3, 3, 100))
+    # Z = np.cos(X) + np.sqrt(np.abs(Y))
+    # surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=\cos\,x+\sqrt{|y|}$')
+    # surf._edgecolors2d = surf._facecolors2d = None
+
+    ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$')
     # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 0 < i < 2 else False for i in x1])
     # ax.fill_between(x1, y1, 1, facecolor = 'cyan', linewidth = 0, label = '', where = [True if 0.5 < i < 1 else False for i in x1])
 
-    polish(ax, (r'$x$', r'$y$', r'$z$'), None, None)
+    polish(ax, (r'$\theta$', r'$r$', r'$z$'), None, None)
     aspect(ax, 1)
 
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
