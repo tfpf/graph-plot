@@ -133,7 +133,8 @@ Returns:
     tuple of the width and height of `ax' in inches
 '''
 
-    bbox = ax.get_window_extent().transformed(ax.figure.dpi_scale_trans.inverted())
+    fig = ax.figure
+    bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
     return bbox.width, bbox.height
 
 ###############################################################################
@@ -196,7 +197,8 @@ Args:
 
         # same as what was done in case 1 for polar plots
         # do not put the first and last labels on the radial axis
-        ax.figure.canvas.draw()
+        fig = ax.figure
+        fig.canvas.draw()
         if ax.name == 'polar' and coordaxis == 'y':
             labels = [l.get_text() for l in labels_getter()]
             labels[0] = labels[-1] = ''
@@ -209,9 +211,9 @@ def draw_polar_axes_patches(ax, labels):
 Show the angular and radial coordinate axes of a polar plot using arrow
 patches. The sizes of these arrow patches must be independent of the size of
 the figure. Hence, this function connected to the resize event of the
-appropriate Matplotlib figure instance. It is called automatically when the
-figure is resized, and previously added patches are removed before adding new
-ones.
+appropriate Matplotlib figure instance (in a rather hacky way). It is called
+automatically when the figure is resized, and previously added patches are
+removed before adding new ones.
 
 Args:
     ax: Matplotlib axes instance
@@ -282,6 +284,8 @@ Args:
     suptitle: str (title of the figure `ax' is in)
 '''
 
+    fig = ax.figure
+
     # improvements for three-dimensional plots
     if ax.name == '3d':
         kwargs = {'which':     'major',
@@ -297,9 +301,8 @@ Args:
     if ax.name == 'polar':
         ax.set_rlabel_position(0)
         # draw_polar_axes_patches(ax, labels)
-        if 'resize_event' not in ax.figure.canvas.callbacks.callbacks:
-            callback = lambda event: draw_polar_axes_patches(ax, labels)
-            ax.figure.canvas.mpl_connect('resize_event', callback)
+        callback = lambda event: draw_polar_axes_patches(ax, labels)
+        fig.canvas.mpl_connect('resize_event', callback)
 
     # axis labels for three-dimensional plots
     # new line character is used because `labelpad' does not work properly
@@ -317,10 +320,10 @@ Args:
     if title is not None:
         ax.set_title(title)
     if suptitle is not None:
-        ax.figure.suptitle(suptitle)
-        ax.figure.canvas.set_window_title(suptitle)
+        fig.suptitle(suptitle)
+        fig.canvas.set_window_title(suptitle)
     else:
-        ax.figure.canvas.set_window_title(f'graph_{int(time.time())}')
+        fig.canvas.set_window_title(f'graph_{int(time.time())}')
 
     # legend
     if ax.get_legend_handles_labels() != ([], []):
@@ -407,17 +410,17 @@ def main():
     # ax.text(0, 0, r'origin', size = 'large')
 
     # x2 = np.linspace(-20, 20, 10000)
-    # y2 = -2 * np.cos((np.pi - x2) / 3)
+    # y2 = np.cos(np.sin(x2))
     # z2 = x2
-    # ax.plot(x2, y2, color = 'C0', label = r'$y=-2\,\cos\;\dfrac{\pi-x}{3}$')
+    # ax.plot(x2, y2, color = 'blue', label = r'$y=\cos\,\sin\,x$')
 
     # X, Y = np.meshgrid(np.linspace(-2 * np.pi, 2 * np.pi, 100), np.linspace(-3, 3, 100))
     # Z = np.cos(X) + np.sqrt(np.abs(Y))
     # surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=\cos\,x+\sqrt{|y|}$')
     # surf._edgecolors2d = surf._facecolors2d = None
 
-    ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$')
-    # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = '$R$', where = [True if 0 < i < 2 else False for i in x1])
+    # ax.fill_between(x1, y1, -20, facecolor = 'cyan', linewidth = 0, label = r'$y<-x$')
+    # ax.fill_betweenx(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if i < 4 else False for i in y1])
     # ax.fill_between(x1, y1, 1, facecolor = 'cyan', linewidth = 0, label = '', where = [True if 0.5 < i < 1 else False for i in x1])
 
     polish(ax, (r'$\theta$', r'$r$', r'$z$'), None, None)
@@ -427,7 +430,13 @@ def main():
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
 
-    ax.figure.tight_layout(pad = 2)
+    # this is hack to maximise the figure window
+    # normally, `full_screen_toggle' does exactly what its name suggests
+    # but on WSL with a virtual display, it maximises the figure window
+    fig = ax.figure
+    fig.canvas.manager.full_screen_toggle()
+
+    fig.tight_layout(pad = 2)
     plt.show()
 
 ###############################################################################
