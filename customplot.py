@@ -208,12 +208,13 @@ Returns:
 
 def limit(ax, coordaxis = None, symbolic = False, s = r'\pi', v = np.pi, first = None, last = None, step = None):
     '''\
-Limit the axis of coordinates to the range given. Draw grid lines as specified.
+Limit the specified axis of coordinates to the range given. Draw grid lines as
+indicated.
 
 In three-dimensional plots, these limits on the axes of coordinates are not
-respected. Matplotlib adds a small delta to the axis range. (The relevant code
-can be found in the `_get_coord_info' method of the three-dimensional axes
-object in `mpl_toolkits'.) To have strict axis limits, you must modify the
+respected. Matplotlib automatically modifies them by a small amount (the
+relevant code can be found in the `_get_coord_info' method of
+mpl_toolkits/mplot3d/axis3d.py). If you don't like this, you must modify the
 source code.
 
 Args:
@@ -356,15 +357,17 @@ Args:
 
 def aspect(ax, ratio = 0):
     '''\
-Set the aspect ratio. If this is a two-dimensional Cartesian plot, the ratio of
-the scales on the axes will be set to the given value (if it is non-zero). If
-this is a two-dimensional polar plot, nothing happens.
+Set the aspect ratio. If `ax' is being used for two-dimensional Cartesian
+plots, the ratio of the scales on the x-axis and y-axis will be set to `ratio'
+(if it is non-zero). If `ax' is being used for two-dimensional polar plots,
+nothing happens.
 
 For three-dimensional plots, an aspect ratio does not make sense, because there
-are three axes. Hence, in this case, the scales on the axes will be made equal
-if the given value is non-zero.
+are three axes of coordinates. Hence, in this case, the scales on those axes
+will be made equal if `ratio' is any non-zero number.
 
 Args:
+    ax: Matplotlib axes instance
     ratio: float (ratio of the scale on the x-axis to that on the y-axis)
 '''
 
