@@ -112,6 +112,7 @@ Returns:
 
     fig = ax.figure
     bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+
     return bbox.width, bbox.height
 
 ###############################################################################
@@ -147,7 +148,7 @@ Args:
     # use this to control the sizes of the arrows
     ax_width_inches, ax_height_inches = _get_ax_size_inches(ax)
 
-    # angular axis arrow patch calculations
+    # angular axis arrow patch
     arrow_height_inches = 1
     ht = arrow_height_inches / ax_height_inches
     xlabel_offset_inches = 0.175
@@ -162,7 +163,7 @@ Args:
     ax.add_patch(angular)
     ax.xaxis.set_label_coords(x + wd, y + ht / 2)
 
-    # radial axis arrow patch calculations
+    # radial axis arrow patch
     arrow_length_inches = 0.6
     wd = arrow_length_inches / ax_width_inches
     ylabel_offset_inches = -0.25
@@ -236,7 +237,7 @@ Args:
     limits_setter = getattr(ax, f'set_{coordaxis}lim')
     ticks_setter  = getattr(ax, f'set_{coordaxis}ticks')
 
-    # case 1: use symbolic labels
+    # case 1: use symbolic tick labels
     if symbolic:
         if None in {first, last, step}:
             raise ValueError('When \'symbolic\' is True, \'first\', \'last\' and \'step\' must not be None.')
@@ -256,7 +257,7 @@ Args:
         labels_setter(labels)
         limits_setter(v * first, v * last)
 
-    # case 2: allow labels to be set automatically
+    # case 2: allow tick labels to be set automatically
     else:
         if None not in {first, last, step}:
             ticks_setter(np.arange(first, last + step / 2, step))
@@ -310,7 +311,7 @@ Args:
     # new line character is used because `labelpad' does not work properly
     if ax.name == '3d':
         for label, coordaxis in zip(labels, 'xyz'):
-            getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad = 10)
+            getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad = 10, linespacing = 3)
 
     # axis labels for two-dimensional Cartesian plots
     # the labels for polar plots are set in `_draw_polar_patches'
@@ -337,7 +338,7 @@ Args:
             kwargs['facecolor'] = 'lightgray'
         ax.legend(**kwargs)
 
-    # if this is a Cartesian two-dimensional plot, draw thick coordinate axes
+    # if this is a two-dimensional Cartesian plot, draw thick coordinate axes
     # this does not work as expected in three-dimensional plots
     if ax.name == 'rectilinear':
         kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
