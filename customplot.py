@@ -8,9 +8,9 @@ import time
 
 ###############################################################################
 
-def show_nice_list(items, columns = 3, align_method = 'center'):
+def _iprint(items, columns = 3, align_method = 'center'):
     '''\
-Display a list in neat columns.
+Display an iterable in neat columns.
 
 Args:
     items: iterable (each of its elements must have an `__str__' method)
@@ -35,39 +35,16 @@ Args:
 
 ###############################################################################
 
-def sanitise_discontinuous(y, maximum_diff = 5):
-    '''\
-At a point of essential or jump discontinuity, Matplotlib draws a vertical line
-automatically. This vertical line joins the two points around the
-discontinuity. Traditionally, in maths, such lines are not drawn. Hence, they
-need to be removed from the plot. This is achieved by setting the function
-values at the points of discontinuity to NaN.
-
-Args:
-    y: iterable (values of the discontinuous function)
-
-Returns:
-    np.array with NaN at the points of discontinuity
-'''
-
-    y = np.array(y)
-    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > maximum_diff
-    y[points_of_discontinuity] = np.nan
-
-    return y
-
-###############################################################################
-
-def graph_ticks(first, last, step, symbol = r'\pi', symval = np.pi):
+def _labels_and_ticks(first, last, step, symbol = r'\pi', symval = np.pi):
     r'''
 Create a list of LaTeX-formatted strings and an array of floats for values
 from one rational multiple of π to another.
 
->>> graph_ticks(-1, 5, 2)
+>>> _labels_and_ticks(-1, 5, 2)
 (['$-\\pi$', '$\\pi$', '$3\\pi$', '$5\\pi$'], array([-3.14159265,  3.14159265,  9.42477796, 15.70796327]))
->>> graph_ticks(-1, -1 / 4, 1 / 4)
+>>> _labels_and_ticks(-1, -1 / 4, 1 / 4)
 (['$-\\pi$', '$-\\dfrac{3\\pi}{4}$', '$-\\dfrac{\\pi}{2}$', '$-\\dfrac{\\pi}{4}$'], array([-3.14159265, -2.35619449, -1.57079633, -0.78539816]))
->>> graph_ticks(-2, 2, 1)
+>>> _labels_and_ticks(-2, 2, 1)
 (['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$'], array([-6.28318531, -3.14159265,  0.        ,  3.14159265,  6.28318531]))
 
 Args:
@@ -122,7 +99,7 @@ Returns:
 
 ###############################################################################
 
-def get_ax_size_inches(ax):
+def _get_ax_size_inches(ax):
     '''\
 Obtain the size of a Matplotlib axes instance in inches.
 
@@ -136,6 +113,96 @@ Returns:
     fig = ax.figure
     bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
     return bbox.width, bbox.height
+
+###############################################################################
+
+def _draw_polar_patches(ax, labels):
+    '''\
+Show the angular and radial coordinate axes of a polar plot using arrow
+patches. The sizes of these arrow patches must be independent of the size of
+the figure. Hence, this function connected to the resize event of the
+appropriate Matplotlib figure instance (in a rather hacky way). It is called
+automatically when the figure is resized, and previously added patches are
+removed before adding new ones.
+
+Args:
+    ax: Matplotlib axes instance
+    labels: tuple (strings to label the axes of coordinates)
+'''
+
+    # when the figure containing `ax' is resized, `ax' is also resized
+    # delay for some time to allow this to happen
+    plt.pause(0.5)
+
+    # remove the previously added patches (if any)
+    for patch in ax.patches:
+        patch.remove()
+    ax.patches = []
+
+    # centre of the arrow patches in axes coordinates
+    # i.e. [0, 0] is the lower left of the axes, and [1, 1], upper right
+    x, y = [1.3, 0.5]
+
+    # obtain the size of the Matplotlib axes
+    # use this to control the sizes of the arrows
+    ax_width_inches, ax_height_inches = _get_ax_size_inches(ax)
+
+    # angular axis arrow patch calculations
+    arrow_height_inches = 1
+    ht = arrow_height_inches / ax_height_inches
+    xlabel_offset_inches = 0.175
+    wd = xlabel_offset_inches / ax_width_inches
+    kwargs = {'posA':            (x, y - ht / 2),
+              'posB':            (x, y + ht / 2),
+              'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
+              'connectionstyle': 'arc3, rad = 0.15',
+              'clip_on':         False,
+              'transform':       ax.transAxes}
+    angular = mpl.patches.FancyArrowPatch(**kwargs)
+    ax.add_patch(angular)
+    ax.xaxis.set_label_coords(x + wd, y + ht / 2)
+
+    # radial axis arrow patch calculations
+    arrow_length_inches = 0.6
+    wd = arrow_length_inches / ax_width_inches
+    ylabel_offset_inches = -0.25
+    ht = ylabel_offset_inches / ax_height_inches
+    kwargs = {'posA':            (x - wd / 3, y),
+              'posB':            (x + 2 * wd / 3, y),
+              'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
+              'clip_on':         False,
+              'transform':       ax.transAxes}
+    radial = mpl.patches.FancyArrowPatch(**kwargs)
+    ax.add_patch(radial)
+    ax.yaxis.set_label_coords(x + wd / 2, y + ht)
+
+    # axis labels
+    ax.set_xlabel(labels[0])
+    ax.set_ylabel(labels[1], rotation = 0)
+
+###############################################################################
+
+def sanitise_discontinuous(y, maximum_diff = 5):
+    '''\
+At a point of essential or jump discontinuity, Matplotlib draws a vertical line
+automatically. This vertical line joins the two points around the
+discontinuity. Traditionally, in maths, such lines are not drawn. Hence, they
+need to be removed from the plot. This is achieved by setting the function
+values at the points of discontinuity to NaN.
+
+Args:
+    y: iterable (values of the discontinuous function)
+    maximum_diff: float (the maximum permissible derivative of `y')
+
+Returns:
+    np.array with NaN at the points of discontinuity
+'''
+
+    y = np.array(y)
+    points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > maximum_diff
+    y[points_of_discontinuity] = np.nan
+
+    return y
 
 ###############################################################################
 
@@ -173,7 +240,7 @@ Args:
         if None in {first, last, step}:
             raise ValueError('When \'symbolic\' is True, \'first\', \'last\' and \'step\' must not be None.')
 
-        labels, ticks = graph_ticks(first, last, step, s, v)
+        labels, ticks = _labels_and_ticks(first, last, step, s, v)
 
         # in polar plots, the anglular axis may go from 0 to 2π
         # in which case, do not draw the label for 2π (as it overlaps with 0)
@@ -206,72 +273,6 @@ Args:
 
 ###############################################################################
 
-def draw_polar_axes_patches(ax, labels):
-    '''\
-Show the angular and radial coordinate axes of a polar plot using arrow
-patches. The sizes of these arrow patches must be independent of the size of
-the figure. Hence, this function connected to the resize event of the
-appropriate Matplotlib figure instance (in a rather hacky way). It is called
-automatically when the figure is resized, and previously added patches are
-removed before adding new ones.
-
-Args:
-    ax: Matplotlib axes instance
-    labels: tuple (strings to label the axes of coordinates)
-'''
-
-    # when the figure containing `ax' is resized, `ax' is also resized
-    # delay for some time to allow this to happen
-    plt.pause(0.5)
-
-    # remove the previously added patches (if any)
-    for patch in ax.patches:
-        patch.remove()
-    ax.patches = []
-
-    # centre of the arrow patches in axes coordinates
-    # i.e. [0, 0] is the lower left of the axes, and [1, 1], upper right
-    x, y = [1.3, 0.5]
-
-    # obtain the size of the Matplotlib axes
-    # use this to control the sizes of the arrows
-    ax_width_inches, ax_height_inches = get_ax_size_inches(ax)
-
-    # angular axis arrow patch calculations
-    arrow_height_inches = 1
-    ht = arrow_height_inches / ax_height_inches
-    xlabel_offset_inches = 0.175
-    wd = xlabel_offset_inches / ax_width_inches
-    kwargs = {'posA':            (x, y - ht / 2),
-              'posB':            (x, y + ht / 2),
-              'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
-              'connectionstyle': 'arc3, rad = 0.15',
-              'clip_on':         False,
-              'transform':       ax.transAxes}
-    angular = mpl.patches.FancyArrowPatch(**kwargs)
-    ax.add_patch(angular)
-    ax.xaxis.set_label_coords(x + wd, y + ht / 2)
-
-    # radial axis arrow patch calculations
-    arrow_length_inches = 0.6
-    wd = arrow_length_inches / ax_width_inches
-    ylabel_offset_inches = -0.25
-    ht = ylabel_offset_inches / ax_height_inches
-    kwargs = {'posA':            (x - wd / 3, y),
-              'posB':            (x + 2 * wd / 3, y),
-              'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
-              'clip_on':         False,
-              'transform':       ax.transAxes}
-    radial = mpl.patches.FancyArrowPatch(**kwargs)
-    ax.add_patch(radial)
-    ax.yaxis.set_label_coords(x + wd / 2, y + ht)
-
-    # axis labels
-    ax.set_xlabel(labels[0])
-    ax.set_ylabel(labels[1], rotation = 0)
-
-###############################################################################
-
 def polish(ax, labels = ('$x$', '$y$', '$z$'), title = None, suptitle = None):
     '''\
 Label the coordinate axes. Give the plot a title. Add a legend. Draw grid
@@ -300,8 +301,8 @@ Args:
     # improvements for polar plots
     if ax.name == 'polar':
         ax.set_rlabel_position(0)
-        # draw_polar_axes_patches(ax, labels)
-        callback = lambda event: draw_polar_axes_patches(ax, labels)
+        # _draw_polar_patches(ax, labels)
+        callback = lambda event: _draw_polar_patches(ax, labels)
         fig.canvas.mpl_connect('resize_event', callback)
 
     # axis labels for three-dimensional plots
@@ -311,7 +312,7 @@ Args:
             getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad = 10)
 
     # axis labels for two-dimensional Cartesian plots
-    # the labels for polar plots are set in `draw_polar_axes_patches'
+    # the labels for polar plots are set in `_draw_polar_patches'
     elif ax.name == 'rectilinear':
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1], rotation = 90)
@@ -362,6 +363,9 @@ this is a two-dimensional polar plot, nothing happens.
 For three-dimensional plots, an aspect ratio does not make sense, because there
 are three axes. Hence, in this case, the scales on the axes will be made equal
 if the given value is non-zero.
+
+Args:
+    ratio: float (ratio of the scale on the x-axis to that on the y-axis)
 '''
 
     if ratio == 0:
