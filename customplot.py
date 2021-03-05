@@ -9,8 +9,7 @@ import time
 
 ###############################################################################
 
-# an identifier which will be used to uniquely identify some things
-_customplot_ID = f'cp_{int(time.time_ns()):X}_{np.random.randint(1000, 99999)}'
+_customplot_ID = f'cp_{int(time.time_ns()):X}_{np.random.randint(1000, 9999)}'
 
 ###############################################################################
 
@@ -43,8 +42,8 @@ Args:
 
 def _labels_and_ticks(first, last, step, symbol = r'\pi', symval = np.pi):
     r'''
-Create a list of LaTeX-formatted strings and an array of floats for values
-from one rational multiple of π to another.
+Create a list of LaTeX-formatted strings and a NumPy array of floats for values
+from one rational multiple of π (or some other number) to another.
 
 >>> _labels_and_ticks(-1, 5, 2)
 (['$-\\pi$', '$\\pi$', '$3\\pi$', '$5\\pi$'], array([-3.14159265,  3.14159265,  9.42477796, 15.70796327]))
@@ -61,7 +60,7 @@ Args:
     symval: float (numerical value represented by `symbol')
 
 Returns:
-    tuple of a list of labels and an array of values indicated by said labels
+    tuple of a list of labels and a NumPy array of the respective values
 '''
 
     coefficients = np.arange(first, last + step / 2, step)
@@ -197,8 +196,8 @@ def sanitise_discontinuous(y, maximum_diff = 5):
 At a point of essential or jump discontinuity, Matplotlib draws a vertical line
 automatically. This vertical line joins the two points around the
 discontinuity. Traditionally, in maths, such lines are not drawn. Hence, they
-need to be removed from the plot. This is achieved by setting the function
-values at the points of discontinuity to NaN.
+must removed from the plot. This is achieved by setting the function values at
+the points of discontinuity to NaN.
 
 Args:
     y: iterable (values of the discontinuous function)
@@ -224,8 +223,8 @@ indicated.
 In three-dimensional plots, these limits on the axes of coordinates are not
 respected. Matplotlib automatically modifies them by a small amount (the
 relevant code can be found in the `_get_coord_info' method of
-mpl_toolkits/mplot3d/axis3d.py). If you don't like this, you must modify the
-source code.
+mpl_toolkits/mplot3d/axis3d.py as of version 3.3.4 of the Matplotlib source).
+If you don't like this, you must modify the source code.
 
 Args:
     ax: Matplotlib axes instance
@@ -253,7 +252,7 @@ Args:
 
         labels, ticks = _labels_and_ticks(first, last, step, s, v)
 
-        # in polar plots, the anglular axis may go from 0 to 2π
+        # in polar plots, the angular axis may go from 0 to 2π
         # in which case, do not draw the label for 2π (as it overlaps with 0)
         # further, do not put the first and last labels on the radial axis
         if ax.name == 'polar':
@@ -347,14 +346,12 @@ Args:
             kwargs['facecolor'] = 'lightgray'
         ax.legend(**kwargs)
 
-    # if this is a two-dimensional Cartesian plot, draw thick coordinate axes
-    # this does not work as expected in three-dimensional plots
+    # draw thick axes of coordinates in two-dimensional Cartesian plots
     if ax.name == 'rectilinear':
         kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
         ax.axhline(**kwargs)
         ax.axvline(**kwargs)
 
-    # enable grid
     # minor grid doesn't look very good in three-dimensional plots
     if ax.name in {'rectilinear', 'polar'}:
         ax.grid(b = True, which = 'major', linewidth = 0.8, linestyle = ':')
@@ -405,7 +402,7 @@ def main():
                    v        = np.pi,
                    first    = 0,
                    last     = 2,
-                   step     = 0.125)
+                   step     = 1 / 6)
     limit(ax, 'y', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
@@ -452,7 +449,7 @@ def main():
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
 
-    # this is hack to maximise the figure window
+    # this is a hack to maximise the figure window
     # normally, `full_screen_toggle' does exactly what its name suggests
     # but on WSL with a virtual display, it maximises the figure window
     fig = ax.figure
