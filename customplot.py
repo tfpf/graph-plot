@@ -2,9 +2,15 @@
 
 import fractions
 import matplotlib as mpl
+import matplotlib.patches as matpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+
+###############################################################################
+
+# an identifier which will be used to uniquely identify some things
+_customplot_ID = f'cp_{int(time.time_ns()):X}_{np.random.randint(1000, 99999)}'
 
 ###############################################################################
 
@@ -135,10 +141,12 @@ Args:
     # delay for some time to allow this to happen
     plt.pause(0.5)
 
-    # remove the previously added patches (if any)
-    for patch in ax.patches:
+    # remove the previously added arrow patches (if any)
+    # do not remove any other other patches
+    comparer = lambda patch: patch.get_gid() == _customplot_ID
+    patches_to_remove = list(filter(comparer, ax.patches))
+    for patch in patches_to_remove:
         patch.remove()
-    ax.patches = []
 
     # centre of the arrow patches in axes coordinates
     # i.e. [0, 0] is the lower left of the axes, and [1, 1], upper right
@@ -158,8 +166,9 @@ Args:
               'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
               'connectionstyle': 'arc3, rad = 0.15',
               'clip_on':         False,
-              'transform':       ax.transAxes}
-    angular = mpl.patches.FancyArrowPatch(**kwargs)
+              'transform':       ax.transAxes,
+              'gid':             _customplot_ID}
+    angular = matpatches.FancyArrowPatch(**kwargs)
     ax.add_patch(angular)
     ax.xaxis.set_label_coords(x + wd, y + ht / 2)
 
@@ -172,8 +181,9 @@ Args:
               'posB':            (x + 2 * wd / 3, y),
               'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
               'clip_on':         False,
-              'transform':       ax.transAxes}
-    radial = mpl.patches.FancyArrowPatch(**kwargs)
+              'transform':       ax.transAxes,
+              'gid':             _customplot_ID}
+    radial = matpatches.FancyArrowPatch(**kwargs)
     ax.add_patch(radial)
     ax.yaxis.set_label_coords(x + wd / 2, y + ht)
 
@@ -196,7 +206,7 @@ Args:
     maximum_diff: float (the maximum permissible derivative of `y')
 
 Returns:
-    np.array with NaN at the points of discontinuity
+    NumPy array with NaN at the points of discontinuity
 '''
 
     y = np.array(y)
@@ -326,7 +336,7 @@ Args:
         fig.suptitle(suptitle)
         fig.canvas.set_window_title(suptitle)
     else:
-        fig.canvas.set_window_title(f'graph_{int(time.time())}')
+        fig.canvas.set_window_title(_customplot_ID)
 
     # legend
     if ax.get_legend_handles_labels() != ([], []):
@@ -401,30 +411,36 @@ def main():
                    s        = r'\pi',
                    v        = np.pi,
                    first    = 0,
-                   last     = 4,
-                   step     = 1)
+                   last     = 2,
+                   step     = 0.5)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -2,
+                   first    = -5,
                    last     = 2,
                    step     = 1)
 
     x1 = np.linspace(0, 2 * np.pi, 10000)
-    y1 = 1 - np.cos(x1)
+    y1 = np.sin(3 * x1)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$r=1-\cos\,\theta$')
-    # ax.plot(0, 0, color = 'red', mfc = 'red', linestyle = 'none', marker = 'o', label = '')
+    ax.plot(x1, y1, color = 'red', label = r'$r=\sin\,3\theta$')
+    # ax.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0, 0, r'origin', size = 'large')
 
     # x2 = np.linspace(-20, 20, 10000)
-    # y2 = np.cos(np.sin(x2))
+    # y2 = sanitise_discontinuous(np.imag(np.log(x2 + 1j * 0)), 0.5)
     # z2 = x2
-    # ax.plot(x2, y2, color = 'blue', label = r'$y=\cos\,\sin\,x$')
+    # ax.plot(x2, y2, color = 'blue', label = r'$y=\mathfrak{I}\{\mathrm{Log}\;x\}$')
+    # ax.plot([0, 0], [0, np.pi], color = 'blue', linestyle = 'none', marker = 'o', label = '')
 
-    # X, Y = np.meshgrid(np.linspace(-2 * np.pi, 2 * np.pi, 100), np.linspace(-3, 3, 100))
-    # Z = np.cos(X) + np.sqrt(np.abs(Y))
-    # surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=\cos\,x+\sqrt{|y|}$')
+    # x3 = np.linspace(0, 20, 10000)
+    # y3 = 1 / x3
+    # z3 = x3
+    # ax.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
+
+    # X, Y = np.meshgrid(np.linspace(-4, 4, 1000), np.linspace(-4, 4, 1000))
+    # Z = np.imag(np.log(X + 1j * Y))
+    # surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=\mathfrak{I}\{{\mathrm{Log}(x+iy)}\}$')
     # surf._edgecolors2d = surf._facecolors2d = None
 
     # ax.fill_between(x1, y1, -20, facecolor = 'cyan', linewidth = 0, label = r'$y<-x$')
@@ -434,7 +450,6 @@ def main():
     polish(ax, (r'$\theta$', r'$r$', r'$z$'), None, None)
     aspect(ax, 1)
 
-    # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
 
