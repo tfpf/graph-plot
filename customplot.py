@@ -2,14 +2,14 @@
 
 import fractions
 import matplotlib as mpl
-import matplotlib.patches as matpatches
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import time
 
 ###############################################################################
 
-_customplot_ID = f'cp_{int(time.time_ns()):X}_{np.random.randint(1000, 9999)}'
+_customplot_ID = f'cp_{int(time.time_ns())}_{np.random.randint(1000, 9999)}'
 
 ###############################################################################
 
@@ -23,14 +23,14 @@ Args:
     align_method: str (string method name: 'ljust', 'center' or 'rjust')
 '''
 
-    # convert iterable into a two-dimensional list
+    # Convert the iterable into a two-dimensional list.
     items = [str(item) for item in items]
     if len(items) % columns != 0:
         items.extend([''] * (columns - len(items) % columns))
     items = [items[i : i + columns] for i in range(0, len(items), columns)]
 
-    # calculate the required width of all columns
-    # width of a column is width of longest string in that column plus padding
+    # The required width of a column is the width of the longest string in that
+    # column plus some extra spaces for padding.
     widths = [max(len(row[i]) for row in items) + 2 for i in range(columns)]
 
     for row in items:
@@ -65,8 +65,9 @@ Returns:
 
     coefficients = np.arange(first, last + step / 2, step)
 
-    # pre-allocate space for the list because its length is known
-    # this is approximately twice as fast as appending repeatedly
+    # Pre-allocate space for the list because its length is known. As a result,
+    # this loop will run approximately twice as fast as it would if items were
+    # repeatedly appended to the list.
     labels = [None] * len(coefficients)
 
     for i, coefficient in enumerate(coefficients):
@@ -74,19 +75,17 @@ Returns:
         num = value.numerator
         den = value.denominator
 
-        # case 1: `coefficient' is zero
+        # Case 1: `coefficient' is zero.
         if num == 0:
             labels[i] = '$0$'
             continue
 
-        # build a string which has to be appended to `label'
-        # Python does not have a string builder data type
-        # so, create a list to store the different parts of the string
-        # then join those parts
-        # I found that this is faster than repeated string concatenation
+        # Build the string which will be the next item in `labels'. Create a
+        # list to store the different parts of the string, and join those
+        # parts.
         builder = ['$']
 
-        # case 2: `coefficient' is non-zero
+        # Case 2: `coefficient' is non-zero.
         if num < 0:
             builder.append('-')
             num = abs(num)
@@ -130,31 +129,33 @@ the figure. Hence, this function is connected to the resize event of the
 appropriate Matplotlib figure instance. It is called automatically when the
 figure is resized; previously added patches are removed before adding new ones.
 
+Finally, the axes of coordinates are labelled.
+
 Args:
     ax: Matplotlib axes instance
     labels: tuple (strings to label the axes of coordinates)
 '''
 
-    # when the figure containing `ax' is resized, `ax' is also resized
-    # delay for some time to allow this to happen
+    # When the figure containing `ax' is resized, `ax' is also resized. Delay
+    # for some time to allow this to happen.
     plt.pause(0.5)
 
-    # remove the previously added arrow patches (if any)
-    # do not remove any other other patches
+    # Remove the previously added arrow patches (if any). Do not remove any
+    # other patches.
     comparer = lambda patch: patch.get_gid() == _customplot_ID
     patches_to_remove = list(filter(comparer, ax.patches))
     for patch in patches_to_remove:
         patch.remove()
 
-    # centre of the arrow patches in axes coordinates
-    # i.e. [0, 0] is the lower left of the axes, and [1, 1], upper right
+    # This is the centre of the arrow patches in axes coordinates. (Axes
+    # coordinates: [0, 0] is the lower left corner of the axes, and [1, 1], the
+    # upper right.)
     x, y = [1.3, 0.5]
 
-    # obtain the size of the Matplotlib axes
-    # use this to control the sizes of the arrows
+    # Obtain the current size of the Matplotlib axes instance. This is used to
+    # calculate the sizes of the arrows.
     ax_width_inches, ax_height_inches = _get_ax_size_inches(ax)
 
-    # angular axis arrow patch
     arrow_height_inches = 1
     ht = arrow_height_inches / ax_height_inches
     xlabel_offset_inches = 0.175
@@ -166,11 +167,10 @@ Args:
               'clip_on':         False,
               'transform':       ax.transAxes,
               'gid':             _customplot_ID}
-    angular = matpatches.FancyArrowPatch(**kwargs)
+    angular = mpatches.FancyArrowPatch(**kwargs)
     ax.add_patch(angular)
     ax.xaxis.set_label_coords(x + wd, y + ht / 2)
 
-    # radial axis arrow patch
     arrow_length_inches = 0.6
     wd = arrow_length_inches / ax_width_inches
     ylabel_offset_inches = -0.25
@@ -181,11 +181,10 @@ Args:
               'clip_on':         False,
               'transform':       ax.transAxes,
               'gid':             _customplot_ID}
-    radial = matpatches.FancyArrowPatch(**kwargs)
+    radial = mpatches.FancyArrowPatch(**kwargs)
     ax.add_patch(radial)
     ax.yaxis.set_label_coords(x + wd / 2, y + ht)
 
-    # axis labels
     ax.set_xlabel(labels[0])
     ax.set_ylabel(labels[1], rotation = 0)
 
@@ -223,8 +222,8 @@ indicated.
 In three-dimensional plots, these limits on the axes of coordinates are not
 respected. Matplotlib automatically modifies them by a small amount (the
 relevant code can be found in the `_get_coord_info' method of
-mpl_toolkits/mplot3d/axis3d.py as of version 3.3.4 of the Matplotlib source).
-If you don't like this, you must modify the source code.
+mpl_toolkits/mplot3d/axis3d.py as of version 3.3.4 of Matplotlib). If you don't
+like this, you must modify the source code.
 
 Args:
     ax: Matplotlib axes instance
@@ -245,16 +244,17 @@ Args:
     limits_setter = getattr(ax, f'set_{coordaxis}lim')
     ticks_setter  = getattr(ax, f'set_{coordaxis}ticks')
 
-    # case 1: use symbolic tick labels
+    # Case 1: use symbolic tick labels.
     if symbolic:
         if None in {first, last, step}:
             raise ValueError('When \'symbolic\' is True, \'first\', \'last\' and \'step\' must not be None.')
 
         labels, ticks = _labels_and_ticks(first, last, step, s, v)
 
-        # in polar plots, the angular axis may go from 0 to 2π
-        # in which case, do not draw the label for 2π (as it overlaps with 0)
-        # further, do not put the first and last labels on the radial axis
+        # In polar plots, the angular axis may go from 0 to 2π. In that case,
+        # do not draw the label for 2π. (Otherwise, it'll overlap with that for
+        # 0). Further, do not draw the first and last labels on the radial
+        # axis. (This reduces cluttering.)
         if ax.name == 'polar':
             if coordaxis == 'x' and first == 0 and last == 2:
                 labels, ticks = labels[: -1], ticks[: -1]
@@ -265,15 +265,15 @@ Args:
         labels_setter(labels)
         limits_setter(v * first, v * last)
 
-    # case 2: allow tick labels to be set automatically
+    # Case 2: allow tick labels to be set automatically.
     else:
         if None not in {first, last, step}:
             ticks_setter(np.arange(first, last + step / 2, step))
         if None not in {first, last}:
             limits_setter(first, last)
 
-        # same as what was done in case 1 for polar plots
-        # do not put the first and last labels on the radial axis
+        # Like in case 1, do not draw the first and last labels on the radial
+        # axis.
         fig = ax.figure
         fig.canvas.draw()
         if ax.name == 'polar' and coordaxis == 'y':
@@ -297,7 +297,6 @@ Args:
 
     fig = ax.figure
 
-    # improvements for three-dimensional plots
     if ax.name == '3d':
         kwargs = {'which':     'major',
                   'labelsize': 'small',
@@ -308,26 +307,22 @@ Args:
         ax.zaxis.set_tick_params(pad = 1, **kwargs)
         ax.set_facecolor('white')
 
-    # improvements for polar plots
     if ax.name == 'polar':
         ax.set_rlabel_position(0)
         # _draw_polar_patches(ax, labels)
         callback = lambda event: _draw_polar_patches(ax, labels)
         fig.canvas.mpl_connect('resize_event', callback)
 
-    # axis labels for three-dimensional plots
-    # new line character is used because `labelpad' does not work properly
+    # A new line character is used here because the `labelpad' argument does
+    # not work.
     if ax.name == '3d':
         for label, coordaxis in zip(labels, 'xyz'):
             getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad = 10, linespacing = 3)
 
-    # axis labels for two-dimensional Cartesian plots
-    # the labels for polar plots are set in `_draw_polar_patches'
     elif ax.name == 'rectilinear':
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1], rotation = 90)
 
-    # titles
     if title is not None:
         ax.set_title(title)
     if suptitle is not None:
@@ -336,7 +331,6 @@ Args:
     else:
         fig.canvas.set_window_title(_customplot_ID)
 
-    # legend
     if ax.get_legend_handles_labels() != ([], []):
         kwargs = {'loc': 'best'}
         if ax.name == 'polar':
@@ -346,13 +340,13 @@ Args:
             kwargs['facecolor'] = 'lightgray'
         ax.legend(**kwargs)
 
-    # draw thick axes of coordinates in two-dimensional Cartesian plots
+    # Draw thick coordinate axes in two-dimensional Cartesian plots.
     if ax.name == 'rectilinear':
         kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
         ax.axhline(**kwargs)
         ax.axvline(**kwargs)
 
-    # minor grid doesn't look very good in three-dimensional plots
+    # Minor grid lines don't look good in three-dimensional plots.
     if ax.name in {'rectilinear', 'polar'}:
         ax.grid(b = True, which = 'major', linewidth = 0.8, linestyle = ':')
         ax.grid(b = True, which = 'minor', linewidth = 0.1, linestyle = '-')
@@ -394,21 +388,21 @@ def main():
     plt.style.use('dandy.mplstyle')
 
     ax = plt.figure().add_subplot(1, 1, 1,
-                                  projection = 'polar',
+                                  # projection = 'polar',
                                   # projection = '3d',
                                  )
-    limit(ax, 'x', symbolic = True,
+    limit(ax, 'x', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = 0,
-                   last     = 2,
-                   step     = 1 / 6)
+                   first    = -10,
+                   last     = 6,
+                   step     = 1)
     limit(ax, 'y', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = 0,
-                   last     = 2,
-                   step     = 0.5)
+                   first    = -2,
+                   last     = 6,
+                   step     = 1)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
@@ -416,10 +410,10 @@ def main():
                    last     = 2,
                    step     = 1)
 
-    x1 = np.linspace(0, 2 * np.pi, 10000)
-    y1 = np.sin(3 * x1)
+    x1 = np.linspace(-20, 20, 10000)
+    y1 = np.exp(x1)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$r=\sin\,3\theta$')
+    ax.plot(x1, y1, color = 'red', label = r'$y=e^x$')
     # ax.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0, 0, r'origin', size = 'large')
 
@@ -443,7 +437,7 @@ def main():
     # ax.fill_betweenx(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if i < 4 else False for i in y1])
     # ax.fill_between(x1, y1, 1, facecolor = 'cyan', linewidth = 0, label = '', where = [True if 0.5 < i < 1 else False for i in x1])
 
-    polish(ax, (r'$\theta$', r'$r$', r'$z$'), None, None)
+    polish(ax, (r'$x$', r'$y$', r'$z$'), None, None)
     aspect(ax, 1)
 
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
