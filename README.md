@@ -61,9 +61,9 @@ STIX font. To do so, modify the file `dandy.mplstyle` like this. (Only the
 relevant lines are shown.)
 ```python
 ...
-font.family: STIXGeneral
+font.family:     STIXGeneral
 ...
-mathtext.fontset: stix
+mathtext.fontset:  stix
 ...
 ```
 
