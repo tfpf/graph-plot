@@ -9,7 +9,14 @@ import time
 
 ###############################################################################
 
-_customplot_ID = f'cp_{int(time.time_ns())}_{np.random.randint(1000, 9999)}'
+def _generate_gid():
+    '''\
+Generate a string which will be used to uniquely identify patches not added by
+the user. This string will also be used as the title of the figure window if
+the user has not supplied a title.
+'''
+
+    return f'cp_{int(time.time_ns())}_{np.random.randint(100000, 999999)}'
 
 ###############################################################################
 
@@ -142,7 +149,8 @@ Args:
 
     # Remove the previously added arrow patches (if any). Do not remove any
     # other patches.
-    comparer = lambda patch: patch.get_gid() == _customplot_ID
+    gid = ax.get_gid()
+    comparer = lambda patch: patch.get_gid() == gid
     patches_to_remove = list(filter(comparer, ax.patches))
     for patch in patches_to_remove:
         patch.remove()
@@ -166,7 +174,7 @@ Args:
               'connectionstyle': 'arc3, rad = 0.15',
               'clip_on':         False,
               'transform':       ax.transAxes,
-              'gid':             _customplot_ID}
+              'gid':             gid}
     angular = mpatches.FancyArrowPatch(**kwargs)
     ax.add_patch(angular)
     ax.xaxis.set_label_coords(x + wd, y + ht / 2)
@@ -180,7 +188,7 @@ Args:
               'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
               'clip_on':         False,
               'transform':       ax.transAxes,
-              'gid':             _customplot_ID}
+              'gid':             gid}
     radial = mpatches.FancyArrowPatch(**kwargs)
     ax.add_patch(radial)
     ax.yaxis.set_label_coords(x + wd / 2, y + ht)
@@ -295,6 +303,9 @@ Args:
     suptitle: str (title of the figure `ax' is in)
 '''
 
+    gid = _generate_gid()
+    ax.set_gid(gid)
+
     fig = ax.figure
 
     if ax.name == '3d':
@@ -329,7 +340,7 @@ Args:
         fig.suptitle(suptitle)
         fig.canvas.set_window_title(suptitle)
     else:
-        fig.canvas.set_window_title(_customplot_ID)
+        fig.canvas.set_window_title(gid)
 
     if ax.get_legend_handles_labels() != ([], []):
         kwargs = {'loc': 'best'}
@@ -391,17 +402,17 @@ def main():
                                   # projection = 'polar',
                                   # projection = '3d',
                                  )
-    limit(ax, 'x', symbolic = False,
-                   s        = r'\pi',
-                   v        = np.pi,
-                   first    = -10,
-                   last     = 6,
-                   step     = 1)
-    limit(ax, 'y', symbolic = False,
+    limit(ax, 'x', symbolic = True,
                    s        = r'\pi',
                    v        = np.pi,
                    first    = -2,
-                   last     = 6,
+                   last     = 2,
+                   step     = 1 / 4)
+    limit(ax, 'y', symbolic = False,
+                   s        = r'\pi',
+                   v        = np.pi,
+                   first    = -3,
+                   last     = 3,
                    step     = 1)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
@@ -411,9 +422,9 @@ def main():
                    step     = 1)
 
     x1 = np.linspace(-20, 20, 10000)
-    y1 = np.exp(x1)
+    y1 = np.sin(x1)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$y=e^x$')
+    ax.plot(x1, y1, color = 'red', label = r'$y=\sin\,x$')
     # ax.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0, 0, r'origin', size = 'large')
 
