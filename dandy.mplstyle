@@ -19,8 +19,6 @@ lines.dashdot_pattern: 6, 3, 1, 3
 lines.dotted_pattern:  1, 3
 lines.scale_dashes:    True
 
-markers.fillstyle: full # full, left, right, bottom, top, none
-
 ###############################################################################
 # patches
 ###############################################################################
@@ -112,12 +110,6 @@ axes.ymargin: 0.05
 polaraxes.grid: True
 
 axes3d.grid: True
-
-###############################################################################
-# axis
-###############################################################################
-xaxis.labellocation: center  # left, right, center
-yaxis.labellocation: center  # bottom, top, center
 
 ###############################################################################
 # ticks
