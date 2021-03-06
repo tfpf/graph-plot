@@ -64,7 +64,7 @@ mathtext.rm:       Cochineal
 mathtext.sf:       sans
 mathtext.tt:       monospace
 mathtext.fontset:  custom                # dejavusans, dejavuserif, cm, stix, stixsans, custom
-mathtext.fallback: cm
+mathtext.fallback: stix
 mathtext.default:  it
 
 ###############################################################################

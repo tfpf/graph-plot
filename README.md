@@ -53,6 +53,21 @@ In case you want nothing to do with fonts, you can ignore this section
 entirely. Matplotlib will warn you that Cochineal is not installed (if it
 isn't), and fall back to the default font. (Functionality remains unaffected.)
 
+### Using a Built-in Font
+You have a choice of fonts available out of the box. My suggestion is to use a
+STIX font. To do so, modify the file `dandy.mplstyle` like this. (Only the
+relevant lines are shown.)
+```python
+...
+font.family: STIXGeneral
+...
+mathtext.fontset: stix
+...
+```
+
+I do not recommend using the built-in Computer Modern font, because it cannot
+render minus signs in normal text.
+
 ### Using a Custom Font
 Let's say you want to use Libre Baskerville.
 * Download the font files for Libre Baskerville. (It is a Google font. So, it
@@ -72,33 +87,18 @@ wherever it appears, with `Libre Baskerville`. In other words, the contents of
 shown.)
 ```python
 ...
-font.family: Libre Baskerville
+font.family:     Libre Baskerville
 ...
-mathtext.cal: Libre Baskerville:bold:italic
-mathtext.rm : Libre Baskerville
-mathtext.tt : Libre Baskerville
-mathtext.it : Libre Baskerville:italic
-mathtext.bf : Libre Baskerville:bold
-mathtext.sf : Libre Baskerville
+mathtext.bf:       Libre Baskerville:bold
+mathtext.cal:      Libre Baskerville:bold:italic
+mathtext.it:       Libre Baskerville:italic
+mathtext.rm:       Libre Baskerville
 ...
 ```
 
-After this, any text in any new graph you plot will use Libre Baskerville. If
-you feel confident, you can experiment with different fonts (i.e. a monospace
-font for `mathtext.tt`, a calligraphy font for `mathtext.cal` and a sans-serif
-font for `mathtext.sf`).
-
-### Using a Built-in Font
-You have a choice of fonts available out of the box. My suggestion is to use
-the serif font. To do so, modify the file `dandy.mplstyle` like this. (Once
-again, only the relevant lines are shown.)
-```python
-...
-font.family: serif
-...
-mathtext.fontset: dejavuserif
-...
-```
+If you feel confident, you can experiment with different fonts (i.e. a
+monospace font for `mathtext.tt`, a calligraphy font for `mathtext.cal` and a
+sans-serif font for `mathtext.sf`).
 
 ## Subplots
 Sometimes, subplots (multiple plots in a single figure) don't look pretty
