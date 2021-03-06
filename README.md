@@ -36,8 +36,8 @@ download location. Execute the following command.
 python3 examples.py
 ```
 
-Alternatively, you can run it with Cython (if you have it installed). This
-feature is experimental and has not been tested much.
+Alternatively, you can use Cython (if you have it installed). This feature is
+experimental and has not been tested much.
 ```makefile
 make run
 ```
