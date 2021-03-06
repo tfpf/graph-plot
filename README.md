@@ -27,9 +27,11 @@ happen automatically.
 These requirements are not strict. Slightly older versions should also be okay.
 
 # Usage
+Several examples have been provided; hopefully, they will make everything
+clear.
+
 Clone or download this repository. Open a terminal window to the clone or
-download location. Several examples have been provided; hopefully, they will
-make everything clear.
+download location. Execute the following command.
 ```shell
 python3 examples.py
 ```
