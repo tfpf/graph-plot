@@ -16,7 +16,7 @@ the user. This string will also be used as the title of the figure window if
 the user has not supplied a title.
 '''
 
-    return f'cp_{int(time.time_ns())}_{np.random.randint(100000, 999999)}'
+    return f'cp_{time.time_ns()}_{np.random.randint(100000, 999999)}'
 
 ###############################################################################
 
@@ -254,8 +254,8 @@ Args:
 
     # Case 1: use symbolic tick labels.
     if symbolic:
-        if None in {first, last, step}:
-            raise ValueError('When \'symbolic\' is True, \'first\', \'last\' and \'step\' must not be None.')
+        if any(arg is None for arg in [first, last, step]):
+            raise ValueError('If argument "symbolic" is True, arguments "first", "last" and "step" must not be None.')
 
         labels, ticks = _labels_and_ticks(first, last, step, s, v)
 
@@ -275,9 +275,9 @@ Args:
 
     # Case 2: allow tick labels to be set automatically.
     else:
-        if None not in {first, last, step}:
+        if all(arg is not None for arg in [first, last, step]):
             ticks_setter(np.arange(first, last + step / 2, step))
-        if None not in {first, last}:
+        if all(arg is not None for arg in [first, last]):
             limits_setter(first, last)
 
         # Like in case 1, do not draw the first and last labels on the radial
