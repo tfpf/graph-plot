@@ -108,6 +108,9 @@ because elements from adjacent plots overlap with each other. To get around
 this problem, you can interactively adjust the spacing by using the 'Configure
 subplots' option in the menu bar at the bottom.
 
+After doing this, maximise, un-maximise and again maximise the figure window.
+As a result, anything that needs to be redrawn will be redrawn.
+
 ## DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI parameter
 before adjusting anything else. In the file `dandy.mplstyle`, search for
