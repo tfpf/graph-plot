@@ -135,12 +135,11 @@ Returns:
 
 def _draw_polar_patches(event):
     '''\
-Draw arrow patches to show the angular and radial coordinate axes of all polar
-plots in the figure. The sizes of these arrow patches must be independent of
-the size of the figure. Hence, this function is connected to the resize event
-of the appropriate Matplotlib figure canvas instance. It is called
-automatically when the canvas is resized; previously added patches are removed
-before adding new ones.
+Draw arrow patches to show the angular and radial axes of coordinates of all
+polar plots in the figure. The sizes of these arrow patches must be independent
+of the size of the figure. Hence, this function is connected to the resize
+event of the appropriate Matplotlib figure canvas instance, so that the arrows
+can be redrawn when the canvas is resized.
 
 Finally, labels on the axes of coordinates are made visible.
 
@@ -165,14 +164,15 @@ Args:
         for patch in patches_to_remove:
             patch.remove()
 
-        # This is the centre of the arrow patches in axes coordinates. (Axes
-        # coordinates: [0, 0] is the lower left corner of the axes, and [1, 1],
-        # the upper right.)
-        x, y = [1.3, 0.5]
-
         # Obtain the current size of the Matplotlib axes instance. This is used
         # to calculate the sizes of the arrows.
         ax_width_inches, ax_height_inches = _get_ax_size_inches(ax)
+
+        # This is the centre of the arrow patches in axes coordinates. (Axes
+        # coordinates: [0, 0] is the lower left corner of the Matplotlib axes,
+        # and [1, 1], the upper right.)
+        x = 1 + 0.8 / ax_width_inches
+        y = 0.5
 
         arrow_height_inches = 1
         ht = arrow_height_inches / ax_height_inches
@@ -303,7 +303,7 @@ Args:
 
 def polish(ax, labels = ('$x$', '$y$', '$z$'), title = None, suptitle = None):
     '''\
-Label the coordinate axes. Give the plot a title. Add a legend. Draw grid
+Label the axes of coordinates. Give the plot a title. Add a legend. Draw grid
 lines. Make some minor appearance enhancements.
 
 Args:
@@ -335,9 +335,9 @@ Args:
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1], rotation = 90)
 
-    # The labels of the polar coordinate axes will initially not be visible.
-    # They will be made visible after they have been placed in their correct
-    # locations by a callback.
+    # The labels of the polar axes of coordinates will initially not be
+    # visible. They will be made visible after they have been placed in their
+    # correct locations by a callback.
     elif ax.name == 'polar':
         ax.set_rlabel_position(0)
         ax.set_xlabel(labels[0], visible = False)
@@ -422,12 +422,12 @@ def main():
                    first    = 0,
                    last     = 2,
                    step     = 0.125)
-    limit(ax, 'y', symbolic = False,
-                   s        = r'\pi',
-                   v        = np.pi,
+    limit(ax, 'y', symbolic = True,
+                   s        = r'a',
+                   v        = 1,
                    first    = 0,
-                   last     = 3,
-                   step     = 0.5)
+                   last     = 4,
+                   step     = 1)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
@@ -435,21 +435,21 @@ def main():
                    last     = 2,
                    step     = 1)
 
+    # t = np.linspace(-100, 100, 100000)
     x1 = np.linspace(0, 2 * np.pi, 10000)
-    y1 = 1 - np.cos(3 * x1)
+    y1 = 5 * np.cos(x1) ** 2 * np.sin(x1) ** 2 / (np.cos(x1) ** 5 + np.sin(x1) ** 5)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$y=1-\cos\,3x$')
-    for _ in range(8): ax.add_patch(mpatches.Rectangle((np.random.random() * 2.5, np.random.random() * 2.5), np.random.random() / 3, np.random.random() / 3))
+    ax.plot(x1, y1, color = 'red', label = r'$r=\dfrac{5a\,\cos^2\,\theta\,\sin^2\,\theta}{\cos^5\,\theta+\sin^5\,\theta}$')
     # ax.plot([0, 1, 2, 3, 4, 5, 6], [1, 1, 1, 1, 1, 1, 1], color = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0, 0, r'origin', size = 'large')
 
-    # x2 = np.linspace(-20, 20, 10000)
-    # y2 = sanitise_discontinuous(np.imag(np.log(x2 + 1j * 0)), 0.5)
+    # x2 = 5 * t ** 2 / (1 + t ** 5)
+    # y2 = 5 * t ** 3 / (1 + t ** 5)
     # z2 = x2
-    # ax.plot(x2, y2, color = 'blue', label = r'$y=\mathfrak{I}\{\mathrm{Log}\;x\}$')
+    # ax.plot(x2, y2, color = 'red', label = r'')
     # ax.plot([0, 0], [0, np.pi], color = 'blue', linestyle = 'none', marker = 'o', label = '')
 
-    # x3 = np.linspace(0, 20, 10000)
+    # x3 = 5 * t ** 2 / (1 + t ** 5)np.linspace(0, 20, 10000)
     # y3 = 1 / x3
     # z3 = x3
     # ax.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
@@ -463,7 +463,7 @@ def main():
     # ax.fill_betweenx(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if i < 4 else False for i in y1])
     # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$R$', where = [True if 0 < i < 3 else False for i in x1])
 
-    polish(ax, (r'$x$', r'$y$', r'$z$'), None, None)
+    polish(ax, (r'$\theta$', r'$r$', r'$z$'), None, None)
     aspect(ax, 1)
 
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
