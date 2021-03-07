@@ -6,6 +6,11 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import weakref
+
+###############################################################################
+
+_gid = weakref.WeakKeyDictionary()
 
 ###############################################################################
 
@@ -128,73 +133,78 @@ Returns:
 
 ###############################################################################
 
-def _draw_polar_patches(ax, labels):
+def _draw_polar_patches(event):
     '''\
-Show the angular and radial coordinate axes of a polar plot using arrow
-patches. The sizes of these arrow patches must be independent of the size of
-the figure. Hence, this function is connected to the resize event of the
-appropriate Matplotlib figure instance. It is called automatically when the
-figure is resized; previously added patches are removed before adding new ones.
+Draw arrow patches to show the angular and radial coordinate axes of all polar
+plots in the figure. The sizes of these arrow patches must be independent of
+the size of the figure. Hence, this function is connected to the resize event
+of the appropriate Matplotlib figure canvas instance. It is called
+automatically when the canvas is resized; previously added patches are removed
+before adding new ones.
 
-Finally, the axes of coordinates are labelled.
+Finally, labels on the axes of coordinates are made visible.
 
 Args:
-    ax: Matplotlib axes instance
-    labels: tuple (strings to label the axes of coordinates)
+    event: Matplotlib event (the event which triggered this function)
 '''
 
-    # When the figure containing `ax' is resized, `ax' is also resized. Delay
-    # for some time to allow this to happen.
+    # When the canvas is resized, Matplotlib axes are also resized. Delay for
+    # some time to allow this to happen.
     plt.pause(0.5)
 
-    # Remove the previously added arrow patches (if any). Do not remove any
-    # other patches.
-    gid = ax.get_gid()
-    comparer = lambda patch: patch.get_gid() == gid
-    patches_to_remove = list(filter(comparer, ax.patches))
-    for patch in patches_to_remove:
-        patch.remove()
+    fig = event.canvas.figure
+    for ax in fig.axes:
+        if ax.name != 'polar':
+            continue
 
-    # This is the centre of the arrow patches in axes coordinates. (Axes
-    # coordinates: [0, 0] is the lower left corner of the axes, and [1, 1], the
-    # upper right.)
-    x, y = [1.3, 0.5]
+        # Remove the previously added arrow patches (if any). Do not remove any
+        # other patches.
+        gid = _gid[fig]
+        comparer = lambda patch: patch.get_gid() == gid
+        patches_to_remove = list(filter(comparer, ax.patches))
+        for patch in patches_to_remove:
+            patch.remove()
 
-    # Obtain the current size of the Matplotlib axes instance. This is used to
-    # calculate the sizes of the arrows.
-    ax_width_inches, ax_height_inches = _get_ax_size_inches(ax)
+        # This is the centre of the arrow patches in axes coordinates. (Axes
+        # coordinates: [0, 0] is the lower left corner of the axes, and [1, 1],
+        # the upper right.)
+        x, y = [1.3, 0.5]
 
-    arrow_height_inches = 1
-    ht = arrow_height_inches / ax_height_inches
-    xlabel_offset_inches = 0.175
-    wd = xlabel_offset_inches / ax_width_inches
-    kwargs = {'posA':            (x, y - ht / 2),
-              'posB':            (x, y + ht / 2),
-              'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
-              'connectionstyle': 'arc3, rad = 0.15',
-              'clip_on':         False,
-              'transform':       ax.transAxes,
-              'gid':             gid}
-    angular = mpatches.FancyArrowPatch(**kwargs)
-    ax.add_patch(angular)
-    ax.xaxis.set_label_coords(x + wd, y + ht / 2)
+        # Obtain the current size of the Matplotlib axes instance. This is used
+        # to calculate the sizes of the arrows.
+        ax_width_inches, ax_height_inches = _get_ax_size_inches(ax)
 
-    arrow_length_inches = 0.6
-    wd = arrow_length_inches / ax_width_inches
-    ylabel_offset_inches = -0.25
-    ht = ylabel_offset_inches / ax_height_inches
-    kwargs = {'posA':            (x - wd / 3, y),
-              'posB':            (x + 2 * wd / 3, y),
-              'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
-              'clip_on':         False,
-              'transform':       ax.transAxes,
-              'gid':             gid}
-    radial = mpatches.FancyArrowPatch(**kwargs)
-    ax.add_patch(radial)
-    ax.yaxis.set_label_coords(x + wd / 2, y + ht)
+        arrow_height_inches = 1
+        ht = arrow_height_inches / ax_height_inches
+        xlabel_offset_inches = 0.175
+        wd = xlabel_offset_inches / ax_width_inches
+        kwargs = {'posA':            (x, y - ht / 2),
+                  'posB':            (x, y + ht / 2),
+                  'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
+                  'connectionstyle': 'arc3, rad = 0.15',
+                  'clip_on':         False,
+                  'transform':       ax.transAxes,
+                  'gid':             gid}
+        angular = mpatches.FancyArrowPatch(**kwargs)
+        ax.add_patch(angular)
+        ax.xaxis.set_label_coords(x + wd, y + ht / 2)
 
-    ax.set_xlabel(labels[0])
-    ax.set_ylabel(labels[1], rotation = 0)
+        arrow_length_inches = 0.6
+        wd = arrow_length_inches / ax_width_inches
+        ylabel_offset_inches = -0.25
+        ht = ylabel_offset_inches / ax_height_inches
+        kwargs = {'posA':            (x - wd / 3, y),
+                  'posB':            (x + 2 * wd / 3, y),
+                  'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
+                  'clip_on':         False,
+                  'transform':       ax.transAxes,
+                  'gid':             gid}
+        radial = mpatches.FancyArrowPatch(**kwargs)
+        ax.add_patch(radial)
+        ax.yaxis.set_label_coords(x + wd / 2, y + ht)
+
+        ax.xaxis.label.set_visible(True)
+        ax.yaxis.label.set_visible(True)
 
 ###############################################################################
 
@@ -294,7 +304,7 @@ Args:
 def polish(ax, labels = ('$x$', '$y$', '$z$'), title = None, suptitle = None):
     '''\
 Label the coordinate axes. Give the plot a title. Add a legend. Draw grid
-lines.
+lines. Make some minor appearance enhancements.
 
 Args:
     ax: Matplotlib axes instance
@@ -302,11 +312,6 @@ Args:
     title: str (title of the graph plotted in `ax')
     suptitle: str (title of the figure `ax' is in)
 '''
-
-    gid = _generate_gid()
-    ax.set_gid(gid)
-
-    fig = ax.figure
 
     if ax.name == '3d':
         kwargs = {'which':     'major',
@@ -318,21 +323,44 @@ Args:
         ax.zaxis.set_tick_params(pad = 1, **kwargs)
         ax.set_facecolor('white')
 
-    if ax.name == 'polar':
-        ax.set_rlabel_position(0)
-        # _draw_polar_patches(ax, labels)
-        callback = lambda event: _draw_polar_patches(ax, labels)
-        fig.canvas.mpl_connect('resize_event', callback)
-
-    # A new line character is used here because the `labelpad' argument does
-    # not work.
-    if ax.name == '3d':
+        # A new line character is used here because the `labelpad' argument
+        # does not work.
         for label, coordaxis in zip(labels, 'xyz'):
             getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad = 10, linespacing = 3)
 
     elif ax.name == 'rectilinear':
+        kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
+        ax.axhline(**kwargs)
+        ax.axvline(**kwargs)
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1], rotation = 90)
+
+    # The labels of the polar coordinate axes will initially not be visible.
+    # They will be made visible after they have been placed in their correct
+    # locations by a callback.
+    elif ax.name == 'polar':
+        ax.set_rlabel_position(0)
+        ax.set_xlabel(labels[0], visible = False)
+        ax.set_ylabel(labels[1], rotation = 0, visible = False)
+
+    # Minor grid lines don't look good in three-dimensional plots.
+    if ax.name in {'rectilinear', 'polar'}:
+        ax.grid(b = True, which = 'major', linewidth = 0.8, linestyle = ':')
+        ax.grid(b = True, which = 'minor', linewidth = 0.1, linestyle = '-')
+        ax.minorticks_on()
+    elif ax.name == '3d':
+        ax.grid(b = True, which = 'major', linewidth = 0.3, linestyle = '-')
+
+    # If `ax' is being used for polar plots, add the figure to the global
+    # WeakKeyDictionary. Using a WeakKeyDictionary ensures that it doesn't
+    # stick around in memory any longer than it needs to. Also, connect the
+    # resize event of the figure canvas to a callback which does some
+    # additional beautification of polar plots.
+    fig = ax.figure
+    gid = _generate_gid()
+    if ax.name == 'polar' and fig not in _gid:
+        _gid[fig] = gid
+        fig.canvas.mpl_connect('resize_event', _draw_polar_patches)
 
     if title is not None:
         ax.set_title(title)
@@ -350,20 +378,6 @@ Args:
         if ax.name in {'polar', '3d'}:
             kwargs['facecolor'] = 'lightgray'
         ax.legend(**kwargs)
-
-    # Draw thick coordinate axes in two-dimensional Cartesian plots.
-    if ax.name == 'rectilinear':
-        kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
-        ax.axhline(**kwargs)
-        ax.axvline(**kwargs)
-
-    # Minor grid lines don't look good in three-dimensional plots.
-    if ax.name in {'rectilinear', 'polar'}:
-        ax.grid(b = True, which = 'major', linewidth = 0.8, linestyle = ':')
-        ax.grid(b = True, which = 'minor', linewidth = 0.1, linestyle = '-')
-        ax.minorticks_on()
-    elif ax.name == '3d':
-        ax.grid(b = True, which = 'major', linewidth = 0.3, linestyle = '-')
 
 ###############################################################################
 
@@ -399,21 +413,21 @@ def main():
     plt.style.use('dandy.mplstyle')
 
     ax = plt.figure().add_subplot(1, 1, 1,
-                                  # projection = 'polar',
+                                  projection = 'polar',
                                   # projection = '3d',
                                  )
     limit(ax, 'x', symbolic = True,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -2,
+                   first    = 0,
                    last     = 2,
-                   step     = 1 / 4)
+                   step     = 0.125)
     limit(ax, 'y', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -3,
+                   first    = 0,
                    last     = 3,
-                   step     = 1)
+                   step     = 0.5)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
@@ -421,11 +435,12 @@ def main():
                    last     = 2,
                    step     = 1)
 
-    x1 = np.linspace(-20, 20, 10000)
-    y1 = np.sin(x1)
+    x1 = np.linspace(0, 2 * np.pi, 10000)
+    y1 = 1 - np.cos(3 * x1)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$y=\sin\,x$')
-    # ax.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o', label = '')
+    ax.plot(x1, y1, color = 'red', label = r'$y=1-\cos\,3x$')
+    for _ in range(8): ax.add_patch(mpatches.Rectangle((np.random.random() * 2.5, np.random.random() * 2.5), np.random.random() / 3, np.random.random() / 3))
+    # ax.plot([0, 1, 2, 3, 4, 5, 6], [1, 1, 1, 1, 1, 1, 1], color = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0, 0, r'origin', size = 'large')
 
     # x2 = np.linspace(-20, 20, 10000)
@@ -446,7 +461,7 @@ def main():
 
     # ax.fill_between(x1, y1, -20, facecolor = 'cyan', linewidth = 0, label = r'$y<-x$')
     # ax.fill_betweenx(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if i < 4 else False for i in y1])
-    # ax.fill_between(x1, y1, 1, facecolor = 'cyan', linewidth = 0, label = '', where = [True if 0.5 < i < 1 else False for i in x1])
+    # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$R$', where = [True if 0 < i < 3 else False for i in x1])
 
     polish(ax, (r'$x$', r'$y$', r'$z$'), None, None)
     aspect(ax, 1)
