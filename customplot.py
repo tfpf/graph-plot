@@ -149,7 +149,7 @@ Args:
 
     # When the canvas is resized, Matplotlib axes are also resized. Delay for
     # some time to allow this to happen.
-    plt.pause(0.5)
+    plt.pause(0.2)
 
     fig = event.canvas.figure
     for ax in fig.axes:
@@ -301,7 +301,7 @@ Args:
 
 ###############################################################################
 
-def polish(ax, labels = ('$x$', '$y$', '$z$'), title = None, suptitle = None):
+def polish(ax, labels = None, title = None, suptitle = None):
     '''\
 Label the axes of coordinates. Give the plot a title. Add a legend. Draw grid
 lines. Make some minor appearance enhancements.
@@ -312,6 +312,12 @@ Args:
     title: str (title of the graph plotted in `ax')
     suptitle: str (title of the figure `ax' is in)
 '''
+
+    if labels is None:
+        if ax.name in {'rectilinear', '3d'}:
+            labels = ('$x$', '$y$', '$z$')
+        elif ax.name == 'polar':
+            labels = (r'$\theta$', '$r$')
 
     if ax.name == '3d':
         kwargs = {'which':     'major',
@@ -413,20 +419,20 @@ def main():
     plt.style.use('dandy.mplstyle')
 
     ax = plt.figure().add_subplot(1, 1, 1,
-                                  projection = 'polar',
+                                  # projection = 'polar',
                                   # projection = '3d',
                                  )
     limit(ax, 'x', symbolic = True,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = 0,
+                   first    = -2,
                    last     = 2,
-                   step     = 0.125)
-    limit(ax, 'y', symbolic = True,
-                   s        = r'a',
-                   v        = 1,
-                   first    = 0,
-                   last     = 4,
+                   step     = 0.25)
+    limit(ax, 'y', symbolic = False,
+                   s        = r'A',
+                   v        = np.pi,
+                   first    = -3,
+                   last     = 3,
                    step     = 1)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
@@ -435,18 +441,18 @@ def main():
                    last     = 2,
                    step     = 1)
 
-    # t = np.linspace(-100, 100, 100000)
-    x1 = np.linspace(0, 2 * np.pi, 10000)
-    y1 = 5 * np.cos(x1) ** 2 * np.sin(x1) ** 2 / (np.cos(x1) ** 5 + np.sin(x1) ** 5)
+    # t = np.linspace(-5 * np.pi, 5 * np.pi, 10000)
+    x1 = np.linspace(-20, 20, 10000)
+    y1 = np.sin(x1)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$r=\dfrac{5a\,\cos^2\,\theta\,\sin^2\,\theta}{\cos^5\,\theta+\sin^5\,\theta}$')
+    ax.plot(x1, y1, color = 'red', label = r'$y=\sin\,x$')
     # ax.plot([0, 1, 2, 3, 4, 5, 6], [1, 1, 1, 1, 1, 1, 1], color = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0, 0, r'origin', size = 'large')
 
-    # x2 = 5 * t ** 2 / (1 + t ** 5)
-    # y2 = 5 * t ** 3 / (1 + t ** 5)
+    # x2 = x1
+    # y2 = np.exp(-x1 / 10)
     # z2 = x2
-    # ax.plot(x2, y2, color = 'red', label = r'')
+    # ax.plot(x2, y2, color = 'C0', linestyle = ':', label = r'')
     # ax.plot([0, 0], [0, np.pi], color = 'blue', linestyle = 'none', marker = 'o', label = '')
 
     # x3 = 5 * t ** 2 / (1 + t ** 5)np.linspace(0, 20, 10000)
@@ -463,15 +469,16 @@ def main():
     # ax.fill_betweenx(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if i < 4 else False for i in y1])
     # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$R$', where = [True if 0 < i < 3 else False for i in x1])
 
-    polish(ax, (r'$\theta$', r'$r$', r'$z$'), None, None)
+    polish(ax, labels = None, title = None, suptitle = None)
     aspect(ax, 1)
 
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
 
-    # this is a hack to maximise the figure window
-    # normally, `full_screen_toggle' does exactly what its name suggests
-    # but on WSL with a virtual display, it maximises the figure window
+    # This is a hack to maximise the figure window. Normally,
+    # `full_screen_toggle' does exactly what its name suggests: it turns
+    # full-screen mode on or off. But on WSL with a virtual display, it
+    # maximises the figure window.
     fig = ax.figure
     fig.canvas.manager.full_screen_toggle()
 
