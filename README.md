@@ -49,7 +49,8 @@ in `examples.py` and make modifications to the copy.
 
 ## Fonts
 Using a good font can significantly improve the appearance of your plot. (Take
-a look at the [gallery](gallery/). The font used in those plots is Cochineal.)
+a look at the [gallery](gallery/). The font used in those plots is
+[Cochineal](https://ctan.org/pkg/cochineal).)
 
 In case you want nothing to do with fonts, you can ignore this section
 entirely. Matplotlib will warn you that Cochineal is not installed (if it
