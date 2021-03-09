@@ -27,14 +27,14 @@ happen automatically.
 These requirements are not strict. Slightly older versions should also be okay.
 
 # Usage
-Several examples have been provided; hopefully, they will make everything
-clear.
-
 Clone or download this repository. Open a terminal window to the clone or
-download location. Execute the following command.
+download location. Run
 ```shell
 python3 examples.py
 ```
+
+to see some sample plots. Study the code, comparing it with these plots;
+hopefully, that will make everything clear.
 
 Alternatively, you can use Cython (if you have it installed). This feature is
 experimental and has not been tested much.
