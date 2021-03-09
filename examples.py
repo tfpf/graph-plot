@@ -4,7 +4,7 @@ import numpy as np
 import customplot
 
 ###############################################################################
-# two-dimensional Cartesian plot (bare minimum)
+# Two-dimensional Cartesian plot (bare minimum).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot()
@@ -18,19 +18,21 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# two-dimensional Cartesian plot
+# Two-dimensional Cartesian plot.
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
 
-    # create a Matplotlib axes instance
+    # Create a Matplotlib axes instance.
     ax = plt.figure().add_subplot()
 
-    # set the locations of the grid lines on the x-axis
-    # grid lines will be drawn at: [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    # Set the locations of the grid lines on the x-axis. Grid lines will be
+    # drawn at the following x-coordinates.
+    # [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     customplot.limit(ax, 'x', first = -2, last = 10, step = 1)
 
-    # set the locations of the grid lines on the y-axis
-    # grid lines will be drawn at: [-2, -1, 0, 1, 2, 3, 4]
+    # Set the locations of the grid lines on the y-axis. Grid lines will be
+    # drawn at the following y-coordinates.
+    # [-2, -1, 0, 1, 2, 3, 4]
     customplot.limit(ax, 'y', first = -2, last = 4, step = 1)
 
     x = np.linspace(0, 20, 10000)
@@ -39,62 +41,68 @@ with plt.style.context('dandy.mplstyle'):
 
     customplot.polish(ax, title = 'This is the square root function!')
 
-    # set the graph aspect ratio (ratio of the scales on the x-axis and y-axis)
-    # it is recommended to set this to 1 (so shapes are not misrepresented)
-    customplot.aspect(ax, ratio = 1)
+    # Set the ratio of the scales on the x-axis and y-axis (aspect ratio). As
+    # far as possible, this should be set to 1 (so that shapes are not
+    # distorted).
+    customplot.aspect(ax, 1)
 
     plt.show()
 
 ###############################################################################
-# two-dimensional Cartesian plot (discontinuous function)
+# Two-dimensional Cartesian plot (discontinuous function).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
 
-    # create a Matplotlib axes instance
+    # Create a Matplotlib axes instance.
     ax = plt.figure().add_subplot()
 
-    # set the locations of the grid lines on the x-axis
-    # grid lines will be drawn at: [-8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
+    # Set the locations of the grid lines on the x-axis. Grid lines will be
+    # drawn at the following x-coordinates.
+    # [-8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
     customplot.limit(ax, 'x', first = -8, last = 8, step = 1)
 
-    # set the locations of the grid lines on the y-axis
-    # grid lines will be drawn at: [-4, -3, -2, -1, 0, 1, 2, 3, 4]
+    # Set the locations of the grid lines on the y-axis. Grid lines will be
+    # drawn at the following y-coordinates.
+    # [-4, -3, -2, -1, 0, 1, 2, 3, 4]
     customplot.limit(ax, 'y', first = -4, last = 4, step = 1)
 
     x = np.linspace(-8, 8, 10000)
     y = np.heaviside(x, 0.5)
 
-    # remove the vertical line present at the point of discontinuity
+    # Remove the vertical line at the point of discontinuity.
     y = customplot.sanitise_discontinuous(y, maximum_diff = 0.1)
 
     ax.plot(x, y, color = 'red', label = r'$y=u(x)$')
 
-    # markings around the point of discontinuity
+    # Show the values of the function near the point of discontinuity.
     ax.plot(0, 0, color = 'red', linestyle = 'none', marker = 'o')
     ax.plot(0, 1, color = 'red', linestyle = 'none', marker = 'o')
     ax.plot(0, 0.5, color = 'red', linestyle = 'none', marker = 'o', mfc = 'red')
 
     customplot.polish(ax, title = 'This is the unit step function!')
 
-    # set the graph aspect ratio (ratio of the scales on the x-axis and y-axis)
-    # it is recommended to set this to 1 (so shapes are not misrepresented)
-    customplot.aspect(ax, ratio = 1)
+    # Set the ratio of the scales on the x-axis and y-axis (aspect ratio). As
+    # far as possible, this should be set to 1 (so that shapes are not
+    # distorted).
+    customplot.aspect(ax, 1)
 
     plt.show()
 
 ###############################################################################
-# two-dimensional Cartesian plot (trigonometric grid spacing)
+# Two-dimensional Cartesian plot (trigonometric grid spacing).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot()
 
-    # set the locations of the grid lines on the x-axis
-    # `symbolic' indicates that the grid lines should be at multiples of π
-    # i.e. grid lines will be drawn at: [-2π, -1.75π, -1.5π, -1.25π, -π, -0.75π, -0.5π, -0.25π, 0, 0.25π, 0.5π, 0.75π, π, 1.25π, 1.5π, 1.75π, 2π]
+    # Set the locations of the grid lines on the x-axis. Note that `symbolic'
+    # has been set to True. As a result, grid lines will be drawn at the
+    # following x-coordinates.
+    # [-2π, -1.75π, -1.5π, -1.25π, -π, -0.75π, -0.5π, -0.25π, 0, 0.25π, 0.5π, 0.75π, π, 1.25π, 1.5π, 1.75π, 2π]
     customplot.limit(ax, 'x', symbolic = True, first = -2, last = 2, step = 0.25)
 
-    # set the locations of the grid lines on the y-axis
-    # grid lines will be drawn at: [-3, -2, -1, 0, 1, 2, 3]
+    # Set the locations of the grid lines on the y-axis. Grid lines will be
+    # drawn at the following y-coordinates.
+    # [-3, -2, -1, 0, 1, 2, 3]
     customplot.limit(ax, 'y', first = -3, last = 3, step = 1)
 
     x = np.linspace(-2 * np.pi, 2 * np.pi, 10000)
@@ -102,12 +110,12 @@ with plt.style.context('dandy.mplstyle'):
     ax.plot(x, y, color = 'green', label = r'$y=\cos\,x$')
 
     customplot.polish(ax, title = 'This is a trigonometric function!')
-    customplot.aspect(ax, ratio = 1)
+    customplot.aspect(ax, 1)
 
     plt.show()
 
 ###############################################################################
-# two-dimensional Cartesian plot (implicitly defined functions)
+# Two-dimensional Cartesian plot (implicitly defined functions).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot()
@@ -120,66 +128,76 @@ with plt.style.context('dandy.mplstyle'):
     ax.plot(x, y, label = r'$\dfrac{(x-1)^2}{9}+\dfrac{(y+2)^2}{25}=1$')
 
     customplot.polish(ax, title = 'This is an ellipse!')
-    customplot.aspect(ax, ratio = 1)
+    customplot.aspect(ax, 1)
 
     plt.show()
 
 ###############################################################################
-# two-dimensional polar plot
+# Two-dimensional polar plot.
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot(projection = 'polar')
 
-    # for polar plots, the y-axis is actually the radial axis
-    # in most cases, `first' should be zero
-    # grid lines will be drawn at: [0, 1, 2, 3, 4]
-    # but the first (i.e. 0) and last (i.e. 4) will not be labelled
-    # otherwise, the figure gets cluttered
+    # In a polar plot, the y-axis is actually the radial axis. In most cases,
+    # this axis should start from zero. Grid lines will be drawn at the
+    # following r-coordinates.
+    # [0, 1, 2, 3, 4]
+    # However, the first and last grid lines will not be labelled (otherwise,
+    # the figure gets cluttered).
     customplot.limit(ax, 'y', first = 0, last = 4, step = 1)
 
     t = np.linspace(0, 2 * np.pi, 10000)
     r = 1 - np.cos(t)
     ax.plot(t, r, label = r'$r=1-\cos\,t$')
 
-    # since this is a polar plot, the axis labels must be changed
-    # the dollar signs ensure that the labels are written in a maths font
-    # also, the aspect ratio is meaningless here, so it is not set
+    # The polar coordinate axes should be labelled 't' and 'r', not 'x' and
+    # 'y'. These labels are surrounded by dollar signs so that they are
+    # rendered the way mathematical expressions would be rendered.
     customplot.polish(ax, labels = ('$t$', '$r$'), title = 'This is a cardioid!')
+
+    # An aspect ratio is meaningless in polar plots. Hence, `ax.set_aspect' is
+    # not called.
 
     plt.show()
 
 ###############################################################################
-# two-dimensional polar plot (trigonometric grid spacing)
+# Two-dimensional polar plot (trigonometric grid spacing).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot(projection = 'polar')
 
-    # for polar plots, the x-axis is actually the angular axis
-    # `symbolic' indicates that the grid lines should be at pi times the range
-    # i.e. grid lines will be drawn at: [0, 0.25π, 0.5π, 0.75π, π, 1.25π, 1.5π, 1.75π]
-    # the last grid line (2π) is ignored (it coincides with 0)
+    # In a polar plot, the x-axis is actually the angular axis. Note that
+    # `symbolic' has been set to True. As a result, grid lines will be drawn at
+    # the following t-coordinates.
+    # [0, 0.25π, 0.5π, 0.75π, π, 1.25π, 1.5π, 1.75π]
+    # No grid line is drawn at 2π because a t-coordinate of 2π is the same as a
+    # t-coordinate of 0.
     customplot.limit(ax, 'x', symbolic = True, first = 0, last = 2, step = 0.25)
 
-    # for polar plots, the y-axis is actually the radial axis
-    # in most cases, `first' should be zero
-    # grid lines will be drawn at: [0.0, 0.5, 1.0, 1.5, 2.0]
-    # but the first (i.e. 0.0) and last (i.e. 2.0) will not be labelled
-    # otherwise, the figure gets cluttered
+    # In a polar plot, the y-axis is actually the radial axis. In most cases,
+    # this axis should start from zero. Grid lines will be drawn at the
+    # following r-coordinates.
+    # [0.0, 0.5, 1.0, 1.5, 2.0]
+    # However, the first and last grid lines will not be labelled (otherwise,
+    # the figure gets cluttered).
     customplot.limit(ax, 'y', first = 0, last = 2, step = 0.5)
 
     t = np.linspace(0, 2 * np.pi, 10000)
     r = np.sqrt(t / np.pi / 2)
     ax.plot(t, r, label = r'$r=\sqrt{\dfrac{t}{2\pi}}$')
 
-    # since this is a polar plot, the axis labels must be changed
-    # the dollar signs ensure that the labels are written in a maths font
-    # also, the aspect ratio is meaningless here, so it is not set
+    # The polar coordinate axes should be labelled 't' and 'r', not 'x' and
+    # 'y'. These labels are surrounded by dollar signs so that they are
+    # rendered the way mathematical expressions would be rendered.
     customplot.polish(ax, labels = ('$t$', '$r$'), title = 'This is a spiral!')
+
+    # An aspect ratio is meaningless in polar plots. Hence, `ax.set_aspect' is
+    # not called.
 
     plt.show()
 
 ###############################################################################
-# two-dimensional subplots
+# Two-dimensional subplots.
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     fig = plt.figure()
@@ -200,20 +218,20 @@ with plt.style.context('dandy.mplstyle'):
     y = x / 2
     axs[1].plot(x, y, color = 'green', label = r'$x-2y=0$')
     customplot.polish(axs[1], title = 'This is a line!')
-    customplot.aspect(axs[1], ratio = 1)
+    customplot.aspect(axs[1], 1)
 
     customplot.limit(axs[2], 'x', first = 0, last = 8, step = 0.5)
     customplot.limit(axs[2], 'y', first = -1, last = 1, step = 0.5)
-    x = np.linspace(0, 8, 1000)
+    x = np.linspace(0, 8, 4000)
     y = np.random.randn(len(x)) / 10
     axs[2].plot(x, y, label = r'Noise')
     customplot.polish(axs[2], title = 'This is a random signal!')
-    customplot.aspect(axs[2], ratio = 1)
+    customplot.aspect(axs[2], 1)
 
     plt.show()
 
 ###############################################################################
-# three-dimensional Cartesian plot (curve)
+# Three-dimensional Cartesian plot (curve).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot(projection = '3d')
@@ -228,15 +246,16 @@ with plt.style.context('dandy.mplstyle'):
 
     customplot.polish(ax, title = 'This is a helix!')
 
-    # for three-dimensional plots, an aspect ratio is not useful
-    # because there are three coordinate axes
-    # so, if any non-zero value is given, the scales on the axes are made equal
-    customplot.aspect(ax, ratio = 1)
+    # An aspect ratio is meaningless in three-dimensional plots, because there
+    # are three axes of coordinates. Hence, if `ax.set_aspect' is called with
+    # any non-zero ratio, the scales on the x-axis, y-axis and z-axis will be
+    # made equal.
+    customplot.aspect(ax, 1)
 
     plt.show()
 
 ###############################################################################
-# three-dimensional Cartesian plot (curve) (trigonometric grid spacing)
+# Three-dimensional Cartesian plot (curve) (trigonometric grid spacing).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot(projection = '3d')
@@ -251,15 +270,16 @@ with plt.style.context('dandy.mplstyle'):
 
     customplot.polish(ax, title = 'This is a spring!')
 
-    # for three-dimensional plots, an aspect ratio is not useful
-    # because there are three coordinate axes
-    # so, if any non-zero value is given, the scales on the axes are made equal
-    customplot.aspect(ax, ratio = 1)
+    # An aspect ratio is meaningless in three-dimensional plots, because there
+    # are three axes of coordinates. Hence, if `ax.set_aspect' is called with
+    # any non-zero ratio, the scales on the x-axis, y-axis and z-axis will be
+    # made equal.
+    customplot.aspect(ax, 1)
 
     plt.show()
 
 ###############################################################################
-# three-dimensional Cartesian plot (surface) (trigonometric grid spacing)
+# Three-dimensional Cartesian plot (surface) (trigonometric grid spacing).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot(projection = '3d')
@@ -273,11 +293,11 @@ with plt.style.context('dandy.mplstyle'):
     Z = 1.5 * np.cos(X / 2) * np.sin(Y / 5)
     surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=1.5\cdot\cos\,0.5x\cdot\sin\,0.2y$')
 
-    # this line is required because of a library bug
+    # This line is required because of a library bug.
     surf._facecolors2d = surf._edgecolors2d = None
 
     customplot.polish(ax, title = 'This is an interference pattern!')
-    customplot.aspect(ax, ratio = 1)
+    customplot.aspect(ax, 1)
 
     plt.show()
 
