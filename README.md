@@ -39,7 +39,7 @@ $ make run
 ```
 
 A good way to start plotting your own graphs might be to copy parts of the code
-in `examples.py` and make modifications to the copy.
+in `examples.py` to another file, and make modifications to that file.
 
 # Notes
 
@@ -104,7 +104,7 @@ sans-serif font for `mathtext.sf`).
 Sometimes, subplots (multiple plots in a single figure) don't look pretty
 because elements from adjacent plots overlap with each other. To get around
 this problem, you can interactively adjust the spacing by using the 'Configure
-subplots' option in the navigation toolbar of the plot.
+subplots' option in the navigation toolbar of the figure.
 
 After doing this, maximise, un-maximise and again maximise the figure window.
 As a result, anything that needs to be redrawn will be redrawn.
