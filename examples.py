@@ -225,7 +225,7 @@ with plt.style.context('dandy.mplstyle'):
     x = np.linspace(0, 8, 4000)
     y = np.random.randn(len(x)) / 10
     axs[2].plot(x, y, label = r'Noise')
-    customplot.polish(axs[2], title = 'This is a random signal!')
+    customplot.polish(axs[2], labels = (r'$\tau$', r'$\nu$'), title = 'This is a random signal!')
     customplot.aspect(axs[2], 1)
 
     plt.show()
