@@ -1,17 +1,12 @@
 # customplot
 A wrapper around Matplotlib. It can be used to plot beautiful,
-publication-quality graphs. I mainly wrote this to plot graphs of maths
-functions. But with some extra effort, you can plot almost anything!
+publication-quality graphs. I mainly wrote this to plot graphs of functions,
+but it can be used for almost anything, really. (Take a gander at the
+[gallery](#gallery).)
 
-![Astroid](gallery/03_astroid.png)  
-![Lemniscate](gallery/05_lemniscate.png)  
-![Potentiometric Titration](gallery/07_potentiometry.png)  
-![Export Revenue](gallery/09_exports.png)  
-![Oxygen Parameters](gallery/10_oxygen_parameters.png)
-
-It cannot, however, replace Matplotlib or Pyplot. It just automates some
+However, customplot cannot replace Matplotlib or Pyplot. It just automates some
 settings which make the plot look appealing. For sufficiently complicated
-plots, you may have to use some functions of Matplotlib or Pyplot directly.
+plots, you may have to use functions of Matplotlib or Pyplot directly.
 
 Only `rectilinear`, `polar` and `3d` projections of Matplotlib axes are
 supported. Other projections can also be used, but their beautification may not
@@ -27,13 +22,14 @@ happen automatically.
 These requirements are not strict. Slightly older versions should also be okay.
 
 # Usage
-Clone or download this repository. Open a terminal window to the clone or
-download location. Run
+Call `limit` and `polish` on your Matplotlib axes instance before and after
+plotting, respectively.
+
+Run
 ```shell
 python3 examples.py
 ```
-
-to see some sample plots. Study the code, comparing it with these plots;
+to see some sample plots. Study the code and compare it with these plots;
 hopefully, that will make everything clear.
 
 Alternatively, you can use Cython (if you have it installed). This feature is
@@ -48,8 +44,8 @@ in `examples.py` and make modifications to the copy.
 # Notes
 
 ## Fonts
-Using a good font can significantly improve the appearance of your plot. (Take
-a look at the [gallery](gallery/). The font used in those plots is
+Using a good font can significantly improve the appearance of your plot. (Check
+out the [gallery](#gallery). The font used in those plots is
 [Cochineal](https://ctan.org/pkg/cochineal).)
 
 In case you want nothing to do with fonts, you can ignore this section
@@ -62,9 +58,9 @@ STIX font. To do so, modify the file `dandy.mplstyle` like this. (Only the
 relevant lines are shown.)
 ```python
 ...
-font.family:     STIXGeneral
+font.family: STIXGeneral
 ...
-mathtext.fontset:  stix
+mathtext.fontset: stix
 ...
 ```
 
@@ -90,12 +86,12 @@ wherever it appears, with `Libre Baskerville`. In other words, the contents of
 shown.)
 ```python
 ...
-font.family:     Libre Baskerville
+font.family: Libre Baskerville
 ...
-mathtext.bf:       Libre Baskerville:bold
-mathtext.cal:      Libre Baskerville:bold:italic
-mathtext.it:       Libre Baskerville:italic
-mathtext.rm:       Libre Baskerville
+mathtext.bf:  Libre Baskerville:bold
+mathtext.cal: Libre Baskerville:bold:italic
+mathtext.it:  Libre Baskerville:italic
+mathtext.rm:  Libre Baskerville
 ...
 ```
 
@@ -130,4 +126,16 @@ simply a result of the plotting algorithm used by graph plotters. If this
 happens in your plot, try using the `sanitise_discontinuous` function with a
 suitable value of `maximum_diff`. (A demonstration can be found in
 `examples.py`.)
+
+# Gallery
+![Function](gallery/01_function_single.png)  
+![Functions](gallery/02_function_multiple.png)  
+![Astroid](gallery/03_astroid.png)  
+![Folium of Descartes](gallery/04_folium.png)  
+![Lemniscate](gallery/05_lemniscate.png)  
+![Population Distribution](gallery/06_population_distribution.png)  
+![Potentiometric Titration](gallery/07_potentiometry.png)  
+![Refractometry](gallery/08_refractometry.png)  
+![Export Revenue](gallery/09_exports.png)  
+![Oxygen Parameters](gallery/10_oxygen_parameters.png)
 
