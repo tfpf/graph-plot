@@ -26,16 +26,16 @@ Call `limit` and `polish` on your Matplotlib axes instance before and after
 plotting, respectively.
 
 Run
-```shell
-python3 examples.py
+```console
+$ python3 examples.py
 ```
 to see some sample plots. Study the code and compare it with these plots;
 hopefully, that will make everything clear.
 
 Alternatively, you can use Cython (if you have it installed). This feature is
 experimental and has not been tested much.
-```makefile
-make run
+```console
+$ make run
 ```
 
 A good way to start plotting your own graphs might be to copy parts of the code
@@ -75,9 +75,10 @@ with the extension `.ttf`, or perhaps `.otf`).
 * Create a new directory `~/.fonts/LibreBaskerville` and put the
 above-mentioned font files in that directory.
 * Find out where Matplotlib stores its cache.
-```python
-import matplotlib
-print(matplotlib.get_cachedir())
+```console
+$ python3
+>>> import matplotlib
+>>> print(matplotlib.get_cachedir())
 ```
 * Delete all font-related cache files in that location.
 * Open the file `dandy.mplstyle` and search for `Cochineal`. Replace it,
