@@ -147,11 +147,17 @@ Args:
     event: Matplotlib event (the event which triggered this function)
 '''
 
+    canvas = event.canvas
+    fig = canvas.figure
+
+    # Stop the event loop (if it is already running). If this is not done, a
+    # RuntimeError may be raised when `plt.pause' is called.
+    canvas.stop_event_loop()
+
     # When the canvas is resized, Matplotlib axes are also resized. Delay for
     # some time to allow this to happen.
-    plt.pause(0.2)
+    plt.pause(0.01)
 
-    fig = event.canvas.figure
     for ax in fig.axes:
         if ax.name != 'polar':
             continue
@@ -418,19 +424,19 @@ def main():
     plt.style.use('dandy.mplstyle')
 
     ax = plt.figure().add_subplot(1, 1, 1,
-                                  # projection = 'polar',
+                                  projection = 'polar',
                                   # projection = '3d',
                                  )
-    limit(ax, 'x', symbolic = False,
+    limit(ax, 'x', symbolic = True,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -6,
-                   last     = 6,
-                   step     = 1)
+                   first    = 0,
+                   last     = 2,
+                   step     = 0.125)
     limit(ax, 'y', symbolic = False,
                    s        = r'A',
                    v        = np.pi,
-                   first    = -2,
+                   first    = 0,
                    last     = 4,
                    step     = 1)
     limit(ax, 'z', symbolic = False,
@@ -441,10 +447,10 @@ def main():
                    step     = 1)
 
     # t = np.linspace(-5 * np.pi, 5 * np.pi, 10000)
-    x1 = np.linspace(-20, 20, 10000)
-    y1 = np.exp(-np.abs(x1))
+    x1 = np.linspace(0, 2 * np.pi, 10000)
+    y1 = x1
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$y=e^{-|x|}$')
+    ax.plot(x1, y1, color = 'red', label = r'$r=\theta$')
     # ax.plot([0], [0], color = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(5.3, 1.6, r'$t<-\sqrt{3}$', size = 'large')
 
@@ -466,8 +472,8 @@ def main():
 
     # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$')
     # ax.fill_betweenx(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if i < 4 else False for i in y1])
-    ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$', where = [True if 0 < i else False for i in x1])
-    ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = r'$T$', where = [True if 0 > i else False for i in x1])
+    # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$', where = [True if 0 < i else False for i in x1])
+    # ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = r'$T$', where = [True if 0 > i else False for i in x1])
 
     polish(ax, labels = None, title = None, suptitle = None)
     aspect(ax, 1)
