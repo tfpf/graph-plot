@@ -104,7 +104,7 @@ sans-serif font for `mathtext.sf`).
 Sometimes, subplots (multiple plots in a single figure) don't look pretty
 because elements from adjacent plots overlap with each other. To get around
 this problem, you can interactively adjust the spacing by using the 'Configure
-subplots' option in the menu bar at the bottom.
+subplots' option in the navigation toolbar of the plot.
 
 After doing this, maximise, un-maximise and again maximise the figure window.
 As a result, anything that needs to be redrawn will be redrawn.
