@@ -266,6 +266,7 @@ Args:
     labels_getter = getattr(ax, f'get_{coordaxis}ticklabels')
     labels_setter = getattr(ax, f'set_{coordaxis}ticklabels')
     limits_setter = getattr(ax, f'set_{coordaxis}lim')
+    ticks_getter  = getattr(ax, f'get_{coordaxis}ticks')
     ticks_setter  = getattr(ax, f'set_{coordaxis}ticks')
 
     # Case 1: use symbolic tick labels.
@@ -297,12 +298,17 @@ Args:
             limits_setter(first, last)
 
         # Like in case 1, do not draw the first and last labels on the radial
-        # axis.
+        # axis. However, if `step' has not been provided, Matplotlib may not
+        # start labelling the radial axis from zero. So, check the first tick
+        # before doing this.
         fig = ax.figure
         fig.canvas.draw()
         if ax.name == 'polar' and coordaxis == 'y':
             labels = [l.get_text() for l in labels_getter()]
-            labels[0] = labels[-1] = ''
+            ticks = ticks_getter()
+            if ticks[0] == 0:
+                labels[0] = ''
+            labels[-1] = ''
             labels_setter(labels)
 
 ###############################################################################
@@ -438,7 +444,7 @@ def main():
                    v        = np.pi,
                    first    = 0,
                    last     = 4,
-                   step     = 1)
+                   step     = None)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
