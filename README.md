@@ -114,7 +114,8 @@ before adjusting anything else. In the file `dandy.mplstyle`, search for
 `figure.dpi` and change the value next to it.
 
 In my experience, a value of 120 produces pretty graphs on a 1080p screen,
-while a 768p screen requires a value of 96 or so.
+while a 768p screen requires a value of 85 or so. On a 720p screen, 80 should
+work well.
 
 ## Essential and Jump Discontinuities
 There are two types of discontinuities most graph plotters struggle with:
