@@ -415,7 +415,6 @@ Args:
 ###############################################################################
 
 def main():
-    mpl.rcParams['savefig.directory'] = '/mnt/c/Users/vpaij/Pictures/graphs/'
     plt.style.use('dandy.mplstyle')
 
     ax = plt.figure().add_subplot(1, 1, 1,
@@ -425,14 +424,14 @@ def main():
     limit(ax, 'x', symbolic = True,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -2,
-                   last     = 2,
-                   step     = 0.25)
+                   first    = -4,
+                   last     = 4,
+                   step     = 0.5)
     limit(ax, 'y', symbolic = False,
                    s        = r'A',
                    v        = np.pi,
-                   first    = -3,
-                   last     = 3,
+                   first    = -6,
+                   last     = 6,
                    step     = 1)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
@@ -446,13 +445,13 @@ def main():
     y1 = np.sin(x1)
     z1 = x1
     ax.plot(x1, y1, color = 'red', label = r'$y=\sin\,x$')
-    # ax.plot([0, 1, 2, 3, 4, 5, 6], [1, 1, 1, 1, 1, 1, 1], color = 'red', linestyle = 'none', marker = 'o', label = '')
+    # ax.plot([0], [0], color = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0, 0, r'origin', size = 'large')
 
-    # x2 = x1
-    # y2 = np.exp(-x1 / 10)
+    # x2 = np.linspace(-20, 20, 10000)
+    # y2 = x2
     # z2 = x2
-    # ax.plot(x2, y2, color = 'C0', linestyle = ':', label = r'')
+    # ax.plot(x2, y2, color = 'C0', linestyle = ':', label = r'$y=\pm x$')
     # ax.plot([0, 0], [0, np.pi], color = 'blue', linestyle = 'none', marker = 'o', label = '')
 
     # x3 = 5 * t ** 2 / (1 + t ** 5)np.linspace(0, 20, 10000)
@@ -460,8 +459,8 @@ def main():
     # z3 = x3
     # ax.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
 
-    # X, Y = np.meshgrid(np.linspace(-4, 4, 1000), np.linspace(-4, 4, 1000))
-    # Z = np.imag(np.log(X + 1j * Y))
+    # X, Y = np.meshgrid(np.linspace(-4, 4, 100), np.linspace(-4, 4, 100))
+    # Z = X * Y ** 0.5
     # surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=\mathfrak{I}\{{\mathrm{Log}(x+iy)}\}$')
     # surf._edgecolors2d = surf._facecolors2d = None
 
@@ -478,11 +477,12 @@ def main():
     # This is a hack to maximise the figure window. Normally,
     # `full_screen_toggle' does exactly what its name suggests: it turns
     # full-screen mode on or off. But on WSL with a virtual display, it
-    # maximises the figure window.
+    # maximises the figure window if Matplotlib is using either the TkAgg or
+    # the Qt5Agg backend. I prefer the latter.
     fig = ax.figure
     fig.canvas.manager.full_screen_toggle()
 
-    fig.tight_layout(pad = 2)
+    # fig.tight_layout(pad = 2)
     plt.show()
 
 ###############################################################################
