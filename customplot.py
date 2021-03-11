@@ -19,6 +19,9 @@ def _generate_gid():
 Generate a string which will be used to uniquely identify patches not added by
 the user. This string will also be used as the title of the figure window if
 the user has not supplied a title.
+
+Returns:
+    a unique string
 '''
 
     return f'cp_{time.time_ns()}_{np.random.randint(100000, 999999)}'
@@ -430,21 +433,21 @@ def main():
     plt.style.use('dandy.mplstyle')
 
     ax = plt.figure().add_subplot(1, 1, 1,
-                                  projection = 'polar',
+                                  # projection = 'polar',
                                   # projection = '3d',
                                  )
-    limit(ax, 'x', symbolic = True,
+    limit(ax, 'x', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = 0,
-                   last     = 2,
-                   step     = 0.125)
-    limit(ax, 'y', symbolic = False,
-                   s        = r'A',
+                   first    = -6,
+                   last     = 6,
+                   step     = 0.5)
+    limit(ax, 'y', symbolic = True,
+                   s        = r'\pi',
                    v        = np.pi,
-                   first    = 0,
-                   last     = 4,
-                   step     = None)
+                   first    = -0.5,
+                   last     = 1.5,
+                   step     = 0.125)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
@@ -452,21 +455,21 @@ def main():
                    last     = 2,
                    step     = 1)
 
-    # t = np.linspace(-5 * np.pi, 5 * np.pi, 10000)
-    x1 = np.linspace(0, 2 * np.pi, 10000)
-    y1 = x1
+    # t = np.linspace(0, 2 * np.pi, 10000)
+    x1 = np.linspace(-1, 1, 10000)
+    y1 = np.arccos(x1)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$r=\theta$')
-    # ax.plot([0], [0], color = 'red', linestyle = 'none', marker = 'o', label = '')
-    # ax.text(5.3, 1.6, r'$t<-\sqrt{3}$', size = 'large')
+    ax.plot(x1, y1, color = 'red', label = r'$y=\arccos\,x$')
+    # ax.plot([0], [1], color = 'red', linestyle = 'none', marker = 'o', label = '')
+    # ax.text(0.47, -0.05, r'$r+2\Delta r$', size = 'large')
 
-    # x2 = np.linspace(-20, 20, 10000)
-    # y2 = x2
+    # x2 = np.linspace(-51, -50, 10000)
+    # y2 = 7 ** (x1 + 4)
     # z2 = x2
-    # ax.plot(x2, y2, color = 'C0', linestyle = ':', label = r'$y=\pm x$')
-    # ax.plot([0, 0], [0, np.pi], color = 'blue', linestyle = 'none', marker = 'o', label = '')
+    # ax.plot(x2, y2, color = 'C0', linestyle = '-', label = r'$y=7^{x+4}$')
+    # ax.plot([np.e, np.e], [-10, 10], color = 'blue', linestyle = '-', marker = None, label = r'$x=e$')
 
-    # x3 = 5 * t ** 2 / (1 + t ** 5)np.linspace(0, 20, 10000)
+    # x3 = np.linspace(0, 20, 10000)
     # y3 = 1 / x3
     # z3 = x3
     # ax.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
@@ -478,8 +481,7 @@ def main():
 
     # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$')
     # ax.fill_betweenx(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if i < 4 else False for i in y1])
-    # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$', where = [True if 0 < i else False for i in x1])
-    # ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = r'$T$', where = [True if 0 > i else False for i in x1])
+    # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$', where = [True if 1 < i < np.e else False for i in x1])
 
     polish(ax, labels = None, title = None, suptitle = None)
     aspect(ax, 1)
