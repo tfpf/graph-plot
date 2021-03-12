@@ -293,6 +293,16 @@ Args:
         labels_setter(labels)
         limits_setter(v * first, v * last)
 
+        # If the x-axis labels will contain fractions, increase the padding
+        # slightly. Do not do this for polar plots (the spacing is already
+        # quite good). Do not do this for three-dimensional plots, either
+        # (Matplotlib messes up the spacing).
+        if ax.name == 'rectilinear' and coordaxis == 'x' and not all(isinstance(t, int) for t in [first, last, step]):
+            ax.tick_params(axis = coordaxis, which = 'major', pad = 20)
+            for tick in labels_getter():
+                tick.set_horizontalalignment('center')
+                tick.set_verticalalignment('center')
+
     # Case 2: allow tick labels to be set automatically.
     else:
         if all(arg is not None for arg in [first, last, step]):
@@ -433,21 +443,21 @@ def main():
     plt.style.use('dandy.mplstyle')
 
     ax = plt.figure().add_subplot(1, 1, 1,
-                                  # projection = 'polar',
+                                  projection = 'polar',
                                   # projection = '3d',
                                  )
-    limit(ax, 'x', symbolic = False,
+    limit(ax, 'x', symbolic = True,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -6,
-                   last     = 6,
-                   step     = 0.5)
+                   first    = 0,
+                   last     = 2,
+                   step     = 1 / 12)
     limit(ax, 'y', symbolic = True,
-                   s        = r'\pi',
-                   v        = np.pi,
-                   first    = -0.5,
-                   last     = 1.5,
-                   step     = 0.125)
+                   s        = r'a',
+                   v        = 1,
+                   first    = 0,
+                   last     = 5,
+                   step     = 1)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
@@ -456,17 +466,17 @@ def main():
                    step     = 1)
 
     # t = np.linspace(0, 2 * np.pi, 10000)
-    x1 = np.linspace(-1, 1, 10000)
-    y1 = np.arccos(x1)
+    x1 = np.linspace(0, 2 * np.pi, 10000)
+    y1 = x1 - np.sin(x1)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$y=\arccos\,x$')
+    ax.plot(x1, y1, color = 'red', label = r'$r=a(\theta-\sin\,\theta)$')
     # ax.plot([0], [1], color = 'red', linestyle = 'none', marker = 'o', label = '')
     # ax.text(0.47, -0.05, r'$r+2\Delta r$', size = 'large')
 
-    # x2 = np.linspace(-51, -50, 10000)
-    # y2 = 7 ** (x1 + 4)
-    # z2 = x2
-    # ax.plot(x2, y2, color = 'C0', linestyle = '-', label = r'$y=7^{x+4}$')
+    x2 = np.linspace(0, 2 * np.pi, 10000)
+    y2 = 1 - np.cos(x2)
+    z2 = x2
+    ax.plot(x2, y2, color = 'C0', label = r'$r=a(1-\cos\,\theta)$')
     # ax.plot([np.e, np.e], [-10, 10], color = 'blue', linestyle = '-', marker = None, label = r'$x=e$')
 
     # x3 = np.linspace(0, 20, 10000)
