@@ -79,7 +79,7 @@ axes.titlesize:     xx-large # xx-small, x-small, small, medium, large, x-large,
 axes.titleweight:   normal   # 100, 200, 300, 400, 500, 600, 700, 800, 900, normal, bold, bolder, lighter
 axes.titlecolor:    auto
 axes.titley:        None
-axes.titlepad:      6
+axes.titlepad:      20
 axes.labelsize:     x-large  # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
 axes.labelpad:      4
 axes.labelweight:   normal   # 100, 200, 300, 400, 500, 600, 700, 800, 900, normal, bold, bolder, lighter
