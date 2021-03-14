@@ -217,7 +217,7 @@ Args:
 
 ###############################################################################
 
-def sanitise_discontinuous(y, maximum_diff = 5):
+def sanitise(y, maximum_diff = 5):
     '''\
 At a point of essential or jump discontinuity, Matplotlib draws a vertical line
 automatically. This vertical line joins the two points around the
@@ -452,12 +452,12 @@ def main():
                    first    = 0,
                    last     = 2,
                    step     = 1 / 12)
-    limit(ax, 'y', symbolic = True,
-                   s        = r'a',
-                   v        = 1,
+    limit(ax, 'y', symbolic = False,
+                   s        = r'\pi',
+                   v        = np.pi,
                    first    = 0,
-                   last     = 5,
-                   step     = 1)
+                   last     = 1.2,
+                   step     = 0.2)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
@@ -467,16 +467,16 @@ def main():
 
     # t = np.linspace(0, 2 * np.pi, 10000)
     x1 = np.linspace(0, 2 * np.pi, 10000)
-    y1 = x1 - np.sin(x1)
+    y1 = np.sin(3 * x1)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$r=a(\theta-\sin\,\theta)$')
-    # ax.plot([0], [1], color = 'red', linestyle = 'none', marker = 'o', label = '')
+    ax.plot(x1, y1, color = 'red', label = r'$r=\sin\,3\theta$')
+    # ax.plot(x1, y1, color = 'red', linestyle = 'none', marker = 'o', mfc = 'red', label = r'$r=3+2\,\cos\,\theta$')
     # ax.text(0.47, -0.05, r'$r+2\Delta r$', size = 'large')
 
-    x2 = np.linspace(0, 2 * np.pi, 10000)
-    y2 = 1 - np.cos(x2)
-    z2 = x2
-    ax.plot(x2, y2, color = 'C0', label = r'$r=a(1-\cos\,\theta)$')
+    # x2 = np.linspace(0, 2 * np.pi, 10000)
+    # y2 = np.sin(3 * x2)
+    # z2 = x2
+    # ax.plot(x2, y2, color = 'C0', label = r'$r=\sin\,3\theta$')
     # ax.plot([np.e, np.e], [-10, 10], color = 'blue', linestyle = '-', marker = None, label = r'$x=e$')
 
     # x3 = np.linspace(0, 20, 10000)
@@ -490,8 +490,8 @@ def main():
     # surf._edgecolors2d = surf._facecolors2d = None
 
     # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$')
-    # ax.fill_betweenx(x1, y1, y2, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if i < 4 else False for i in y1])
-    # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$', where = [True if 1 < i < np.e else False for i in x1])
+    # ax.fill_between(x1, y1, np.pi / 4, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if 0 < i < 1 else False for i in x1])
+    # ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = r'$S$', where = [True if 0 < i < np.pi / 2 else False for i in x1])
 
     polish(ax, labels = None, title = None, suptitle = None)
     aspect(ax, 1)

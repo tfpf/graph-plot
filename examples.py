@@ -59,18 +59,18 @@ with plt.style.context('dandy.mplstyle'):
     # Set the locations of the grid lines on the x-axis. Grid lines will be
     # drawn at the following x-coordinates.
     # [-8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
-    customplot.limit(ax, 'x', first = -8, last = 8, step = 1)
+    customplot.limit(ax, 'x', first = -4, last = 4, step = 0.5)
 
     # Set the locations of the grid lines on the y-axis. Grid lines will be
     # drawn at the following y-coordinates.
     # [-4, -3, -2, -1, 0, 1, 2, 3, 4]
-    customplot.limit(ax, 'y', first = -4, last = 4, step = 1)
+    customplot.limit(ax, 'y', first = -2, last = 2, step = 0.5)
 
-    x = np.linspace(-8, 8, 10000)
+    x = np.linspace(-4, 4, 10000)
     y = np.heaviside(x, 0.5)
 
     # Remove the vertical line at the point of discontinuity.
-    y = customplot.sanitise_discontinuous(y, maximum_diff = 0.1)
+    y = customplot.sanitise(y, maximum_diff = 0.1)
 
     ax.plot(x, y, color = 'red', label = r'$y=u(x)$')
 
