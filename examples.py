@@ -89,7 +89,7 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional Cartesian plot (trigonometric grid spacing).
+# Two-dimensional Cartesian plot (symbolic labels).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot()
@@ -110,6 +110,33 @@ with plt.style.context('dandy.mplstyle'):
     ax.plot(x, y, color = 'green', label = r'$y=\cos\,x$')
 
     customplot.polish(ax, title = 'This is a trigonometric function!')
+    customplot.aspect(ax, 1)
+
+    plt.show()
+
+###############################################################################
+# Two-dimensional Cartesian plot (symbolic labels with scaling).
+###############################################################################
+with plt.style.context('dandy.mplstyle'):
+    ax = plt.figure().add_subplot()
+
+    # Set the locations of the grid lines on the x-axis. Note that `symbolic'
+    # has been set to True, and a value has been provided for `s' and `v'. As a
+    # result, grid lines will be drawn at the following x-coordinates.
+    # [-2π/γ, -1.75π/γ, -1.5π/γ, -1.25π/γ, -π/γ, -0.75π/γ, -0.5π/γ, -0.25π/γ, 0, 0.25π/γ, 0.5π/γ, 0.75π/γ, π/γ, 1.25π/γ, 1.5π/γ, 1.75π/γ, 2π/γ]
+    # Here, γ is the Euler–Mascheroni constant.
+    customplot.limit(ax, 'x', symbolic = True, s = r'\pi/\gamma', v = np.pi / np.euler_gamma, first = -2, last = 2, step = 0.25)
+
+    # Set the locations of the grid lines on the y-axis. Grid lines will be
+    # drawn at the following y-coordinates.
+    # [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+    customplot.limit(ax, 'y', first = -5, last = 5, step = 1)
+
+    x = np.linspace(-12, 12, 10000)
+    y = np.cos(np.euler_gamma * x)
+    ax.plot(x, y, color = 'green', label = r'$y=\cos\,\gamma x$')
+
+    customplot.polish(ax, title = 'This is a horizontally scaled trigonometric function!')
     customplot.aspect(ax, 1)
 
     plt.show()
@@ -161,7 +188,7 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional polar plot (trigonometric grid spacing).
+# Two-dimensional polar plot (symbolic labels).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot(projection = 'polar')
@@ -255,7 +282,7 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Three-dimensional Cartesian plot (curve) (trigonometric grid spacing).
+# Three-dimensional Cartesian plot (curve) (symbolic labels).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot(projection = '3d')
@@ -279,7 +306,7 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Three-dimensional Cartesian plot (surface) (trigonometric grid spacing).
+# Three-dimensional Cartesian plot (surface) (symbolic labels).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot(projection = '3d')

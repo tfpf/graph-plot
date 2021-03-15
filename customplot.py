@@ -66,17 +66,26 @@ from one rational multiple of π (or some other number) to another.
 (['$-\\pi$', '$-\\dfrac{3\\pi}{4}$', '$-\\dfrac{\\pi}{2}$', '$-\\dfrac{\\pi}{4}$'], array([-3.14159265, -2.35619449, -1.57079633, -0.78539816]))
 >>> _labels_and_ticks(-2, 2, 1)
 (['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$'], array([-6.28318531, -3.14159265,  0.        ,  3.14159265,  6.28318531]))
+>>> _labels_and_ticks(2, 4, 1 / 2, symbol = r'\pi/\omega', symval = np.pi / 2)
+(['$\\dfrac{2\\pi}{\\omega}$', '$\\dfrac{5\\pi}{2\\omega}$', '$\\dfrac{3\\pi}{\\omega}$', '$\\dfrac{7\\pi}{2\\omega}$', '$\\dfrac{4\\pi}{\\omega}$'], array([3.14159265, 3.92699082, 4.71238898, 5.49778714, 6.28318531]))
 
 Args:
     first: float (first item in the returned array shall be `first * symval')
     last: float (last item in the returned array shall be `last * symval')
     step: float (array items will increment in steps of `step * symval')
-    symbol: str (LaTeX code of the symbol to use instead of π)
+    symbol: str (LaTeX code or two slash-separated LaTeX codes of the symbol or
+            symbols to use instead of π)
     symval: float (numerical value represented by `symbol')
 
 Returns:
     tuple of a list of labels and a NumPy array of the respective values
 '''
+
+    if '/' in symbol:
+        s_num, s_den = symbol.split('/')
+    else:
+        s_num = symbol
+        s_den = '1'
 
     coefficients = np.arange(first, last + step / 2, step)
 
@@ -104,13 +113,21 @@ Returns:
         if num < 0:
             builder.append('-')
             num = abs(num)
-        if den != 1:
+        is_fraction = den != 1 or s_den != '1'
+        if is_fraction:
             builder.append(r'\dfrac{')
         if num != 1:
             builder.append(f'{num}')
-        builder.append(symbol)
+        if s_num != '1' or num == 1:
+            builder.append(s_num)
+        if is_fraction:
+            builder.append(r'}{')
         if den != 1:
-            builder.append(f'}}{{{den}}}')
+            builder.append(f'{den}')
+        if s_den != '1':
+            builder.append(s_den)
+        if is_fraction:
+            builder.append(r'}')
         builder.append('$')
         labels[i] = ''.join(builder)
 
@@ -256,7 +273,8 @@ Args:
     ax: Matplotlib axes instance
     coordaxis: str (which axis of coordinates to limit: 'x', 'y' or 'z')
     symbolic: bool (whether ticks are at rational multiples of `v')
-    s: str (LaTeX code of the symbol to use instead of π)
+    s: str (LaTeX code or two slash-separated LaTeX codes of the symbol or
+       symbols to use instead of π)
     v: float (numerical value represented by `s')
     first: float (tick start point)
     last: float (tick end point)
@@ -443,21 +461,21 @@ def main():
     plt.style.use('dandy.mplstyle')
 
     ax = plt.figure().add_subplot(1, 1, 1,
-                                  projection = 'polar',
+                                  # projection = 'polar',
                                   # projection = '3d',
                                  )
     limit(ax, 'x', symbolic = True,
-                   s        = r'\pi',
+                   s        = r'\pi/\omega',
                    v        = np.pi,
-                   first    = 0,
-                   last     = 2,
-                   step     = 1 / 12)
+                   first    = -4,
+                   last     = 4,
+                   step     = 0.5)
     limit(ax, 'y', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = 0,
-                   last     = 1.2,
-                   step     = 0.2)
+                   first    = -6,
+                   last     = 6,
+                   step     = 1)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
@@ -466,17 +484,17 @@ def main():
                    step     = 1)
 
     # t = np.linspace(0, 2 * np.pi, 10000)
-    x1 = np.linspace(0, 2 * np.pi, 10000)
-    y1 = np.sin(3 * x1)
+    x1 = np.linspace(-20, 20, 10000)
+    y1 = np.sin(x1)
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$r=\sin\,3\theta$')
+    ax.plot(x1, y1, color = 'red', label = r'$y=\sin\,\omega x$')
     # ax.plot(x1, y1, color = 'red', linestyle = 'none', marker = 'o', mfc = 'red', label = r'$r=3+2\,\cos\,\theta$')
     # ax.text(0.47, -0.05, r'$r+2\Delta r$', size = 'large')
 
-    # x2 = np.linspace(0, 2 * np.pi, 10000)
-    # y2 = np.sin(3 * x2)
+    # x2 = np.linspace(-20, 20, 10000)
+    # y2 = np.exp(x2)
     # z2 = x2
-    # ax.plot(x2, y2, color = 'C0', label = r'$r=\sin\,3\theta$')
+    # ax.plot(x2, y2, color = 'blue', label = r'$y=e^x$')
     # ax.plot([np.e, np.e], [-10, 10], color = 'blue', linestyle = '-', marker = None, label = r'$x=e$')
 
     # x3 = np.linspace(0, 20, 10000)
@@ -490,7 +508,7 @@ def main():
     # surf._edgecolors2d = surf._facecolors2d = None
 
     # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$')
-    # ax.fill_between(x1, y1, np.pi / 4, facecolor = 'cyan', linewidth = 0, label = '$S$', where = [True if 0 < i < 1 else False for i in x1])
+    # ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = '$S$', where = [True if 0 < i < 100 else False for i in x1])
     # ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = r'$S$', where = [True if 0 < i < np.pi / 2 else False for i in x1])
 
     polish(ax, labels = None, title = None, suptitle = None)
