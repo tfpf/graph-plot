@@ -39,7 +39,7 @@ Args:
 '''
 
     # Convert the iterable into a two-dimensional list.
-    items = [str(item) for item in items]
+    items = list(map(str, items))
     if len(items) % columns != 0:
         items.extend([''] * (columns - len(items) % columns))
     items = [items[i : i + columns] for i in range(0, len(items), columns)]
@@ -332,8 +332,8 @@ Args:
         # axis. However, if `step' has not been provided, Matplotlib may not
         # start labelling the radial axis from zero. So, check the first tick
         # before doing this.
-        fig = ax.figure
-        fig.canvas.draw()
+        canvas = ax.figure.canvas
+        canvas.draw()
         if ax.name == 'polar' and coordaxis == 'y':
             labels = [l.get_text() for l in labels_getter()]
             ticks = ticks_getter()
@@ -406,18 +406,21 @@ Args:
     # resize event of the figure canvas to a callback which does some
     # additional beautification of polar plots.
     fig = ax.figure
+    canvas = fig.canvas
     gid = _generate_gid()
     if ax.name == 'polar' and fig not in _gid:
         _gid[fig] = gid
-        fig.canvas.mpl_connect('resize_event', _draw_polar_patches)
+        canvas.mpl_connect('resize_event', _draw_polar_patches)
 
     if title is not None:
         ax.set_title(title)
     if suptitle is not None:
         fig.suptitle(suptitle)
-        fig.canvas.set_window_title(suptitle)
+        window_title = suptitle
     else:
-        fig.canvas.set_window_title(gid)
+        window_title = gid
+    if canvas.get_window_title().startswith('Figure '):
+        canvas.set_window_title(window_title)
 
     if ax.get_legend_handles_labels() != ([], []):
         kwargs = {'loc': 'best'}
@@ -517,13 +520,15 @@ def main():
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
 
+    fig = ax.figure
+    canvas = fig.canvas
+
     # This is a hack to maximise the figure window. Normally,
     # `full_screen_toggle' does exactly what its name suggests: it turns
     # full-screen mode on or off. But on WSL with a virtual display, it
     # maximises the figure window if Matplotlib is using either the TkAgg or
     # the Qt5Agg backend.
-    fig = ax.figure
-    fig.canvas.manager.full_screen_toggle()
+    canvas.manager.full_screen_toggle()
 
     fig.tight_layout(pad = 2)
     plt.show()
