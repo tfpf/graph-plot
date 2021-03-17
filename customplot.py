@@ -5,6 +5,7 @@ import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import time
 import weakref
 
@@ -431,6 +432,22 @@ Args:
             kwargs['facecolor'] = 'lightgray'
         ax.legend(**kwargs)
 
+    # Maximise the figure window.
+    manager = canvas.manager
+    name = os.name
+    backend = mpl.get_backend()
+    if backend in {'TkAgg', 'TkCairo'}:
+        if name == 'nt':
+            manager.window.state('zoomed')
+        else:
+            manager.resize(*manager.window.maxsize())
+    elif backend in {'GTK3Agg', 'GTK3Cairo'}:
+        manager.window.maximize()
+    elif backend in {'WXAgg', 'WXCairo'}:
+        manager.frame.Maximize(True)
+    elif backend in {'Qt4Agg', 'Qt4Cairo', 'Qt5Agg', 'Qt5Cairo'}:
+        manager.window.showMaximized()
+
 ###############################################################################
 
 def aspect(ax, ratio = 0):
@@ -468,36 +485,36 @@ def main():
                                   # projection = '3d',
                                  )
     limit(ax, 'x', symbolic = True,
-                   s        = r'\pi/\omega',
-                   v        = np.pi,
-                   first    = -4,
-                   last     = 4,
-                   step     = 0.5)
-    limit(ax, 'y', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -6,
-                   last     = 6,
-                   step     = 1)
+                   first    = -1 / 3,
+                   last     = 7 / 3,
+                   step     = 1 / 6)
+    limit(ax, 'y', symbolic = False,
+                   s        = r'R',
+                   v        = np.pi,
+                   first    = -2,
+                   last     = 2,
+                   step     = 0.5)
     limit(ax, 'z', symbolic = False,
                    s        = r'\pi',
                    v        = np.pi,
-                   first    = -5,
-                   last     = 2,
-                   step     = 1)
+                   first    = -1,
+                   last     = 1,
+                   step     = 0.25)
 
-    # t = np.linspace(0, 2 * np.pi, 10000)
+    # t = np.linspace(0, 10 * np.pi, 10000)
     x1 = np.linspace(-20, 20, 10000)
-    y1 = np.sin(x1)
+    y1 = sanitise(np.tan(2 * x1))
     z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$y=\sin\,\omega x$')
+    ax.plot(x1, y1, color = 'red', label = r'$y=\tan\,2\theta$')
     # ax.plot(x1, y1, color = 'red', linestyle = 'none', marker = 'o', mfc = 'red', label = r'$r=3+2\,\cos\,\theta$')
     # ax.text(0.47, -0.05, r'$r+2\Delta r$', size = 'large')
 
-    # x2 = np.linspace(-20, 20, 10000)
-    # y2 = np.exp(x2)
-    # z2 = x2
-    # ax.plot(x2, y2, color = 'blue', label = r'$y=e^x$')
+    x2 = np.linspace(-20, 20, 10000)
+    y2 = sanitise(-np.tan(x2))
+    z2 = x2
+    ax.plot(x2, y2, color = 'blue', label = r'$y=-\tan\,\theta$')
     # ax.plot([np.e, np.e], [-10, 10], color = 'blue', linestyle = '-', marker = None, label = r'$x=e$')
 
     # x3 = np.linspace(0, 20, 10000)
@@ -505,31 +522,22 @@ def main():
     # z3 = x3
     # ax.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
 
-    # X, Y = np.meshgrid(np.linspace(-4, 4, 100), np.linspace(-4, 4, 100))
-    # Z = X * Y ** 0.5
-    # surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=\mathfrak{I}\{{\mathrm{Log}(x+iy)}\}$')
+    # X, Y = np.meshgrid(np.linspace(-3, 3, 1000), np.linspace(-3, 3, 1000))
+    # Z = X ** 2 * Y ** 2 / (X ** 4 + 3 * Y ** 4)
+    # surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=\dfrac{x^2y^2}{x^4+3y^4}$')
     # surf._edgecolors2d = surf._facecolors2d = None
 
     # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$')
     # ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = '$S$', where = [True if 0 < i < 100 else False for i in x1])
     # ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = r'$S$', where = [True if 0 < i < np.pi / 2 else False for i in x1])
 
-    polish(ax, labels = None, title = None, suptitle = None)
+    polish(ax, labels = (r'$\theta$', '$y$'), title = None, suptitle = None)
     aspect(ax, 1)
 
     # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
     # ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
 
     fig = ax.figure
-    canvas = fig.canvas
-
-    # This is a hack to maximise the figure window. Normally,
-    # `full_screen_toggle' does exactly what its name suggests: it turns
-    # full-screen mode on or off. But on WSL with a virtual display, it
-    # maximises the figure window if Matplotlib is using either the TkAgg or
-    # the Qt5Agg backend.
-    canvas.manager.full_screen_toggle()
-
     fig.tight_layout(pad = 2)
     plt.show()
 
