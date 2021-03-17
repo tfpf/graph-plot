@@ -445,7 +445,7 @@ Args:
         manager.window.maximize()
     elif backend in {'WXAgg', 'WXCairo'}:
         manager.frame.Maximize(True)
-    elif backend in {'Qt4Agg', 'Qt4Cairo', 'Qt5Agg', 'Qt5Cairo'}:
+    elif backend in {'Qt5Agg', 'Qt5Cairo'}:
         manager.window.showMaximized()
 
 ###############################################################################
