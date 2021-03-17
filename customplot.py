@@ -177,7 +177,7 @@ Args:
 
     # When the canvas is resized, Matplotlib axes are also resized. Delay for
     # some time to allow this to happen.
-    plt.pause(0.01)
+    plt.pause(0.1)
 
     for ax in fig.axes:
         if ax.name != 'polar':
@@ -412,6 +412,7 @@ Args:
     if ax.name == 'polar' and fig not in _gid:
         _gid[fig] = gid
         canvas.mpl_connect('resize_event', _draw_polar_patches)
+        canvas.resize_event()
 
     if title is not None:
         ax.set_title(title)
