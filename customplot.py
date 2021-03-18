@@ -1,5 +1,3 @@
-#! /usr/local/bin/python3.8 -B
-
 import fractions
 import matplotlib as mpl
 import matplotlib.patches as mpatches
@@ -435,10 +433,9 @@ Args:
 
     # Maximise the figure window.
     manager = canvas.manager
-    name = os.name
     backend = mpl.get_backend()
     if backend in {'TkAgg', 'TkCairo'}:
-        if name == 'nt':
+        if os.name == 'nt':
             manager.window.state('zoomed')
         else:
             manager.resize(*manager.window.maxsize())
@@ -475,75 +472,4 @@ Args:
     elif ax.name == '3d':
         limits = np.array([getattr(ax, f'get_{coordaxis}lim')() for coordaxis in 'xyz'])
         ax.set_box_aspect(np.ptp(limits, axis = 1))
-
-###############################################################################
-
-def main():
-    plt.style.use('dandy.mplstyle')
-
-    ax = plt.figure().add_subplot(1, 1, 1,
-                                  # projection = 'polar',
-                                  # projection = '3d',
-                                 )
-    limit(ax, 'x', symbolic = True,
-                   s        = r'\pi',
-                   v        = np.pi,
-                   first    = -1 / 3,
-                   last     = 7 / 3,
-                   step     = 1 / 6)
-    limit(ax, 'y', symbolic = False,
-                   s        = r'R',
-                   v        = np.pi,
-                   first    = -2,
-                   last     = 2,
-                   step     = 0.5)
-    limit(ax, 'z', symbolic = False,
-                   s        = r'\pi',
-                   v        = np.pi,
-                   first    = -1,
-                   last     = 1,
-                   step     = 0.25)
-
-    # t = np.linspace(0, 10 * np.pi, 10000)
-    x1 = np.linspace(-20, 20, 10000)
-    y1 = sanitise(np.tan(2 * x1))
-    z1 = x1
-    ax.plot(x1, y1, color = 'red', label = r'$y=\tan\,2\theta$')
-    # ax.plot(x1, y1, color = 'red', linestyle = 'none', marker = 'o', mfc = 'red', label = r'$r=3+2\,\cos\,\theta$')
-    # ax.text(0.47, -0.05, r'$r+2\Delta r$', size = 'large')
-
-    x2 = np.linspace(-20, 20, 10000)
-    y2 = sanitise(-np.tan(x2))
-    z2 = x2
-    ax.plot(x2, y2, color = 'blue', label = r'$y=-\tan\,\theta$')
-    # ax.plot([np.e, np.e], [-10, 10], color = 'blue', linestyle = '-', marker = None, label = r'$x=e$')
-
-    # x3 = np.linspace(0, 20, 10000)
-    # y3 = 1 / x3
-    # z3 = x3
-    # ax.plot(x3, y3, color = 'green', label = r'$y=\dfrac{1}{x}$')
-
-    # X, Y = np.meshgrid(np.linspace(-3, 3, 1000), np.linspace(-3, 3, 1000))
-    # Z = X ** 2 * Y ** 2 / (X ** 4 + 3 * Y ** 4)
-    # surf = ax.plot_surface(X, Y, Z, color = 'skyblue', label = r'$z=\dfrac{x^2y^2}{x^4+3y^4}$')
-    # surf._edgecolors2d = surf._facecolors2d = None
-
-    # ax.fill_between(x1, y1, 0, facecolor = 'cyan', linewidth = 0, label = r'$S$')
-    # ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = '$S$', where = [True if 0 < i < 100 else False for i in x1])
-    # ax.fill_between(x1, y1, 0, facecolor = 'skyblue', linewidth = 0, label = r'$S$', where = [True if 0 < i < np.pi / 2 else False for i in x1])
-
-    polish(ax, labels = (r'$\theta$', '$y$'), title = None, suptitle = None)
-    aspect(ax, 1)
-
-    # ax.set_xticklabels([r'$\mu-4\sigma$', r'$\mu-3\sigma$', r'$\mu-2\sigma$', r'$\mu-\sigma$', r'$\mu$', r'$\mu+\sigma$', r'$\mu+2\sigma$', r'$\mu+3\sigma$', r'$\mu+4\sigma$'])
-    # ax.set_yticklabels([r'$0$', r'$\dfrac{0.1}{\sigma}$', r'$\dfrac{0.2}{\sigma}$', r'$\dfrac{0.3}{\sigma}$', r'$\dfrac{0.4}{\sigma}$'])
-
-    fig = ax.figure
-    fig.tight_layout(pad = 2)
-    plt.show()
-
-###############################################################################
-
-if __name__ == '__main__':
-    main()
 
