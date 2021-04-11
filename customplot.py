@@ -233,6 +233,28 @@ Args:
 
 ###############################################################################
 
+def _adjust_text(fig):
+    '''\
+Read and modify the positions of all text objects according to user input.
+Currently, this can be used only in two-dimensional plots.
+
+Args:
+    fig: Matplotlib figure instance
+'''
+
+    canvas = fig.canvas
+    while plt.fignum_exists(fig.number):
+        for ax in fig.axes:
+            for text in ax.texts:
+                try:
+                    x, y = map(float, input(f'{text.get_text()} ').split())
+                    text.set_position((x, y))
+                    canvas.resize_event()
+                except Exception:
+                    continue
+
+###############################################################################
+
 def sanitise(y, maximum_diff = 5):
     '''\
 At a point of essential or jump discontinuity, Matplotlib draws a vertical line
@@ -399,28 +421,23 @@ Args:
     elif ax.name == '3d':
         ax.grid(b = True, which = 'major', linewidth = 0.3, linestyle = '-')
 
-    # If `ax' is being used for polar plots, add the figure to the global
-    # WeakKeyDictionary. Using a WeakKeyDictionary ensures that it doesn't
-    # stick around in memory any longer than it needs to. Also, connect the
-    # resize event of the figure canvas to a callback which does some
-    # additional beautification of polar plots.
+    # Key a unique ID with the figure instance in the global WeakKeyDictionary.
     fig = ax.figure
     canvas = fig.canvas
     gid = _generate_gid()
-    if ax.name == 'polar' and fig not in _gid:
+    if fig not in _gid:
         _gid[fig] = gid
-        canvas.mpl_connect('resize_event', _draw_polar_patches)
-        canvas.resize_event()
+
+        # Connect the resize event of the canvas to a callback which does some
+        # additional beautification.
+        if ax.name == 'polar':
+            canvas.mpl_connect('resize_event', _draw_polar_patches)
+            canvas.resize_event()
 
     if title is not None:
         ax.set_title(title)
     if suptitle is not None:
         fig.suptitle(suptitle)
-        window_title = suptitle
-    else:
-        window_title = gid
-    if canvas.get_window_title().startswith('Figure '):
-        canvas.set_window_title(window_title)
 
     if ax.get_legend_handles_labels() != ([], []):
         kwargs = {'loc': 'best'}
