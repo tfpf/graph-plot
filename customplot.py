@@ -2,6 +2,7 @@ import fractions
 import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import matplotlib.widgets as mwidgets
 import numpy as np
 import os
 import time
@@ -10,6 +11,7 @@ import weakref
 ###############################################################################
 
 _gid = weakref.WeakKeyDictionary()
+_widgets = list()
 
 ###############################################################################
 
@@ -230,6 +232,19 @@ Args:
 
         ax.xaxis.label.set_visible(True)
         ax.yaxis.label.set_visible(True)
+
+###############################################################################
+
+def _adjust_elements(ax):
+    def submit(expression):
+        first, last, step = tuple(map(float, expression.split()))
+        ax.set_xlim(first, last)
+        ax.set_xticks(np.arange(first, last + step / 2, step))
+        ax.figure.canvas.draw()
+    x_adjuster = plt.figure().add_subplot(3, 1, 1)
+    tb = mwidgets.TextBox(x_adjuster, "x-axis")
+    tb.on_submit(submit)
+    _widgets.append(tb)
 
 ###############################################################################
 
