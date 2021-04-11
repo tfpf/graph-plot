@@ -233,22 +233,24 @@ Args:
 
 ###############################################################################
 
-def _adjust_text(fig):
+def _plot_and_adjust_text(fig):
     '''\
 Read and modify the positions of all text objects according to user input.
-Currently, this can be used only in two-dimensional plots.
 
 Args:
     fig: Matplotlib figure instance
 '''
+
+    b = not any(ax.texts for ax in fig.axes)
+    plt.show(block = b)
 
     canvas = fig.canvas
     while plt.fignum_exists(fig.number):
         for ax in fig.axes:
             for text in ax.texts:
                 try:
-                    x, y = map(float, input(f'{text.get_text()} ').split())
-                    text.set_position((x, y))
+                    coords = map(float, input(f'{text.get_text()} ').split())
+                    text.set_position(tuple(coords))
                     canvas.resize_event()
                 except Exception:
                     continue
