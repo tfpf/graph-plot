@@ -235,40 +235,65 @@ Args:
 
 ###############################################################################
 
-def _adjust_elements(ax):
-    def submit(expression):
-        first, last, step = tuple(map(float, expression.split()))
-        ax.set_xlim(first, last)
-        ax.set_xticks(np.arange(first, last + step / 2, step))
-        ax.figure.canvas.draw()
-    x_adjuster = plt.figure().add_subplot(3, 1, 1)
-    tb = mwidgets.TextBox(x_adjuster, "x-axis")
-    tb.on_submit(submit)
-    _widgets.append(tb)
-
-###############################################################################
-
-def _plot_and_adjust_text(fig):
+def adjust_elements(ax):
     '''\
-Read and modify the positions of all text objects according to user input.
+Read plot parameters from the text boxes and modify the plot accordingly. This
+feature is experimental and may not be developed further.
 
 Args:
-    fig: Matplotlib figure instance
+    ax: Matplotlib axes instance (the axes to modify)
 '''
 
-    b = not any(ax.texts for ax in fig.axes)
-    plt.show(block = b)
+    # This function performs the modification.
+    def submit(func, expression, coordaxis = 'x'):
+        canvas = ax.figure.canvas
 
-    canvas = fig.canvas
-    while plt.fignum_exists(fig.number):
-        for ax in fig.axes:
-            for text in ax.texts:
-                try:
-                    coords = map(float, input(f'{text.get_text()} ').split())
-                    text.set_position(tuple(coords))
-                    canvas.resize_event()
-                except Exception:
-                    continue
+        if func is limit:
+            symbolic, s, v, first, last, step = expression.split()
+            func(ax, coordaxis, int(symbolic), s, float(v), float(first), float(last), float(step))
+        else:
+            func(expression)
+        canvas.draw()
+
+    # Separate figure in which widgets to adjust `ax' will be placed.
+    fig = plt.figure(figsize = (8, 4))
+
+    x_axis_adjuster = fig.add_subplot(8, 3, 1)
+    tb = mwidgets.TextBox(x_axis_adjuster, 'x-axis')
+    tb.on_submit(lambda expr: submit(limit, expr, 'x'))
+    _widgets.append(tb)
+    x_label_adjuster = fig.add_subplot(8, 3, 2)
+    tb = mwidgets.TextBox(x_label_adjuster, 'label')
+    tb.on_submit(lambda expr: submit(ax.set_xlabel, expr))
+    tb.set_val(ax.get_xlabel())
+    _widgets.append(tb)
+
+    y_axis_adjuster = fig.add_subplot(8, 3, 4)
+    tb = mwidgets.TextBox(y_axis_adjuster, 'y-axis')
+    tb.on_submit(lambda expr: submit(limit, expr, 'y'))
+    _widgets.append(tb)
+    y_label_adjuster = fig.add_subplot(8, 3, 5)
+    tb = mwidgets.TextBox(y_label_adjuster, 'label')
+    tb.on_submit(lambda expr: submit(ax.set_ylabel, expr))
+    tb.set_val(ax.get_ylabel())
+    _widgets.append(tb)
+
+    if ax.name == '3d':
+        z_axis_adjuster = fig.add_subplot(8, 3, 7)
+        tb = mwidgets.TextBox(z_axis_adjuster, 'z-axis')
+        tb.on_submit(lambda expr: submit(limit, expr, 'z'))
+        _widgets.append(tb)
+        z_label_adjuster = fig.add_subplot(8, 3, 8)
+        tb = mwidgets.TextBox(z_label_adjuster, 'label')
+        tb.on_submit(lambda expr: submit(ax.set_zlabel, expr))
+        tb.set_val(ax.get_zlabel())
+        _widgets.append(tb)
+
+    for i, text in zip(range(3, 25, 3), ax.texts):
+        text_adjuster = fig.add_subplot(8, 3, i)
+        tb = mwidgets.TextBox(text_adjuster, text.get_text())
+        tb.on_submit(lambda expr: submit(text.set_position, tuple(map(float, expr.split()))))
+        _widgets.append(tb)
 
 ###############################################################################
 
