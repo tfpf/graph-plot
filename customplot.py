@@ -11,7 +11,6 @@ import weakref
 ###############################################################################
 
 _gid = weakref.WeakKeyDictionary()
-_widgets = list()
 
 ###############################################################################
 
@@ -237,65 +236,96 @@ Args:
 
 def adjust_elements(ax):
     '''\
-Read plot parameters from text boxes and modify the plot accordingly. Also
-provide text boxes to place the first few Matplotlib text objects. This feature
-is experimental and may not be developed further.
+Create a figure in which some plot parameters and the positions of some text
+objects can be modified. This function must be called before the call to
+`plt.show'. This feature is experimental and may not be developed further.
 
 Args:
     ax: Matplotlib axes instance (the axes to modify)
+
+Returns:
+    dict of widgets (caller must keep a strong reference to this dictionary)
 '''
 
-    # This function performs the modification.
-    def submit(func, expression, coordaxis = 'x'):
-        canvas = ax.figure.canvas
+    canvas = ax.figure.canvas
 
-        # In any of the statements fail, the plot should not be disturbed.
+    # Decide on an arrangement depending on the plot type.
+    rows = 2 + (len(ax.texts) + 1) // 2
+    if ax.name in {'rectilinear', 'polar'}:
+        cols = 2
+        coordaxes = 'xy'
+    elif ax.name == '3d':
+        cols = 3
+        coordaxes = 'xyz'
+
+    # Hide the last axes if it not required.
+    fig, axs = plt.subplots(nrows = rows, ncols = cols, figsize = (4 * cols, rows))
+    if len(ax.texts) % 2:
+        axs[-1, -1].set_visible(False)
+
+    # All relevant plot parameters will be stored in this dictionary for easy
+    # access.
+    parameters = dict()
+
+    # This function modifies the axes according the plot parameters provided.
+    def modify_axes(key, expression):
+        parameters[key] = expression
+
+        # In case of any error in obtaining the symbols, symbolic labels will
+        # not be used. But in case of any error in obtaining the ticks,
+        # everything will be aborted, because the limits are not known in
+        # advance.
+        for coordaxis in coordaxes:
+            try:
+                symbolic, s, v = parameters[(coordaxis, 'sv')].split()
+                symbolic = int(symbolic)
+                v = float(v)
+            except (KeyError, ValueError):
+                symbolic, s, v = False, r'\pi', np.pi
+
+            try:
+                first, last, step = map(float, parameters[(coordaxis, 'limits')].split())
+            except (KeyError, ValueError):
+                continue
+
+            limit(ax, coordaxis, symbolic, s, v, first, last, step)
+
+        canvas.draw()
+
+    # This function places Matplotlib text objects at the provided coordinates.
+    def place_text(text, expression):
         try:
-            if func is limit:
-                symbolic, s, v, first, last, step = expression.split()
-                func(ax, coordaxis, int(symbolic), s, float(v), float(first), float(last), float(step))
-            else:
-                func(expression)
-            canvas.draw()
-        except Exception as e:
-            print(e)
+            coords = tuple(map(float, expression.split()))
+        except ValueError:
+            return
 
-    # Separate figure in which widgets to adjust `ax' will be placed.
-    fig = plt.figure(figsize = (6, 3))
+        text.set_position(coords)
 
-    x_axis_adjuster = fig.add_subplot(8, 3, 1)
-    tb = mwidgets.TextBox(x_axis_adjuster, 'x-axis')
-    tb.on_submit(lambda expr: submit(limit, expr, 'x'))
-    _widgets.append(tb)
-    x_label_adjuster = fig.add_subplot(8, 3, 4)
-    tb = mwidgets.TextBox(x_label_adjuster, 'x-axis label')
-    tb.on_submit(lambda expr: submit(ax.set_xlabel, expr))
-    _widgets.append(tb)
+        canvas.draw()
 
-    y_axis_adjuster = fig.add_subplot(8, 3, 2)
-    tb = mwidgets.TextBox(y_axis_adjuster, 'y-axis')
-    tb.on_submit(lambda expr: submit(limit, expr, 'y'))
-    _widgets.append(tb)
-    y_label_adjuster = fig.add_subplot(8, 3, 5)
-    tb = mwidgets.TextBox(y_label_adjuster, 'y-axis label')
-    tb.on_submit(lambda expr: submit(ax.set_ylabel, expr))
-    _widgets.append(tb)
+    # Put all created widgets in a list, which will be returned to the caller.
+    widgets = list()
 
-    if ax.name == '3d':
-        z_axis_adjuster = fig.add_subplot(8, 3, 3)
-        tb = mwidgets.TextBox(z_axis_adjuster, 'z-axis')
-        tb.on_submit(lambda expr: submit(limit, expr, 'z'))
-        _widgets.append(tb)
-        z_label_adjuster = fig.add_subplot(8, 3, 6)
-        tb = mwidgets.TextBox(z_label_adjuster, 'z-axis label')
-        tb.on_submit(lambda expr: submit(ax.set_zlabel, expr))
-        _widgets.append(tb)
+    # Note how the lambda functions have been created with a dummy default
+    # argument. This is done because lambdas are evaluated after the completion
+    # of the loop.
+    # https://stackoverflow.com/q/2295290
+    for i, coordaxis in enumerate(coordaxes):
+        widget = mwidgets.TextBox(axs[0, i], f'{coordaxis}-axis symbols')
+        widget.on_submit(lambda expr, coordaxis = coordaxis: modify_axes((coordaxis, 'sv'), expr))
+        widgets.append(widget)
 
-    for i, text in zip(range(7, 25, 3), ax.texts):
-        text_adjuster = fig.add_subplot(8, 3, i)
-        tb = mwidgets.TextBox(text_adjuster, f'location of {text.get_text()}')
-        tb.on_submit(lambda expr: submit(text.set_position, tuple(map(float, expr.split()))))
-        _widgets.append(tb)
+        widget = mwidgets.TextBox(axs[1, i], f'{coordaxis}-axis limits')
+        widget.on_submit(lambda expr, coordaxis = coordaxis: modify_axes((coordaxis, 'limits'), expr))
+        widgets.append(widget)
+
+    # Same thing about the lambda function in this loop, too.
+    for i, text in enumerate(ax.texts, 2 * cols):
+        widget = mwidgets.TextBox(axs[i // 2, i % 2], f'location of {text.get_text()}')
+        widget.on_submit(lambda expr, text = text: place_text(text, expr))
+        widgets.append(widget)
+
+    return widgets
 
 ###############################################################################
 
