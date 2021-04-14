@@ -146,8 +146,7 @@ Returns:
     tuple of the width and height of `ax' in inches
 '''
 
-    fig = ax.figure
-    bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    bbox = ax.get_window_extent().transformed(ax.figure.dpi_scale_trans.inverted())
 
     return bbox.width, bbox.height
 
@@ -234,6 +233,83 @@ Args:
 
 ###############################################################################
 
+def _modify_axes(ax, parameters, key, expression):
+    '''\
+Place an expression into a dictionary. Then try to parse the items in the
+dictionary. If this succeeds, modify the given axis of coordinates of the
+Matplotlib axes.
+
+Args:
+    ax: Matplotlib axes instance
+    parameters: dict (dictionary in which `expression' will be keyed by `key')
+    key: tuple
+    expression: str
+'''
+
+    parameters[key] = expression
+
+    # In case of any error in obtaining the symbols, symbolic labels will not
+    # be used. But in case of any error in obtaining the ticks, everything will
+    # be aborted, because the limits are not known in advance.
+    for coordaxis in 'xyz':
+        try:
+            symbolic, s, v = parameters[(coordaxis, 'sv')].split()
+            symbolic = int(symbolic)
+            v = float(v)
+        except (KeyError, ValueError):
+            symbolic, s, v = False, r'\pi', np.pi
+
+        try:
+            first, last, step = map(float, parameters[(coordaxis, 'ticks')].split())
+        except (KeyError, ValueError):
+            continue
+
+        limit(ax, coordaxis, symbolic, s, v, first, last, step)
+
+    ax.figure.canvas.draw()
+
+###############################################################################
+
+def _place_text(ax, text, expression):
+    '''\
+Obtain a tuple from an expression. Place a text object at the location
+represented by that tuple.
+
+Args:
+    ax: Matplotlib axes instance
+    text: Matplotlib text instance
+    expression: str
+'''
+    try:
+        coords = tuple(map(float, expression.split()))
+    except ValueError:
+        return
+
+    text.set_position(coords)
+
+    ax.figure.canvas.draw()
+
+###############################################################################
+
+def _set_label(ax, coordaxis, expression):
+    '''\
+Set the label on an axis of coordinates.
+
+Args:
+    ax: Matplotlib axes instance
+    coordaxis: str (which axis to label: 'x', 'y' or 'z')
+    expression: str (axis label)
+'''
+
+    try:
+        getattr(ax, f'set_{coordaxis}label')(expression)
+    except AttributeError:
+        return
+
+    ax.figure.canvas.draw()
+
+###############################################################################
+
 def adjust_elements(ax):
     '''\
 Create a figure in which some plot parameters and the positions of some text
@@ -244,85 +320,47 @@ Args:
     ax: Matplotlib axes instance (the axes to modify)
 
 Returns:
-    dict of widgets (caller must keep a strong reference to this dictionary)
+    list of widgets (caller must keep a strong reference to this list)
 '''
 
-    canvas = ax.figure.canvas
-
-    # Decide on an arrangement depending on the plot type.
-    rows = 2 + (len(ax.texts) + 1) // 2
-    if ax.name in {'rectilinear', 'polar'}:
-        cols = 2
-        coordaxes = 'xy'
-    elif ax.name == '3d':
-        cols = 3
-        coordaxes = 'xyz'
-
-    # Hide the last axes if it not required.
-    fig, axs = plt.subplots(nrows = rows, ncols = cols, figsize = (4 * cols, rows))
-    if len(ax.texts) % 2:
-        axs[-1, -1].set_visible(False)
+    rows = 3 + (len(ax.texts) + 2) // 3
+    cols = 3
+    fig = plt.figure(figsize = (3 * cols, 0.5 * rows))
 
     # All relevant plot parameters will be stored in this dictionary for easy
     # access.
     parameters = dict()
 
-    # This function modifies the axes according the plot parameters provided.
-    def modify_axes(key, expression):
-        parameters[key] = expression
-
-        # In case of any error in obtaining the symbols, symbolic labels will
-        # not be used. But in case of any error in obtaining the ticks,
-        # everything will be aborted, because the limits are not known in
-        # advance.
-        for coordaxis in coordaxes:
-            try:
-                symbolic, s, v = parameters[(coordaxis, 'sv')].split()
-                symbolic = int(symbolic)
-                v = float(v)
-            except (KeyError, ValueError):
-                symbolic, s, v = False, r'\pi', np.pi
-
-            try:
-                first, last, step = map(float, parameters[(coordaxis, 'limits')].split())
-            except (KeyError, ValueError):
-                continue
-
-            limit(ax, coordaxis, symbolic, s, v, first, last, step)
-
-        canvas.draw()
-
-    # This function places Matplotlib text objects at the provided coordinates.
-    def place_text(text, expression):
-        try:
-            coords = tuple(map(float, expression.split()))
-        except ValueError:
-            return
-
-        text.set_position(coords)
-
-        canvas.draw()
-
-    # Put all created widgets in a list, which will be returned to the caller.
+    # All created widgets will be put in this list, which will be returned to
+    # the caller.
     widgets = list()
 
-    # Note how the lambda functions have been created with a dummy default
-    # argument. This is done because lambdas are evaluated after the completion
-    # of the loop.
+    # Text Boxes to modify the ticks. Note how the lambda functions have a
+    # dummy default argument. This is done because lambdas are evaluated after
+    # the completion of the loop.
     # https://stackoverflow.com/q/2295290
-    for i, coordaxis in enumerate(coordaxes):
-        widget = mwidgets.TextBox(axs[0, i], f'{coordaxis}-axis symbols')
-        widget.on_submit(lambda expr, coordaxis = coordaxis: modify_axes((coordaxis, 'sv'), expr))
+    for i, coordaxis in enumerate('xyz'):
+        adjuster = fig.add_subplot(rows, cols, i + 1)
+        widget = mwidgets.TextBox(adjuster, f'{coordaxis}-axis symbols')
+        widget.set_val(r'0 \pi ' f'{np.pi}')
+        widget.on_submit(lambda expr, coordaxis = coordaxis: _modify_axes(ax, parameters, (coordaxis, 'sv'), expr))
         widgets.append(widget)
 
-        widget = mwidgets.TextBox(axs[1, i], f'{coordaxis}-axis limits')
-        widget.on_submit(lambda expr, coordaxis = coordaxis: modify_axes((coordaxis, 'limits'), expr))
+        adjuster = fig.add_subplot(rows, cols, i + 1 + cols)
+        widget = mwidgets.TextBox(adjuster, f'{coordaxis}-axis ticks')
+        widget.on_submit(lambda expr, coordaxis = coordaxis: _modify_axes(ax, parameters, (coordaxis, 'ticks'), expr))
         widgets.append(widget)
 
-    # Same thing about the lambda function in this loop, too.
-    for i, text in enumerate(ax.texts, 2 * cols):
-        widget = mwidgets.TextBox(axs[i // 2, i % 2], f'location of {text.get_text()}')
-        widget.on_submit(lambda expr, text = text: place_text(text, expr))
+        adjuster = fig.add_subplot(rows, cols, i + 1 + 2 * cols)
+        widget = mwidgets.TextBox(adjuster, f'{coordaxis}-axis label')
+        widget.on_submit(lambda expr, coordaxis = coordaxis: _set_label(ax, coordaxis, expr))
+        widgets.append(widget)
+
+    # Text boxes to place text objects.
+    for i, text in enumerate(ax.texts, 10):
+        adjuster = fig.add_subplot(rows, cols, i)
+        widget = mwidgets.TextBox(adjuster, f'location of {text.get_text()}')
+        widget.on_submit(lambda expr, text = text: _place_text(ax, text, expr))
         widgets.append(widget)
 
     return widgets
@@ -427,8 +465,7 @@ Args:
         # axis. However, if `step' has not been provided, Matplotlib may not
         # start labelling the radial axis from zero. So, check the first tick
         # before doing this.
-        canvas = ax.figure.canvas
-        canvas.draw()
+        ax.figure.canvas.draw()
         if ax.name == 'polar' and coordaxis == 'y':
             labels = [l.get_text() for l in labels_getter()]
             ticks = ticks_getter()
