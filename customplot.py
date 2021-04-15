@@ -233,7 +233,7 @@ Args:
 
 ###############################################################################
 
-def _modify_axes(ax, parameters, key, expression):
+def _modify_axis(ax, parameters, coordaxis, text_id, expression):
     '''\
 Place an expression into a dictionary. Then try to parse the items in the
 dictionary. If this succeeds, modify the given axis of coordinates of the
@@ -241,32 +241,31 @@ Matplotlib axes.
 
 Args:
     ax: Matplotlib axes instance
-    parameters: dict (dictionary in which `expression' will be keyed by `key')
-    key: tuple
+    parameters: dict (`expression' will be keyed by `coordaxis' and `text_id')
+    coordaxis: str (which axis to modify: 'x', 'y' or 'z')
+    text_id: str (information about which text box triggered this function)
     expression: str
 '''
 
-    parameters[key] = expression
+    parameters[(coordaxis, text_id)] = expression
 
-    # In case of any error in obtaining the symbols, symbolic labels will not
-    # be used. But in case of any error in obtaining the ticks, everything will
-    # be aborted, because the limits are not known in advance.
-    for coordaxis in 'xyz':
-        try:
-            symbolic, s, v = parameters[(coordaxis, 'sv')].split()
-            symbolic = int(symbolic)
-            v = float(v)
-        except (KeyError, ValueError):
-            symbolic, s, v = False, r'\pi', np.pi
+    # In case of any error in parsing the symbol data, fall back to defaults.
+    try:
+        symbolic, s, v = parameters[(coordaxis, 'sv')].split()
+        symbolic = int(symbolic)
+        v = float(v)
+    except (KeyError, ValueError):
+        symbolic, s, v = False, r'\pi', np.pi
 
-        try:
-            first, last, step = map(float, parameters[(coordaxis, 'ticks')].split())
-        except (KeyError, ValueError):
-            continue
+    # In case of any error in parsing the tick data, abort. Because this data
+    # can be changed by other entities, too.
+    try:
+        first, last, step = map(float, parameters[(coordaxis, 'ticks')].split())
+    except (KeyError, ValueError):
+        return
 
-        limit(ax, coordaxis, symbolic, s, v, first, last, step)
-
-    ax.figure.canvas.draw()
+    if limit(ax, coordaxis, symbolic, s, v, first, last, step):
+        ax.figure.canvas.draw()
 
 ###############################################################################
 
@@ -343,12 +342,12 @@ Returns:
         adjuster = fig.add_subplot(rows, cols, i + 1)
         widget = mwidgets.TextBox(adjuster, f'{coordaxis}-axis symbols')
         widget.set_val(r'0 \pi ' f'{np.pi}')
-        widget.on_submit(lambda expr, coordaxis = coordaxis: _modify_axes(ax, parameters, (coordaxis, 'sv'), expr))
+        widget.on_submit(lambda expr, coordaxis = coordaxis: _modify_axis(ax, parameters, coordaxis, 'sv', expr))
         widgets.append(widget)
 
         adjuster = fig.add_subplot(rows, cols, i + 1 + cols)
         widget = mwidgets.TextBox(adjuster, f'{coordaxis}-axis ticks')
-        widget.on_submit(lambda expr, coordaxis = coordaxis: _modify_axes(ax, parameters, (coordaxis, 'ticks'), expr))
+        widget.on_submit(lambda expr, coordaxis = coordaxis: _modify_axis(ax, parameters, coordaxis, 'ticks', expr))
         widgets.append(widget)
 
         adjuster = fig.add_subplot(rows, cols, i + 1 + 2 * cols)
@@ -412,10 +411,13 @@ Args:
     first: float (tick start point)
     last: float (tick end point)
     step: float (tick spacing)
+
+Returns:
+    bool, indicating whether this function did something or returned early
 '''
 
     if coordaxis == 'z' and ax.name != '3d':
-        return
+        return False
 
     labels_getter = getattr(ax, f'get_{coordaxis}ticklabels')
     labels_setter = getattr(ax, f'set_{coordaxis}ticklabels')
@@ -473,6 +475,8 @@ Args:
                 labels[0] = ''
             labels[-1] = ''
             labels_setter(labels)
+
+    return True
 
 ###############################################################################
 
