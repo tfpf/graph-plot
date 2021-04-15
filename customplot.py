@@ -17,8 +17,7 @@ _gid = weakref.WeakKeyDictionary()
 def _generate_gid():
     '''\
 Generate a string which will be used to uniquely identify patches not added by
-the user. This string will also be used as the title of the figure window if
-the user has not supplied a title.
+the user.
 
 Returns:
     a unique string
