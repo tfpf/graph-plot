@@ -64,7 +64,7 @@ with plt.style.context('dandy.mplstyle'):
     # Set the locations of the grid lines on the y-axis. Grid lines will be
     # drawn at the following y-coordinates.
     # [-4, -3, -2, -1, 0, 1, 2, 3, 4]
-    customplot.limit(ax, 'y', first = -2, last = 2, step = 0.5)
+    customplot.limit(ax, 'y', first = -1.5, last = 2.5, step = 0.5)
 
     x = np.linspace(-4, 4, 10000)
     y = np.heaviside(x, 0.5)
@@ -136,13 +136,13 @@ with plt.style.context('dandy.mplstyle'):
     y = np.cos(np.euler_gamma * x)
     ax.plot(x, y, color = 'green', label = r'$y=\cos\,\gamma x$')
 
-    customplot.polish(ax, title = 'This is a horizontally scaled trigonometric function!')
+    customplot.polish(ax, title = 'This is a horizontally-scaled trigonometric function!')
     customplot.aspect(ax, 1)
 
     plt.show()
 
 ###############################################################################
-# Two-dimensional Cartesian plot (implicitly defined functions).
+# Two-dimensional Cartesian plot (implicitly-defined functions).
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
     ax = plt.figure().add_subplot()
@@ -209,7 +209,11 @@ with plt.style.context('dandy.mplstyle'):
     # the figure gets cluttered).
     customplot.limit(ax, 'y', first = 0, last = 2, step = 0.5)
 
-    t = np.linspace(0, 2 * np.pi, 10000)
+    # This is not a trigonometric function, so the range of values the
+    # independent variable `t' may take is not restricted. Here, the upper
+    # limit on `t' has been chosen in such a way that the visible portion of
+    # the graph does not end abruptly.
+    t = np.linspace(0, 25, 10000)
     r = np.sqrt(t / np.pi / 2)
     ax.plot(t, r, label = r'$r=\sqrt{\dfrac{t}{2\pi}}$')
 
