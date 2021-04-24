@@ -237,11 +237,11 @@ with plt.style.context('dandy.mplstyle'):
     axs[1] = fig.add_subplot(2, 2, 2)
     axs[2] = fig.add_subplot(2, 1, 2)
 
-    customplot.limit(axs[0], 'y', first = 0, last = 4, step = 1)
-    t = np.linspace(0, 2 * np.pi, 10000)
-    r = 2 * np.sin(3 * t)
-    axs[0].plot(t, r, color = 'red', label = r'$r=2\,\sin\,3t$')
-    customplot.polish(axs[0], labels = ('$t$', '$r$'), title = 'This is a flower!')
+    customplot.limit(axs[0], 'y', first = 0, last = 1.5, step = 0.5)
+    phi = np.linspace(0, 2 * np.pi, 10000)
+    r = np.sin(3 * phi)
+    axs[0].plot(phi, r, color = 'red', label = r'$r=\sin\,3\varphi$')
+    customplot.polish(axs[0], labels = (r'$\varphi$', '$r$'), title = 'This is a flower!')
 
     customplot.limit(axs[1], 'x', first = 0, last = 8, step = 1)
     customplot.limit(axs[1], 'y', first = 0, last = 4, step = 1)
