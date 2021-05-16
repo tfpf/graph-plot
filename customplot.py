@@ -6,6 +6,7 @@ import matplotlib.widgets as mwidgets
 import numpy as np
 import os
 import time
+import tkinter as tk
 import weakref
 
 ###############################################################################
@@ -229,139 +230,6 @@ Args:
 
         ax.xaxis.label.set_visible(True)
         ax.yaxis.label.set_visible(True)
-
-###############################################################################
-
-def _modify_axis(ax, parameters, coordaxis, text_id, expression):
-    '''\
-Place an expression into a dictionary. Then try to parse the items in the
-dictionary. If this succeeds, modify the given axis of coordinates of the
-Matplotlib axes.
-
-Args:
-    ax: Matplotlib axes instance
-    parameters: dict (`expression' will be keyed by `coordaxis' and `text_id')
-    coordaxis: str (which axis to modify: 'x', 'y' or 'z')
-    text_id: str (information about which text box triggered this function)
-    expression: str
-'''
-
-    parameters[(coordaxis, text_id)] = expression
-
-    # In case of any error in parsing the symbol data, fall back to defaults.
-    try:
-        symbolic, s, v = parameters[(coordaxis, 'sv')].split()
-        symbolic = int(symbolic)
-        v = float(v)
-    except (KeyError, ValueError):
-        symbolic, s, v = False, r'\pi', np.pi
-
-    # In case of any error in parsing the tick data, abort. Because this data
-    # can be changed by other entities, too.
-    try:
-        first, last, step = map(float, parameters[(coordaxis, 'ticks')].split())
-    except (KeyError, ValueError):
-        return
-
-    if limit(ax, coordaxis, symbolic, s, v, first, last, step):
-        ax.figure.canvas.draw()
-
-###############################################################################
-
-def _place_text(ax, text, expression):
-    '''\
-Obtain a tuple from an expression. Place a text object at the location
-represented by that tuple.
-
-Args:
-    ax: Matplotlib axes instance
-    text: Matplotlib text instance
-    expression: str
-'''
-    try:
-        coords = tuple(map(float, expression.split()))
-    except ValueError:
-        return
-
-    text.set_position(coords)
-
-    ax.figure.canvas.draw()
-
-###############################################################################
-
-def _set_label(ax, coordaxis, expression):
-    '''\
-Set the label on an axis of coordinates.
-
-Args:
-    ax: Matplotlib axes instance
-    coordaxis: str (which axis to label: 'x', 'y' or 'z')
-    expression: str (axis label)
-'''
-
-    try:
-        getattr(ax, f'set_{coordaxis}label')(expression)
-    except AttributeError:
-        return
-
-    ax.figure.canvas.draw()
-
-###############################################################################
-
-def adjust_elements(ax):
-    '''\
-Create a figure in which some plot parameters and the positions of some text
-objects can be modified. This function must be called before the call to
-`plt.show'. This feature is experimental and may not be developed further.
-
-Args:
-    ax: Matplotlib axes instance (the axes to modify)
-
-Returns:
-    list of widgets (caller must keep a strong reference to this list)
-'''
-
-    rows = 3 + (len(ax.texts) + 2) // 3
-    cols = 3
-    fig = plt.figure(figsize = (3 * cols, 0.5 * rows))
-
-    # All relevant plot parameters will be stored in this dictionary for easy
-    # access.
-    parameters = dict()
-
-    # All created widgets will be put in this list, which will be returned to
-    # the caller.
-    widgets = list()
-
-    # Text Boxes to modify the ticks. Note how the lambda functions have a
-    # dummy default argument. This is done because lambdas are evaluated after
-    # the completion of the loop.
-    # https://stackoverflow.com/q/2295290
-    for i, coordaxis in enumerate('xyz'):
-        adjuster = fig.add_subplot(rows, cols, i + 1)
-        widget = mwidgets.TextBox(adjuster, f'{coordaxis}-axis symbols')
-        widget.set_val(r'0 \pi ' f'{np.pi}')
-        widget.on_submit(lambda expr, coordaxis = coordaxis: _modify_axis(ax, parameters, coordaxis, 'sv', expr))
-        widgets.append(widget)
-
-        adjuster = fig.add_subplot(rows, cols, i + 1 + cols)
-        widget = mwidgets.TextBox(adjuster, f'{coordaxis}-axis ticks')
-        widget.on_submit(lambda expr, coordaxis = coordaxis: _modify_axis(ax, parameters, coordaxis, 'ticks', expr))
-        widgets.append(widget)
-
-        adjuster = fig.add_subplot(rows, cols, i + 1 + 2 * cols)
-        widget = mwidgets.TextBox(adjuster, f'{coordaxis}-axis label')
-        widget.on_submit(lambda expr, coordaxis = coordaxis: _set_label(ax, coordaxis, expr))
-        widgets.append(widget)
-
-    # Text boxes to place text objects.
-    for i, text in enumerate(ax.texts, 10):
-        adjuster = fig.add_subplot(rows, cols, i)
-        widget = mwidgets.TextBox(adjuster, f'location of {text.get_text()}')
-        widget.on_submit(lambda expr, text = text: _place_text(ax, text, expr))
-        widgets.append(widget)
-
-    return widgets
 
 ###############################################################################
 
@@ -603,4 +471,230 @@ Args:
     elif ax.name == '3d':
         limits = np.array([getattr(ax, f'get_{coordaxis}lim')() for coordaxis in 'xyz'])
         ax.set_box_aspect(np.ptp(limits, axis = 1))
+
+###############################################################################
+
+class AxesOptions(tk.Frame):
+    '''\
+Interactively adjust some plot elements of a Matplotlib axes via a GUI. This
+feature is experimental and may not be developed further.
+
+Args:
+    parent: tkinter.Tk or tkinter.Toplevel (master window)
+    ax: Matplotlib axes instance
+'''
+
+    padx, pady, border = 10, 10, 3
+
+    ###########################################################################
+
+    def __init__(self, parent, ax, bg = '#333333', fg = '#CCCCCC'):
+        tk.Frame.__init__(self, parent, bg = bg)
+        self.grid()
+
+        self.parent = parent
+        self.ax = ax
+        self.fig = ax.figure
+        self.canvas = self.fig.canvas
+        self.coordaxes = 'xyz'
+        self.headers = ['Symbolic', 'Symbol', 'Value', 'Label', 'Limits']
+
+        parent.resizable(False, False)
+        parent.title(self.__class__.__name__)
+
+        # Upper half of the window, which will allow the user to manipulate the
+        # axes of coordinates.
+        upper_frame = tk.Frame(self, bg = bg, borderwidth = self.border, relief = tk.RAISED)
+        upper_frame.grid(row = 0, padx = self.padx, pady = self.pady)
+
+        # Create header labels.
+        for i, label_text in enumerate(self.headers, 1):
+            row_header = tk.Label(upper_frame, text = label_text, bg = bg, fg = fg)
+            row_header.grid(row = i, column = 0, padx = self.padx, pady = self.pady)
+        for i, coordaxis in enumerate(self.coordaxes, 1):
+            column_header = tk.Label(upper_frame, text = f'{coordaxis}-axis', bg = bg, fg = fg)
+            column_header.grid(row = 0, column = i, padx = self.padx, pady = self.pady)
+
+        # Create widgets where data will be entered. The first item is a
+        # checkbox; the rest are entries. (Which is why I chose to write nested
+        # loops rather than use `itertools.product'.) Put each widget into a
+        # dictionary so that it can be looked up easily in the callback.
+        self.widgets = dict()
+        for i, coordaxis in enumerate(self.coordaxes, 1):
+            check_variable = tk.BooleanVar()
+            check_button = tk.Checkbutton(upper_frame, bg = bg, borderwidth = 0, highlightthickness = 0)
+            check_button.configure(variable = check_variable, offvalue = False, onvalue = True)
+            check_button.grid(row = 1, column = i, padx = self.padx, pady = self.pady)
+            self.widgets[f'{coordaxis},{self.headers[0]}'] = check_variable
+
+            validate_command = self.register(self._validate_for_axis)
+            for j, label_text in enumerate(self.headers[1 :], 2):
+                entry = tk.Entry(upper_frame, name = f'{coordaxis},{label_text}', bg = bg, fg = fg)
+                entry.configure(validate = 'focusout', validatecommand = (validate_command, '%W', '%P'))
+                entry.bind('<Return>', lambda event: self.focus_set())
+                entry.grid(row = j, column = i, padx = self.padx, pady = self.pady)
+                self.widgets[f'{coordaxis},{label_text}'] = entry
+
+        # Set some defaults for the above entries.
+        for coordaxis in self.coordaxes:
+            self.widgets[f'{coordaxis},{self.headers[1]}'].insert(0, r'\pi')
+            self.widgets[f'{coordaxis},{self.headers[2]}'].insert(0, f'{np.pi}')
+            self.widgets[f'{coordaxis},{self.headers[3]}'].insert(0, f'${coordaxis}$')
+
+        # Lower half of the window, which will allow the user to place
+        # Matplotlib text instances.
+        lower_frame = tk.Frame(self, bg = bg, borderwidth = self.border, relief = tk.RAISED)
+        lower_frame.grid(row = 1, padx = self.padx, pady = self.pady)
+
+        # Create headers and entries for the above. Lambda functions have dummy
+        # default arguments because they are evaluated after the completion of
+        # the loop.
+        # https://stackoverflow.com/q/2295290
+        for i, text in enumerate(ax.texts):
+            label = tk.Label(lower_frame, text = f'Location of {text.get_text()}', bg = bg, fg = fg)
+            label.grid(row = i, column = 0, padx = self.padx, pady = self.pady)
+
+            entry = tk.Entry(lower_frame, bg = bg, fg = fg)
+            validate_command = lambda entry = entry, text = text: self._validate_for_text(entry, text)
+            entry.configure(validate = 'focusout', validatecommand = validate_command)
+            entry.bind('<Return>', lambda event: self.focus_set())
+            entry.grid(row = i, column = 1, padx = self.padx, pady = self.pady)
+
+        # Entry containing the name of the file to which the figure will be
+        # saved.
+        validate_command = self.register(self._validate_for_save)
+        entry = tk.Entry(self, bg = bg, fg = fg, width = 60)
+        entry.configure(validate = 'focusout', validatecommand = (validate_command, '%P'))
+        entry.bind('<Return>', lambda event: self.focus_set())
+        entry.insert(0, os.path.join(mpl.rcParams['savefig.directory'], f'{self.canvas.get_window_title()}.png'))
+        entry.grid(row = 2, padx = self.padx, pady = self.pady)
+
+    ###########################################################################
+
+    def _validate_for_axis(self, name, text):
+        '''\
+Modify an axes of coordinates using the data received.
+
+Args:
+    name: str (name of the tkinter.Entry which triggered this function)
+    text: str (contents of `entry')
+'''
+
+        # The name of the entry is actually a hierarchical name. Hence, it
+        # contains some unwanted things. Remove those things, and we'll be left
+        # with the name that was assigned while constructing the entry. From
+        # the name, find out what modification has to be done.
+        name = name.split('.')[-1]
+        coordaxis, label_text = name.split(',')
+
+        # If the user is setting the label of an axis of coordinates, there is
+        # nothing else to do.
+        if label_text == 'Label':
+            try:
+                getattr(self.ax, f'set_{coordaxis}label')(text)
+            except AttributeError:
+                return False
+            else:
+                self.canvas.draw()
+                plt.pause(1)
+                return True
+
+        # Disable symbolic labelling if a valid float is not specified.
+        symbolic = self.widgets[f'{coordaxis},{self.headers[0]}'].get()
+        try:
+            v = float(self.widgets[f'{coordaxis},{self.headers[2]}'].get())
+        except ValueError:
+            symbolic = False
+
+        # Disable symbolic labelling if no symbol is specified.
+        s = self.widgets[f'{coordaxis},{self.headers[1]}'].get()
+        if s == '':
+            symbolic = False
+
+        try:
+            first, last, step = map(float, self.widgets[f'{coordaxis},{self.headers[4]}'].get().split())
+        except ValueError:
+            return False
+
+        if limit(self.ax, coordaxis, symbolic, s, v, first, last, step):
+            self.canvas.draw()
+            plt.pause(1)
+            return True
+
+        return False
+
+    ###########################################################################
+
+    def _validate_for_text(self, entry, text):
+        '''\
+Place a Matplotlib text instance at the coordinates specified. Run the event
+loop so that the plot gets updated.
+
+Args:
+    entry: tkinter.Entry (widget containing coordinates)
+    text: Matplotlib text instance
+'''
+
+        try:
+            coords = tuple(map(float, entry.get().split()))
+        except ValueError:
+            return False
+
+        text.set_position(coords)
+        self.canvas.draw()
+        plt.pause(1)
+
+        return True
+
+    ###########################################################################
+
+    def _validate_for_save(self, text):
+        '''\
+Save the figure.
+
+Args:
+    text: str (full path to the file to which the figure has to be saved)
+'''
+
+        self.fig.savefig(text)
+        return True
+
+###############################################################################
+
+def AxesOptions_demo(use_AxesOptions = True):
+    '''\
+This function demonstrates how a plot can be modified interactively using the
+`AxesOptions' class.
+
+Args:
+    use_AxesOptions: bool (whether to use the `AxesOptions' class or not)
+'''
+
+    with plt.style.context('dandy.mplstyle'):
+        ax = plt.figure().add_subplot()
+        limit(ax, 'x', first = -6, last = 6, step = 1)
+        limit(ax, 'y', first = -3, last = 3, step = 1)
+
+        x_vals = np.linspace(-20, 20, 500000)
+        y_vals = np.cos(x_vals)
+        ax.plot(x_vals, y_vals, label = r'$y=\cos\,x$', alpha = 0.65)
+        ax.text(0, 1, r'$(0,1)$', size = 'large')
+        ax.text(np.pi, -1, r'$(\pi,-1)$', size = 'large')
+
+        polish(ax)
+        aspect(ax, 1)
+
+        # Option 1: display the plot without doing anything else.
+        if not use_AxesOptions:
+            plt.show()
+            return
+
+        # Option 2: display a separate window in addition to the plot. This
+        # window can be used to adjust some plot elements. Just type into any
+        # entry and press the Enter key. The plot will get updated.
+        plt.show(block = False)
+        plt.pause(2)
+        root = tk.Tk()
+        AxesOptions(root, ax)
+        root.mainloop()
 
