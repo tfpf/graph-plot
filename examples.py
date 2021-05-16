@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import tkinter as tk
 
 import customplot
 
@@ -140,6 +141,56 @@ with plt.style.context('dandy.mplstyle'):
     customplot.aspect(ax, 1)
 
     plt.show()
+
+###############################################################################
+# Two-dimensional interactive Cartesian plot.
+###############################################################################
+with plt.style.context('dandy.mplstyle'):
+    ax = plt.figure().add_subplot()
+    customplot.limit(ax, 'x', first = -6, last = 6, step = 1)
+    customplot.limit(ax, 'y', first = -3, last = 3, step = 1)
+
+    x = np.linspace(-8, 8, 10000)
+    y = np.sin(x)
+    ax.plot(x, y, label = r'$y=\sin\,x$')
+    ax.text(0, 0, r'$(0,0)$', size = 'large')
+    ax.text(np.pi, 0, r'$(\pi,0)$', size = 'large')
+
+    customplot.polish(ax, title = 'This is an interactive plot!')
+    customplot.aspect(ax, 1)
+
+    # Call `plt.show' in a non-blocking manner.
+    plt.show(block = False)
+
+    # Run the event loop for a few seconds so that the plot is drawn properly.
+    plt.pause(2)
+
+    # Create the GUI which will be used to interact with the plot.
+    root = tk.Tk()
+    customplot.AxesOptions(root, ax)
+    root.mainloop()
+
+    # After doing this, two windows will open. The plot window will be frozen,
+    # because the event loop of the GUI will be running. This GUI has three
+    # parts.
+
+    # The upper part contains twelve entries which can be used to
+    # manipulate the axes of coordinates. 'Symbolic' is a checkbox indicating
+    # whether the markings on the axis should be at multiples of the number
+    # entered in 'Value'. 'Symbol' is a string which represents said value.
+    # 'Label' is used to label the axis of coordinates. 'Limits' shall contain
+    # three space-separated numbers, which are used as `first', `last' and
+    # `step' in the `limit' function described previously. After you're done
+    # typing into these entries, press Enter. The plot will get updated.
+
+    # The middle part contains as many entries as there are text objects in the
+    # plot. Specify the coordinates (again, space-separated) at which these
+    # text objects must occur, and press Enter. The plot will get updated.
+
+    # Finally, the third part contains the name of the file to which the figure
+    # will be saved. By default, it will be `mpl.rcParams["savefig.directory"]'
+    # prepended to a randomly generated name. To save the figure, click on the
+    # entry and press Enter.
 
 ###############################################################################
 # Two-dimensional Cartesian plot (implicitly-defined functions).

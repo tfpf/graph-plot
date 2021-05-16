@@ -561,7 +561,7 @@ Args:
 
         # Entry containing the name of the file to which the figure will be
         # saved.
-        entry = tk.Entry(self, bg = bg, fg = fg, width = 60)
+        entry = tk.Entry(self, bg = bg, fg = fg, width = 70)
         entry.bind('<Return>', lambda event: self._validate_for_save(entry.get()))
         entry.insert(0, os.path.join(mpl.rcParams['savefig.directory'], f'{self._canvas.get_window_title()}.png'))
         entry.grid(row = 2, padx = self.padx, pady = self.pady)
@@ -657,43 +657,4 @@ Args:
             self._fig.savefig(text)
         except FileNotFoundError:
             return
-
-###############################################################################
-
-def AxesOptions_demo(use_AxesOptions = True):
-    '''\
-This function demonstrates how a plot can be modified interactively using the
-`AxesOptions' class.
-
-Args:
-    use_AxesOptions: bool (whether to use the `AxesOptions' class or not)
-'''
-
-    with plt.style.context('dandy.mplstyle'):
-        ax = plt.figure().add_subplot()
-        limit(ax, 'x', first = -6, last = 6, step = 1)
-        limit(ax, 'y', first = -3, last = 3, step = 1)
-
-        x_vals = np.linspace(-20, 20, 500000)
-        y_vals = np.cos(x_vals)
-        ax.plot(x_vals, y_vals, label = r'$y=\cos\,x$', alpha = 0.65)
-        ax.text(0, 1, r'$(0,1)$', size = 'large')
-        ax.text(np.pi, -1, r'$(\pi,-1)$', size = 'large')
-
-        polish(ax)
-        aspect(ax, 1)
-
-        # Option 1: display the plot without doing anything else.
-        if not use_AxesOptions:
-            plt.show()
-            return
-
-        # Option 2: display a separate window in addition to the plot. This
-        # window can be used to adjust some plot elements. Just type into any
-        # entry and press the Enter key. The plot will get updated.
-        plt.show(block = False)
-        plt.pause(2)
-        root = tk.Tk()
-        AxesOptions(root, ax)
-        root.mainloop()
 

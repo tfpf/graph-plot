@@ -1,16 +1,8 @@
-# customplot
-A wrapper around Matplotlib. It can be used to plot beautiful,
+# Introduction
+Customplot is a  wrapper around Matplotlib. It can be used to plot interactive
 publication-quality graphs. I mainly wrote this to plot graphs of functions,
 but it can be used for almost anything, really. (Take a gander at the
 [gallery](#gallery).)
-
-However, customplot cannot replace Matplotlib or Pyplot. It just automates some
-settings which make the plot look appealing. For sufficiently complicated
-plots, you may have to use functions of Matplotlib or Pyplot directly.
-
-Only `rectilinear`, `polar` and `3d` projections of Matplotlib axes are
-supported. Other projections can also be used, but their beautification may not
-happen automatically.
 
 # Requirements
 | Name       | Minimum Version |
@@ -18,30 +10,32 @@ happen automatically.
 | Python     | 3.8             |
 | Matplotlib | 3.3.4           |
 | NumPy      | 1.17            |
+| Tkinter    | 8.6             |
 
 These requirements are not strict. Slightly older versions should also be okay.
 
 # Usage
 Call `limit` and `polish` on your Matplotlib axes instance before and after
-plotting, respectively.
-
-Run
+plotting, respectively. Check the file `examples.py` for details. You can run
+it using the command
 ```console
 $ python3 examples.py
 ```
-to see some sample plots. Study the code and compare it with these plots;
-hopefully, that will make everything clear.
-
-Alternatively, you can use Cython (if you have it installed). This feature is
-experimental and has not been tested much.
-```console
-$ make run
-```
+to see how things work.
 
 A good way to start plotting your own graphs might be to copy parts of the code
-in `examples.py` to another file, and make modifications to that file.
+in `examples.py` to another file, make modifications to that file, and run it.
 
 # Notes
+
+## General
+Customplot cannot replace Matplotlib or Pyplot. It just does a few things which
+make the plot look appealing. For sufficiently complicated plots, you may have
+to use functions of Matplotlib or Pyplot directly.
+
+Only `rectilinear`, `polar` and `3d` projections of Matplotlib axes are
+supported. Other projections can also be used, but their beautification may not
+happen automatically.
 
 ## Fonts
 Using a good font can significantly improve the appearance of your plot. (Check
