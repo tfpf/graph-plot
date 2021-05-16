@@ -1,7 +1,6 @@
 # Introduction
 Customplot is a  wrapper around Matplotlib. It can be used to plot beautiful,
-publication-quality graphs, with can optionally be controlled in an interactive
-manner.
+publication-quality graphs, which can optionally be controlled interactively.
 
 ![Interactive Screengrab](gallery/00_interactive_screengrab.png)
 
