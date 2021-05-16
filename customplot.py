@@ -492,12 +492,12 @@ Args:
         tk.Frame.__init__(self, parent, bg = bg)
         self.grid()
 
-        self.parent = parent
-        self.ax = ax
-        self.fig = ax.figure
-        self.canvas = self.fig.canvas
-        self.coordaxes = 'xyz'
-        self.headers = ['Symbolic', 'Symbol', 'Value', 'Label', 'Limits']
+        self._ax = ax
+        self._fig = ax.figure
+        self._canvas = self._fig.canvas
+        self._coordaxes = 'xyz'
+        self._headers = ['Symbolic', 'Symbol', 'Value', 'Label', 'Limits']
+        self._widgets = dict()
 
         parent.resizable(False, False)
         parent.title(self.__class__.__name__)
@@ -508,10 +508,10 @@ Args:
         upper_frame.grid(row = 0, padx = self.padx, pady = self.pady)
 
         # Create header labels.
-        for i, label_text in enumerate(self.headers, 1):
+        for i, label_text in enumerate(self._headers, 1):
             row_header = tk.Label(upper_frame, text = label_text, bg = bg, fg = fg)
             row_header.grid(row = i, column = 0, padx = self.padx, pady = self.pady)
-        for i, coordaxis in enumerate(self.coordaxes, 1):
+        for i, coordaxis in enumerate(self._coordaxes, 1):
             column_header = tk.Label(upper_frame, text = f'{coordaxis}-axis', bg = bg, fg = fg)
             column_header.grid(row = 0, column = i, padx = self.padx, pady = self.pady)
 
@@ -519,27 +519,26 @@ Args:
         # checkbox; the rest are entries. (Which is why I chose to write nested
         # loops rather than use `itertools.product'.) Put each widget into a
         # dictionary so that it can be looked up easily in the callback.
-        self.widgets = dict()
-        for i, coordaxis in enumerate(self.coordaxes, 1):
+        validate_command = self.register(self._validate_for_axis)
+        for i, coordaxis in enumerate(self._coordaxes, 1):
             check_variable = tk.BooleanVar()
             check_button = tk.Checkbutton(upper_frame, bg = bg, borderwidth = 0, highlightthickness = 0)
             check_button.configure(variable = check_variable, offvalue = False, onvalue = True)
             check_button.grid(row = 1, column = i, padx = self.padx, pady = self.pady)
-            self.widgets[f'{coordaxis},{self.headers[0]}'] = check_variable
+            self._widgets[f'{coordaxis},{self._headers[0]}'] = check_variable
 
-            validate_command = self.register(self._validate_for_axis)
-            for j, label_text in enumerate(self.headers[1 :], 2):
+            for j, label_text in enumerate(self._headers[1 :], 2):
                 entry = tk.Entry(upper_frame, name = f'{coordaxis},{label_text}', bg = bg, fg = fg)
                 entry.configure(validate = 'focusout', validatecommand = (validate_command, '%W', '%P'))
                 entry.bind('<Return>', lambda event: self.focus_set())
                 entry.grid(row = j, column = i, padx = self.padx, pady = self.pady)
-                self.widgets[f'{coordaxis},{label_text}'] = entry
+                self._widgets[f'{coordaxis},{label_text}'] = entry
 
-        # Set some defaults for the above entries.
-        for coordaxis in self.coordaxes:
-            self.widgets[f'{coordaxis},{self.headers[1]}'].insert(0, r'\pi')
-            self.widgets[f'{coordaxis},{self.headers[2]}'].insert(0, f'{np.pi}')
-            self.widgets[f'{coordaxis},{self.headers[3]}'].insert(0, f'${coordaxis}$')
+        # Set defaults for some of the above entries.
+        for coordaxis in self._coordaxes:
+            self._widgets[f'{coordaxis},{self._headers[1]}'].insert(0, r'\pi')
+            self._widgets[f'{coordaxis},{self._headers[2]}'].insert(0, f'{np.pi}')
+            self._widgets[f'{coordaxis},{self._headers[3]}'].insert(0, f'${coordaxis}$')
 
         # Lower half of the window, which will allow the user to place
         # Matplotlib text instances.
@@ -562,11 +561,9 @@ Args:
 
         # Entry containing the name of the file to which the figure will be
         # saved.
-        validate_command = self.register(self._validate_for_save)
         entry = tk.Entry(self, bg = bg, fg = fg, width = 60)
-        entry.configure(validate = 'focusout', validatecommand = (validate_command, '%P'))
-        entry.bind('<Return>', lambda event: self.focus_set())
-        entry.insert(0, os.path.join(mpl.rcParams['savefig.directory'], f'{self.canvas.get_window_title()}.png'))
+        entry.bind('<Return>', lambda event: self._validate_for_save(entry.get()))
+        entry.insert(0, os.path.join(mpl.rcParams['savefig.directory'], f'{self._canvas.get_window_title()}.png'))
         entry.grid(row = 2, padx = self.padx, pady = self.pady)
 
     ###########################################################################
@@ -591,33 +588,33 @@ Args:
         # nothing else to do.
         if label_text == 'Label':
             try:
-                getattr(self.ax, f'set_{coordaxis}label')(text)
+                getattr(self._ax, f'set_{coordaxis}label')(text)
             except AttributeError:
                 return False
-            else:
-                self.canvas.draw()
-                plt.pause(1)
-                return True
+
+            self._canvas.draw()
+            plt.pause(1)
+            return True
 
         # Disable symbolic labelling if a valid float is not specified.
-        symbolic = self.widgets[f'{coordaxis},{self.headers[0]}'].get()
+        symbolic = self._widgets[f'{coordaxis},{self._headers[0]}'].get()
         try:
-            v = float(self.widgets[f'{coordaxis},{self.headers[2]}'].get())
+            v = float(self._widgets[f'{coordaxis},{self._headers[2]}'].get())
         except ValueError:
             symbolic = False
 
         # Disable symbolic labelling if no symbol is specified.
-        s = self.widgets[f'{coordaxis},{self.headers[1]}'].get()
+        s = self._widgets[f'{coordaxis},{self._headers[1]}'].get()
         if s == '':
             symbolic = False
 
         try:
-            first, last, step = map(float, self.widgets[f'{coordaxis},{self.headers[4]}'].get().split())
+            first, last, step = map(float, self._widgets[f'{coordaxis},{self._headers[4]}'].get().split())
         except ValueError:
             return False
 
-        if limit(self.ax, coordaxis, symbolic, s, v, first, last, step):
-            self.canvas.draw()
+        if limit(self._ax, coordaxis, symbolic, s, v, first, last, step):
+            self._canvas.draw()
             plt.pause(1)
             return True
 
@@ -641,7 +638,7 @@ Args:
             return False
 
         text.set_position(coords)
-        self.canvas.draw()
+        self._canvas.draw()
         plt.pause(1)
 
         return True
@@ -656,8 +653,10 @@ Args:
     text: str (full path to the file to which the figure has to be saved)
 '''
 
-        self.fig.savefig(text)
-        return True
+        try:
+            self._fig.savefig(text)
+        except FileNotFoundError:
+            return
 
 ###############################################################################
 
