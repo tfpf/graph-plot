@@ -484,7 +484,7 @@ Args:
     ax: Matplotlib axes instance
 '''
 
-    padx, pady, border = 10, 10, 3
+    padx, pady, border = 8, 8, 3
 
     ###########################################################################
 

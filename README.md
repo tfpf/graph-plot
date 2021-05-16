@@ -1,16 +1,20 @@
 # Introduction
-Customplot is a  wrapper around Matplotlib. It can be used to plot interactive
-publication-quality graphs. I mainly wrote this to plot graphs of functions,
-but it can be used for almost anything, really. (Take a gander at the
-[gallery](#gallery).)
+Customplot is a  wrapper around Matplotlib. It can be used to plot beautiful,
+publication-quality graphs, with can optionally be controlled in an interactive
+manner.
+
+![Interactive Screengrab](gallery/00_interactive_screengrab.png)
+
+I mainly wrote this to plot graphs of functions, but it can be used for almost
+anything, really. (Take a gander at the [gallery](#gallery).)
 
 # Requirements
-| Name       | Minimum Version |
-| :--------: | :-------------: |
-| Python     | 3.8             |
-| Matplotlib | 3.3.4           |
-| NumPy      | 1.17            |
-| Tkinter    | 8.6             |
+| Name       | Version  |
+| :--------: | :------: |
+| Python     | 3.8      |
+| Matplotlib | 3.3.4    |
+| NumPy      | 1.17     |
+| Tkinter    | 8.6      |
 
 These requirements are not strict. Slightly older versions should also be okay.
 
