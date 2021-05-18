@@ -174,14 +174,14 @@ with plt.style.context('dandy.mplstyle'):
     # because the event loop of the GUI will be running. This GUI has three
     # parts.
 
-    # The upper part contains twelve entries which can be used to
-    # manipulate the axes of coordinates. 'Symbolic' is a checkbox indicating
-    # whether the markings on the axis should be at multiples of the number
-    # entered in 'Value'. 'Symbol' is a string which represents said value.
-    # 'Label' is used to label the axis of coordinates. 'Limits' shall contain
-    # three space-separated numbers, which are used as `first', `last' and
-    # `step' in the `limit' function described previously. After you're done
-    # typing into these entries, press Enter. The plot will get updated.
+    # The upper part contains twelve entries which can be used to manipulate
+    # the axes of coordinates. 'Symbolic' is a checkbox indicating whether the
+    # markings on the axis should be at multiples of the number entered in
+    # 'Value'. 'Symbol' is a string which represents said value. 'Limits' shall
+    # contain three space-separated numbers, which are used as `first', `last'
+    # and `step' in the `limit' function described previously. 'Label' is used
+    # to label the axis of coordinates. After you're done typing into these
+    # entries, press Enter. The plot will get updated.
 
     # The middle part contains as many entries as there are text objects in the
     # plot. Specify the coordinates (again, space-separated) at which these
@@ -191,7 +191,8 @@ with plt.style.context('dandy.mplstyle'):
     # will be saved. By default, it will be `mpl.rcParams["savefig.directory"]'
     # prepended to a randomly generated name. To save the figure, click on the
     # entry, edit the file name (or leave the displayed name as it is) and
-    # press Enter.
+    # press Enter. (There will no acknowledgement; the fill will be saved
+    # silently.)
 
 ###############################################################################
 # Two-dimensional Cartesian plot (implicitly-defined functions).
