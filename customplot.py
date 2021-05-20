@@ -518,7 +518,7 @@ Args:
         self._widgets = dict()
 
         parent.resizable(False, False)
-        parent.title(f'{self.__class__.__name__} @ 0x{id(self._ax):X}')
+        parent.title(f'{self.__class__.__name__} for {self._canvas.get_window_title()} at 0x{id(self._ax):X}')
 
         # Upper part of the window, which will allow the user to manipulate the
         # axes of coordinates.
