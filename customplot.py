@@ -2,6 +2,7 @@ import fractions
 import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import matplotlib.widgets as mwidgets
 import numpy as np
 import os
@@ -291,6 +292,7 @@ Returns:
     limits_setter = getattr(ax, f'set_{coordaxis}lim')
     ticks_getter  = getattr(ax, f'get_{coordaxis}ticks')
     ticks_setter  = getattr(ax, f'set_{coordaxis}ticks')
+    axis          = getattr(ax, f'{coordaxis}axis')
 
     # Case 1: use symbolic tick labels.
     if symbolic:
@@ -329,6 +331,10 @@ Returns:
             ticks_setter(np.arange(first, last + step / 2, step))
         if all(arg is not None for arg in [first, last]):
             limits_setter(first, last)
+
+        # Generate the axis labels in case they were erased because of a
+        # previous call to this function.
+        axis.set_major_formatter(mticker.ScalarFormatter())
 
         # Like in case 1, do not draw the first and last labels on the radial
         # axis. However, if `step' has not been provided, Matplotlib may not
@@ -508,17 +514,18 @@ Args:
 
     def __init__(self, parent, ax):
         super().__init__(parent)
-        self.grid()
+        self.pack()
 
         self._ax = ax
         self._fig = ax.figure
         self._canvas = self._fig.canvas
+        self._title = self._canvas.get_window_title()
         self._coordaxes = 'xyz'
         self._headers = ['Symbolic', 'Symbol', 'Value', 'Limits', 'Label']
         self._widgets = dict()
 
         parent.resizable(False, False)
-        parent.title(f'{self.__class__.__name__} for {self._canvas.get_window_title()} at 0x{id(self._ax):X}')
+        parent.title(f'{self.__class__.__name__} for {self._title} at 0x{id(self._ax):X}')
 
         # Upper part of the window, which will allow the user to manipulate the
         # axes of coordinates.
@@ -526,8 +533,8 @@ Args:
         upper_frame.grid(row = 0, padx = self.padx, pady = self.pady)
 
         # Create header labels.
-        for i, label_text in enumerate(self._headers, 1):
-            row_header = _Label(upper_frame, text = label_text)
+        for i, header in enumerate(self._headers, 1):
+            row_header = _Label(upper_frame, text = header)
             row_header.grid(row = i, column = 0, padx = self.padx, pady = self.pady)
         for i, coordaxis in enumerate(self._coordaxes, 1):
             column_header = _Label(upper_frame, text = f'{coordaxis}-axis')
@@ -537,26 +544,27 @@ Args:
         # checkbox; the rest are entries. (Which is why I chose to write nested
         # loops rather than use `itertools.product'.) Put each widget into a
         # dictionary so that it can be looked up easily in the callback.
-        validate_command = self.register(self._validate_for_axis)
         for i, coordaxis in enumerate(self._coordaxes, 1):
+            name = f'{coordaxis},Symbolic'
             check_variable = tk.BooleanVar()
-            check_button = _Checkbutton(upper_frame)
-            check_button.configure(variable = check_variable, offvalue = False, onvalue = True)
+            check_button = _Checkbutton(upper_frame, variable = check_variable, offvalue = False, onvalue = True)
+            check_button.configure(command = getattr(self, f'_modify_{coordaxis}axis_parameters'))
             check_button.grid(row = 1, column = i, padx = self.padx, pady = self.pady)
-            self._widgets[f'{coordaxis},{self._headers[0]}'] = check_variable
+            self._widgets[name] = check_variable
 
-            for j, label_text in enumerate(self._headers[1 :], 2):
-                entry = _Entry(upper_frame, name = f'{coordaxis},{label_text}')
-                entry.configure(validate = 'focusout', validatecommand = (validate_command, '%W', '%P'))
-                entry.bind('<Return>', lambda event: self.focus_set())
+            for j, header in enumerate(self._headers[1 :], 2):
+                name = f'{coordaxis},{header}'
+                entry = _Entry(upper_frame, name = name)
+                entry.bind('<Return>', self._unfocus_from_widget)
+                entry.bind('<FocusOut>', self._modify_axis_parameters)
                 entry.grid(row = j, column = i, padx = self.padx, pady = self.pady)
-                self._widgets[f'{coordaxis},{label_text}'] = entry
+                self._widgets[name] = entry
 
         # Set defaults for some of the above entries.
         for coordaxis in self._coordaxes:
-            self._widgets[f'{coordaxis},{self._headers[1]}'].insert(0, r'\pi')
-            self._widgets[f'{coordaxis},{self._headers[2]}'].insert(0, f'{np.pi}')
-            self._widgets[f'{coordaxis},{self._headers[4]}'].insert(0, f'${coordaxis}$')
+            self._widgets[f'{coordaxis},Symbol'].insert(0, r'\pi')
+            self._widgets[f'{coordaxis},Value'].insert(0, f'{np.pi}')
+            self._widgets[f'{coordaxis},Label'].insert(0, f'${coordaxis}$')
 
         # Middle part of the window, which will allow the user to place
         # Matplotlib text instances.
@@ -564,124 +572,116 @@ Args:
             lower_frame = _Frame(self)
             lower_frame.grid(row = 1, padx = self.padx, pady = self.pady)
 
-        # Create headers and entries for the above. Lambda functions have dummy
-        # default arguments because they are evaluated after the completion of
-        # the loop.
-        # https://stackoverflow.com/q/2295290
+        # Create headers and entries for the above.
         for i, text in enumerate(ax.texts):
             label = _Label(lower_frame, text = f'Location of {text.get_text()}')
             label.grid(row = i, column = 0, padx = self.padx, pady = self.pady)
 
-            entry = _Entry(lower_frame)
-            validate_command = lambda entry = entry, text = text: self._validate_for_text(entry, text)
-            entry.configure(validate = 'focusout', validatecommand = validate_command)
-            entry.bind('<Return>', lambda event: self.focus_set())
+            entry = _Entry(lower_frame, name = f'{i}')
+            entry.bind('<Return>', self._unfocus_from_widget)
+            entry.bind('<FocusOut>', self._set_text_location)
             entry.grid(row = i, column = 1, padx = self.padx, pady = self.pady)
 
         # Entry containing the name of the file to which the figure will be
         # saved.
         entry = _Entry(self, width = 70)
-        entry.bind('<Return>', lambda event: self._validate_for_save(entry.get()))
-        entry.insert(0, os.path.join(mpl.rcParams['savefig.directory'], f'{self._canvas.get_window_title()}.png'))
+        entry.bind('<Return>', self._save_to_file)
+        entry.insert(0, os.path.join(mpl.rcParams['savefig.directory'], f'{self._title}.png'))
         entry.grid(row = 2, padx = self.padx, pady = self.pady)
 
     ###########################################################################
 
-    def _validate_for_axis(self, name, text):
-        '''\
-Modify an axis of coordinates using the data received.
+    def _modify_xaxis_parameters(self):
+        self._modify_axis_parameters(name = 'x,Symbolic')
 
-Args:
-    name: str (name of the widget which triggered this function)
-    text: str (contents of `entry')
-'''
+    ###########################################################################
 
-        # The name of the entry is actually a hierarchical name. Hence, it
-        # contains some unwanted things. Remove those things, and we'll be left
-        # with the name that was assigned while constructing the entry. From
-        # the name, find out what modification has to be done.
-        name = name.split('.')[-1]
-        coordaxis, label_text = name.split(',')
+    def _modify_yaxis_parameters(self):
+        self._modify_axis_parameters(name = 'y,Symbolic')
 
-        # If the user is setting the label of an axis of coordinates, there is
-        # nothing else to do.
-        if label_text == f'{self._headers[4]}':
+    ###########################################################################
+
+    def _modify_zaxis_parameters(self):
+        self._modify_axis_parameters(name = 'z,Symbolic')
+
+    ###########################################################################
+
+    def _modify_axis_parameters(self, event = None, name = None):
+
+        # Either `event' will be None or `name' will be None, but both will not
+        # simultaneously be None.
+        if event is not None:
+            entry = event.widget
+            name = entry.winfo_name()
+        coordaxis, header = name.split(',')
+
+        # If the user is trying to set the label of a coordinate axis, `event'
+        # is guaranteed to not be None. Hence, `entry' is available to use.
+        if header == 'Label':
             try:
-                getattr(self._ax, f'set_{coordaxis}label')(text)
+                getattr(self._ax, f'set_{coordaxis}label')(entry.get())
             except AttributeError:
-                return False
+                return
+            else:
+                self._update_canvas()
+                return
 
-            self._update_ax()
-            return True
-
-        # Disable symbolic labelling if a valid float is not specified.
-        symbolic = self._widgets[f'{coordaxis},{self._headers[0]}'].get()
+        # Disable symbolic labelling if a valid number is not specified.
+        symbolic = self._widgets[f'{coordaxis},Symbolic'].get()
         try:
-            v = float(self._widgets[f'{coordaxis},{self._headers[2]}'].get())
+            v = float(self._widgets[f'{coordaxis},Value'].get())
         except ValueError:
             symbolic = False
+            v = 0
 
         # Disable symbolic labelling if no symbol is specified.
-        s = self._widgets[f'{coordaxis},{self._headers[1]}'].get()
+        s = self._widgets[f'{coordaxis},Symbol'].get()
         if s == '':
             symbolic = False
 
         try:
-            first, last, step = map(float, self._widgets[f'{coordaxis},{self._headers[3]}'].get().split())
+            first, last, step = map(float, self._widgets[f'{coordaxis},Limits'].get().split())
         except ValueError:
-            return False
+            return
 
         if limit(self._ax, coordaxis, symbolic, s, v, first, last, step):
-            self._update_ax()
-            return True
-
-        return False
+            self._update_canvas()
 
     ###########################################################################
 
-    def _validate_for_text(self, entry, text):
-        '''\
-Place a Matplotlib text instance at the coordinates specified. Run the event
-loop so that the plot gets updated.
-
-Args:
-    entry: _Entry (widget containing coordinates)
-    text: Matplotlib text instance
-'''
+    def _set_text_location(self, event):
+        entry = event.widget
+        name = entry.winfo_name()
+        text = self._ax.texts[int(name)]
 
         try:
             coords = tuple(map(float, entry.get().split()))
             text.set_position(coords)
         except (ValueError, IndexError):
-            return False
+            return
 
-        self._update_ax()
-        return True
+        self._update_canvas()
 
     ###########################################################################
 
-    def _validate_for_save(self, text):
-        '''\
-Save the figure.
-
-Args:
-    text: str (full path to the file to which the figure has to be saved)
-'''
+    def _save_to_file(self, event):
+        entry = event.widget
 
         try:
-            self._fig.savefig(text)
+            self._fig.savefig(entry.get())
         except FileNotFoundError:
             return
+        else:
+            self.focus_set()
 
+    ###########################################################################
+
+    def _unfocus_from_widget(self, event):
         self.focus_set()
 
     ###########################################################################
 
-    def _update_ax(self):
-        '''\
-Update the plot.
-'''
-
+    def _update_canvas(self):
         self._canvas.draw()
         plt.pause(0.1)
 
