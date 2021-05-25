@@ -200,7 +200,7 @@ with plt.style.context('dandy.mplstyle'):
     # will be saved. By default, it will be `mpl.rcParams["savefig.directory"]'
     # prepended to the title of the plot window. To save the figure, click on
     # the entry, edit the file name (or leave it unchanged) and press Enter.
-    # (There will no acknowledgement; the fill will be saved silently.)
+    # (There will no acknowledgement; the file will be saved silently.)
 
 ###############################################################################
 # Two-dimensional Cartesian plot (implicitly-defined functions).
