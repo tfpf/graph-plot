@@ -317,7 +317,7 @@ Returns:
 
         # Generate the axis labels in case they were erased because of a
         # previous call to this function.
-        if ax.name in {'rectilinear', '3d'}:
+        if ax.name in {'rectilinear', '3d'} or ax.name == 'polar' and coordaxis == 'y':
             axis.set_major_formatter(mticker.ScalarFormatter())
         elif ax.name == 'polar' and coordaxis == 'x':
             axis.set_major_formatter(mprojections.polar.ThetaFormatter())
@@ -629,7 +629,7 @@ Args:
             symbolic = False
 
         try:
-            first, last, step = map(float, self._widgets[f'{coordaxis},Limits'].get().split())
+            first, last, step = map(eval, self._widgets[f'{coordaxis},Limits'].get().split())
         except ValueError:
             return
 
