@@ -1,6 +1,7 @@
 import fractions
 import matplotlib as mpl
 import matplotlib.patches as mpatches
+import matplotlib.projections as mprojections
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import matplotlib.widgets as mwidgets
@@ -316,7 +317,10 @@ Returns:
 
         # Generate the axis labels in case they were erased because of a
         # previous call to this function.
-        axis.set_major_formatter(mticker.ScalarFormatter())
+        if ax.name in {'rectilinear', '3d'}:
+            axis.set_major_formatter(mticker.ScalarFormatter())
+        elif ax.name == 'polar' and coordaxis == 'x':
+            axis.set_major_formatter(mprojections.polar.ThetaFormatter())
 
         # Like in case 1, do not draw the first and last labels on the radial
         # axis. However, if `step' has not been provided, Matplotlib may not
