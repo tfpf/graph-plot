@@ -546,7 +546,10 @@ Args:
         for coordaxis in self._coordaxes:
             self._widgets[f'{coordaxis},Symbol'].insert(0, r'\pi')
             self._widgets[f'{coordaxis},Value'].insert(0, f'{np.pi}')
-            self._widgets[f'{coordaxis},Label'].insert(0, f'${coordaxis}$')
+            try:
+                self._widgets[f'{coordaxis},Label'].insert(0, getattr(ax, f'get_{coordaxis}label')())
+            except AttributeError:
+                pass
 
         # Middle part of the window, which will allow the user to place
         # Matplotlib text instances.
