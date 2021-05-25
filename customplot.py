@@ -17,14 +17,6 @@ _gid = weakref.WeakKeyDictionary()
 ###############################################################################
 
 def _generate_gid():
-    '''\
-Generate a string which will be used to uniquely identify patches not added by
-the user.
-
-Returns:
-    a unique string
-'''
-
     return f'cp_{time.time_ns()}_{np.random.randint(100000, 999999)}'
 
 ###############################################################################
@@ -136,20 +128,10 @@ Returns:
 
 ###############################################################################
 
-def _get_ax_size_inches(ax):
-    '''\
-Obtain the size of a Matplotlib axes instance in inches.
-
-Args:
-    ax: Matplotlib axes instance
-
-Returns:
-    tuple of the width and height of `ax' in inches
-'''
-
-    bbox = ax.get_window_extent().transformed(ax.figure.dpi_scale_trans.inverted())
-
-    return bbox.width, bbox.height
+def _get_axes_size_in_inches(ax):
+    bbox = ax.get_window_extent()
+    transformed = bbox.transformed(ax.figure.dpi_scale_trans.inverted())
+    return transformed.width, transformed.height
 
 ###############################################################################
 
@@ -192,7 +174,7 @@ Args:
 
         # Obtain the current size of the Matplotlib axes instance. This is used
         # to calculate the sizes of the arrows.
-        ax_width_inches, ax_height_inches = _get_ax_size_inches(ax)
+        ax_width_inches, ax_height_inches = _get_axes_size_in_inches(ax)
 
         # This is the centre of the arrow patches in axes coordinates. (Axes
         # coordinates: [0, 0] is the lower left corner of the Matplotlib axes,
