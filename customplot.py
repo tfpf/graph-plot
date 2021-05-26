@@ -160,6 +160,7 @@ Args:
     # When the canvas is resized, Matplotlib axes are also resized. Delay for
     # some time to allow this to happen.
     plt.pause(0.1)
+    # TODO Experiment with `canvas.flush_events' on a physical display.
 
     for ax in fig.axes:
         if ax.name != 'polar':
@@ -484,11 +485,11 @@ class _Frame(tk.Frame):
 
 class _Label(tk.Label):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC')
+        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', font = (mpl.rcParams['font.family']))
 
 class _Entry(tk.Entry):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', insertbackground = '#CCCCCC')
+        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', insertbackground = '#CCCCCC', font = (mpl.rcParams['font.family']))
 
 class _Checkbutton(tk.Checkbutton):
     def __init__(self, *args, **kwargs):
@@ -684,5 +685,5 @@ Args:
 
     def _update_canvas(self):
         self._canvas.draw()
-        plt.pause(0.1)
+        self._canvas.flush_events()
 
