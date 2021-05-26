@@ -284,15 +284,20 @@ Returns:
 
         labels, ticks = _labels_and_ticks(first, last, step, s, v)
 
-        # In polar plots, the angular axis may go from 0 to 2π. In that case,
-        # do not draw the label for 2π. (Otherwise, it'll overlap with that for
-        # 0). Further, do not draw the first and last labels on the radial
-        # axis. (This reduces cluttering.)
         if ax.name == 'polar':
-            if coordaxis == 'x' and first == 0 and last == 2:
+
+            # Does the angular axis go from 0 to 2π? If yes, remove the last
+            # tick and label (i.e. the ones for 2π). Otherwise, they will
+            # overlap with the first tick and label (i.e. the ones for 0).
+            if coordaxis == 'x' and first == 0 and np.isclose(last * v, 2 * np.pi):
                 labels, ticks = labels[: -1], ticks[: -1]
+
+            # Remove the last label on the radial axis. Remove the first label
+            # if it marks zero.
             elif coordaxis == 'y':
-                labels[0] = labels[-1] = ''
+                if first == 0:
+                    labels[0] = ''
+                labels[-1] = ''
 
         ticks_setter(ticks)
         labels_setter(labels)
@@ -304,9 +309,9 @@ Returns:
         # (Matplotlib messes up the spacing).
         if ax.name == 'rectilinear' and coordaxis == 'x' and not all(isinstance(t, int) for t in [first, last, step]):
             ax.tick_params(axis = coordaxis, which = 'major', pad = 20)
-            for tick in labels_getter():
-                tick.set_horizontalalignment('center')
-                tick.set_verticalalignment('center')
+            for label in labels_getter():
+                label.set_horizontalalignment('center')
+                label.set_verticalalignment('center')
 
     # Case 2: allow tick labels to be set automatically.
     else:
@@ -322,18 +327,25 @@ Returns:
         elif ax.name == 'polar' and coordaxis == 'x':
             axis.set_major_formatter(mprojections.polar.ThetaFormatter())
 
-        # Like in case 1, do not draw the first and last labels on the radial
-        # axis. However, if `step' has not been provided, Matplotlib may not
-        # start labelling the radial axis from zero. So, check the first tick
-        # before doing this.
-        ax.figure.canvas.draw()
-        if ax.name == 'polar' and coordaxis == 'y':
-            labels = [l.get_text() for l in labels_getter()]
+        if ax.name == 'polar':
+            ax.figure.canvas.draw()
             ticks = ticks_getter()
-            if ticks[0] == 0:
-                labels[0] = ''
-            labels[-1] = ''
-            labels_setter(labels)
+            labels = [label.get_text() for label in labels_getter()]
+
+            # Just like in case 1. With the difference that `ticks' is used
+            # instead of `first' and `last' to check the limits.
+            if coordaxis == 'x' and ticks[0] == 0 and np.isclose(ticks[-1], 2 * np.pi):
+                labels, ticks = labels[: -1], ticks[: -1]
+                ticks_setter(ticks)
+                labels_setter(labels)
+
+            # Again, just like case 1.
+            elif coordaxis == 'y':
+                if ticks[0] == 0:
+                    labels[0] = ''
+                labels[-1] = ''
+                ticks_setter(ticks)
+                labels_setter(labels)
 
     return True
 
@@ -618,7 +630,7 @@ Args:
         # Disable symbolic labelling if a valid number is not specified.
         symbolic = self._widgets[f'{coordaxis},Symbolic'].get()
         try:
-            v = float(self._widgets[f'{coordaxis},Value'].get())
+            v = eval(self._widgets[f'{coordaxis},Value'].get())
         except ValueError:
             symbolic = False
             v = 0
