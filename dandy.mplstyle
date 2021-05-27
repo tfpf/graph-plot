@@ -55,13 +55,13 @@ text.hinting_factor: 8
 text.kerning_factor: 0              # 0, 6
 text.antialiased:    True
 
-mathtext.bf:       Cochineal:bold
 mathtext.cal:      cmsy10
+mathtext.bf:       Cochineal:bold
 mathtext.it:       Cochineal:italic
 mathtext.rm:       Cochineal
 mathtext.sf:       sans
 mathtext.tt:       monospace
-mathtext.fontset:  custom                # dejavusans, dejavuserif, cm, stix, stixsans, custom
+mathtext.fontset:  custom           # dejavusans, dejavuserif, cm, stix, stixsans, custom
 mathtext.fallback: stix
 mathtext.default:  it
 
