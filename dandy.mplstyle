@@ -56,7 +56,7 @@ text.kerning_factor: 0              # 0, 6
 text.antialiased:    True
 
 mathtext.bf:       Cochineal:bold
-mathtext.cal:      Cochineal:bold:italic
+mathtext.cal:      cmsy10
 mathtext.it:       Cochineal:italic
 mathtext.rm:       Cochineal
 mathtext.sf:       sans
