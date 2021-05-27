@@ -187,10 +187,10 @@ with plt.style.context('dandy.mplstyle'):
     # the axes of coordinates. 'Symbolic' is a checkbox indicating whether the
     # markings on the axis should be at multiples of the number entered in
     # 'Value'. 'Symbol' is a string which represents said value. 'Limits' shall
-    # contain three space-separated numbers, which are used as `first', `last'
-    # and `step' in the `limit' function described previously. 'Label' is used
-    # to label the axis of coordinates. After you're done typing into these
-    # entries, press Enter. The plot will get updated.
+    # contain three space-separated numbers, which are used as the arguments
+    # `first', `last' and `step' for the function `customplot.limit'. 'Label'
+    # is used to label the axis of coordinates. After you're done typing into
+    # these entries, press Enter. The plot will get updated.
 
     # The middle part contains as many entries as there are text objects in the
     # plot. Specify the coordinates (again, space-separated) at which these
