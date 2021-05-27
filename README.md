@@ -41,12 +41,12 @@ supported. Other projections can also be used, but their beautification may not
 happen automatically.
 
 ## Interactive Plots
-It is possible to interactively control your plots, as seen in the image above.
-`TkAgg` or `TkCairo` are probably the best backends to use for interactive
-plots. (Luckily, `TkAgg` is the default backend Matplotlib uses. Usually). If
-you use any other backend, the plot window will be frozen. (It won't respond to
-GUI events like mouse clicks and key presses, although it _will_ get updated
-when you enter values into the interactive GUI.)
+`TkAgg` is probably the best backend to use with interactive plots. (Luckily,
+it is the default backend Matplotlib uses. Usually). There are a couple of
+issues with `*Cairo` backends (there is nothing Customplot can do to fix them).
+And if you use any of the others, the plot window will be unresponsive. (It
+won't respond to GUI events like mouse clicks and key presses, although it
+_will_ get updated when you enter values into the interactive GUI.)
 
 To see how interactive plots can be created, check `examples.py`.
 
