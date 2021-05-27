@@ -40,6 +40,16 @@ Only `rectilinear`, `polar` and `3d` projections of Matplotlib axes are
 supported. Other projections can also be used, but their beautification may not
 happen automatically.
 
+## Interactive Plots
+It is possible to interactively control your plots, as seen in the image above.
+`TkAgg` or `TkCairo` are probably the best backends to use for interactive
+plots. (Luckily, `TkAgg` is the default backend Matplotlib uses. Usually). If
+you use any other backend, the plot window will be frozen. (It won't respond to
+GUI events like mouse clicks and key presses, although it _will_ get updated
+when you enter values into the interactive GUI.)
+
+To see how interactive plots can be created, check `examples.py`.
+
 ## Fonts
 Using a good font can significantly improve the appearance of your plot. (Check
 out the [gallery](#gallery). The font used in those plots is
@@ -87,15 +97,10 @@ shown.)
 font.family: Libre Baskerville
 ...
 mathtext.bf:  Libre Baskerville:bold
-mathtext.cal: Libre Baskerville:bold:italic
 mathtext.it:  Libre Baskerville:italic
 mathtext.rm:  Libre Baskerville
 ...
 ```
-
-If you feel confident, you can experiment with different fonts (i.e. a
-monospace font for `mathtext.tt`, a calligraphy font for `mathtext.cal` and a
-sans-serif font for `mathtext.sf`).
 
 ## Subplots
 Sometimes, subplots (multiple plots in a single figure) don't look pretty
@@ -103,8 +108,8 @@ because elements from adjacent plots overlap with each other. To get around
 this problem, you can interactively adjust the spacing by using the 'Configure
 subplots' option in the navigation toolbar of the figure.
 
-After doing this, maximise, un-maximise and again maximise the figure window.
-As a result, anything that needs to be redrawn will be redrawn.
+After doing this, un-maximise and maximise the figure window. As a result,
+anything that needs to be redrawn will be redrawn.
 
 ## DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI parameter
