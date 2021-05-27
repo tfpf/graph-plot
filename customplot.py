@@ -160,7 +160,6 @@ Args:
     # When the canvas is resized, Matplotlib axes are also resized. Delay for
     # some time to allow this to happen.
     plt.pause(0.1)
-    # TODO Experiment with `canvas.flush_events' on a physical display.
 
     for ax in fig.axes:
         if ax.name != 'polar':
