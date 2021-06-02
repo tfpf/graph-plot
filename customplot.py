@@ -683,6 +683,7 @@ Args:
     ###########################################################################
 
     def _update_canvas(self):
-        self._canvas.draw()
-        self._canvas.flush_events()
+        if self._fig.stale:
+            self._canvas.draw()
+            self._canvas.flush_events()
 
