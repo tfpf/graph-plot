@@ -168,8 +168,8 @@ with plt.style.context('dandy.mplstyle'):
     # After doing this, two windows will open: the plot window and an
     # interactive GUI. This GUI has three parts.
 
-    # The upper part is a ribbon which shows all Matplotlib axes present in the
-    # figure. This is important only if you have multiple plots in the figure.
+    # The upper part is a ribbon where you can select one of the Matplotlib
+    # axes present in the figure.
 
     # The middle part contains twelve entries which can be used to manipulate
     # the axes of coordinates. 'Symbolic' is a checkbox indicating whether the
