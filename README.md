@@ -41,10 +41,13 @@ supported. Other projections can also be used, but their beautification may not
 happen automatically.
 
 ## Interactive Plots
+As seen in the image above, you can interactively adjust some plot elements of
+all Matplotlib axes in a figure. To do so, just use `customplot.show(fig)`
+(`fig` being the Matplotlib figure instance) instead of `plt.show()`. More
+details can be found in `examples.py`.
+
 Interactive plots don't work too well with `*Cairo` backends (there is nothing
 Customplot can do to fix them). Try `TkAgg`, `WXAgg` or `Qt5Agg`.
-
-To see how interactive plots can be created, check `examples.py`.
 
 ## Fonts
 Using a good font can significantly improve the appearance of your plot. (Check
