@@ -4,11 +4,12 @@ import matplotlib.patches as mpatches
 import matplotlib.projections as mprojections
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-import matplotlib.widgets as mwidgets
+import multiprocessing as mp
 import numpy as np
 import os
 import time
 import tkinter as tk
+import tkinter.ttk as ttk
 import weakref
 
 ###############################################################################
@@ -496,194 +497,203 @@ class _Checkbutton(tk.Checkbutton):
 
 ###############################################################################
 
-class AxesOptions(_Frame):
+class _Options(mp.Process):
     '''\
 Interactively adjust some plot elements of a Matplotlib axes instance via a
 GUI. This feature is experimental and may not be developed further.
 
 Args:
-    parent: tkinter.Tk or tkinter.Toplevel (master window)
     ax: Matplotlib axes instance
+    queue: multiprocessing.Queue
 '''
 
     padx, pady = 10, 10
 
     ###########################################################################
 
-    def __init__(self, parent, ax):
-        super().__init__(parent)
-        self.pack()
-
-        self._ax = ax
-        self._fig = ax.figure
-        self._canvas = self._fig.canvas
-        self._title = self._canvas.get_window_title()
-        self._coordaxes = 'xyz'
+    def __init__(self, fig, queue):
+        super().__init__()
+        self._fig = fig
+        self._queue = queue
         self._headers = ['Symbolic', 'Symbol', 'Value', 'Limits', 'Label']
-        self._widgets = dict()
+        self._widgets = [dict() for _ in range(len(fig.axes))]
 
-        parent.resizable(False, False)
-        parent.title(f'{self.__class__.__name__} for {self._title} at 0x{id(self._ax):X}')
+    ###########################################################################
 
-        # Upper part of the window, which will allow the user to manipulate the
-        # axes of coordinates.
-        upper_frame = _Frame(self)
-        upper_frame.grid(row = 0, padx = self.padx, pady = self.pady)
+    def run(self):
+        self.root = tk.Tk()
+        self.root.resizable(False, False)
+        self.root.title(f'Options for {self._fig.canvas.get_window_title()} at 0x{id(self._fig):X}')
 
-        # Create header labels.
-        for i, header in enumerate(self._headers, 1):
-            row_header = _Label(upper_frame, text = header)
-            row_header.grid(row = i, column = 0, padx = self.padx, pady = self.pady)
-        for i, coordaxis in enumerate(self._coordaxes, 1):
-            column_header = _Label(upper_frame, text = f'{coordaxis}-axis')
-            column_header.grid(row = 0, column = i, padx = self.padx, pady = self.pady)
+        style = ttk.Style(self.root)
+        style.configure('lefttab.TNotebook', tabposition = tk.NSEW, background = '#333333', foreground = '#CCCCCC', font = ('Cochineal'))
+        style.map('lefttab.TNotebook.Tab', background = [('selected', '#CCCCCC')], foreground = [('selected', '#333333')])
+        style.configure('lefttab.TNotebook.Tab', background = '#333333', foreground = '#CCCCCC', font = ('Cochineal'))
+        self.notebook = ttk.Notebook(self.root, style = 'lefttab.TNotebook')
+        self.notebook.pack()
 
-        # Create widgets where data will be entered. The first item is a
-        # checkbox; the rest are entries. (Which is why I chose to write nested
-        # loops rather than use `itertools.product'.) Put each widget into a
-        # dictionary so that it can be looked up easily in the callback.
-        for i, coordaxis in enumerate(self._coordaxes, 1):
-            name = f'{coordaxis},Symbolic'
-            check_variable = tk.BooleanVar()
-            check_button = _Checkbutton(upper_frame, variable = check_variable, offvalue = False, onvalue = True)
-            check_button.configure(command = getattr(self, f'_modify_{coordaxis}axis_parameters'))
-            check_button.grid(row = 1, column = i, padx = self.padx, pady = self.pady)
-            self._widgets[name] = check_variable
+        # Create one notebook page for each Matplotlib axes in the figure.
+        for i, ax in enumerate(self._fig.axes):
+            frame = _Frame(self.root)
 
-            for j, header in enumerate(self._headers[1 :], 2):
-                name = f'{coordaxis},{header}'
-                entry = _Entry(upper_frame, name = name)
-                entry.bind('<Return>', self._unfocus_from_widget)
-                entry.bind('<FocusOut>', self._modify_axis_parameters)
-                entry.grid(row = j, column = i, padx = self.padx, pady = self.pady)
-                self._widgets[name] = entry
+            # Upper part of the page. Allows the user to manipulate the axes of
+            # coordinates.
+            upper = _Frame(frame)
 
-        # Set defaults for some of the above entries.
-        for coordaxis in self._coordaxes:
-            self._widgets[f'{coordaxis},Symbol'].insert(0, r'\pi')
-            self._widgets[f'{coordaxis},Value'].insert(0, f'{np.pi}')
+            # Header labels for the same.
+            for j, header in enumerate(self._headers, 1):
+                row_header = _Label(upper, text = header)
+                row_header.grid(row = j, column = 0, padx = self.padx, pady = self.pady)
+            for j, coordaxis in enumerate('xyz', 1):
+                column_header = _Label(upper, text = f'{coordaxis}-axis')
+                column_header.grid(row = 0, column = j, padx = self.padx, pady = self.pady)
+
+            # Widgets organised according to above headers.
+            for j, coordaxis in enumerate('xyz', 1):
+                check_variable = tk.BooleanVar()
+                check_button = _Checkbutton(upper, variable = check_variable, offvalue = False, onvalue = True)
+                check_button.configure(command = self._put_axes_data)
+                check_button.grid(row = 1, column = j, padx = self.padx, pady = self.pady)
+                self._widgets[i][f'{coordaxis},Symbolic'] = check_variable
+
+                for k, header in enumerate(self._headers[1 :], 2):
+                    entry = _Entry(upper)
+                    entry.bind('<Return>', self._focus_out)
+                    entry.bind('<FocusOut>', self._put_axes_data)
+                    entry.grid(row = k, column = j, padx = self.padx, pady = self.pady)
+                    self._widgets[i][f'{coordaxis},{header}'] = entry
+
+            # Set defaults for some of the above entries.
+            for coordaxis in 'xyz':
+                self._widgets[i][f'{coordaxis},Symbol'].insert(0, r'\pi')
+                self._widgets[i][f'{coordaxis},Value'].insert(0, f'{np.pi}')
+                try:
+                    self._widgets[i][f'{coordaxis},Label'].insert(0, getattr(ax, f'get_{coordaxis}label')())
+                except AttributeError:
+                    pass
+
+            upper.grid(row = 0, padx = self.padx, pady = self.pady)
+            self.notebook.add(frame, text = f'{ax.get_title()} ({ax.name})')
+
+            if ax.texts == []:
+                continue
+
+            # Lower part of the page. Allows the user to place Matplotlib text
+            # objects.
+            lower = _Frame(frame)
+
+            # Header labels and entries for the same.
+            for j, text in enumerate(ax.texts):
+                prompt = _Label(lower, text = f'Location of {text.get_text()}')
+                prompt.grid(row = j, column = 0, padx = self.padx, pady = self.pady)
+                response = _Entry(lower, name = f'{j}')
+                response.bind('<Return>', self._focus_out)
+                response.bind('<FocusOut>', self._put_text_data)
+                response.grid(row = j, column = 1, padx = self.padx, pady = self.pady)
+
+            lower.grid(row = 1, padx = self.padx, pady = self.pady)
+
+        self.root.mainloop()
+
+    ###########################################################################
+
+    def _focus_out(self, event):
+        self.root.focus_set()
+
+    ###########################################################################
+
+    def _put_axes_data(self, event = None):
+        i = self.notebook.index('current')
+        data = {key: val.get() for key, val in self._widgets[i].items()}
+        data['index'] = i
+        self._queue.put(data)
+
+    ###########################################################################
+
+    def _put_text_data(self, event):
+        entry = event.widget
+        i = self.notebook.index('current')
+        j = int(entry.winfo_name())
+        coords = entry.get()
+        self._queue.put((i, j, coords))
+
+###############################################################################
+
+def show(fig):
+    '''\
+Open an interactive GUI in a separate process. Said GUI can be used to
+manipulate some elements of the plots in a figure.
+
+Args:
+    fig: Matplotlib figure instance
+'''
+
+    canvas = fig.canvas
+    canvas.draw()
+
+    queue = mp.Queue()
+    interactive = _Options(fig, queue)
+    interactive.start()
+
+    # Keep polling the queue for data coming from the interactive GUI.
+    while plt.fignum_exists(fig.number):
+        canvas.start_event_loop(0.1)
+        if queue.empty():
+            continue
+        data = queue.get()
+
+        # If a tuple was received, set the location of the Matplotlib text
+        # instance indicated.
+        if isinstance(data, tuple):
+            i, j, coords = data
+
             try:
-                self._widgets[f'{coordaxis},Label'].insert(0, getattr(ax, f'get_{coordaxis}label')())
+                coords = tuple(float(eval(coord)) for coord in coords.split())
+                fig.axes[i].texts[j].set_position(coords)
+            except (IndexError, NameError, ValueError):
+                pass
+
+            if fig.stale:
+                canvas.draw_idle()
+
+            continue
+
+        # A tuple was not received, so `data' must be a dictionary. Apply the
+        # changes (if any) to all axes of coordinates.
+        ax = fig.axes[data['index']]
+        for coordaxis in 'xyz':
+
+            # Set the axis label.
+            try:
+                getattr(ax, f'set_{coordaxis}label')(data[f'{coordaxis},Label'])
             except AttributeError:
                 pass
 
-        # Middle part of the window, which will allow the user to place
-        # Matplotlib text instances.
-        if ax.texts != []:
-            lower_frame = _Frame(self)
-            lower_frame.grid(row = 1, padx = self.padx, pady = self.pady)
-
-        # Create headers and entries for the above.
-        for i, text in enumerate(ax.texts):
-            label = _Label(lower_frame, text = f'Location of {text.get_text()}')
-            label.grid(row = i, column = 0, padx = self.padx, pady = self.pady)
-
-            entry = _Entry(lower_frame, name = f'{i}')
-            entry.bind('<Return>', self._unfocus_from_widget)
-            entry.bind('<FocusOut>', self._set_text_location)
-            entry.grid(row = i, column = 1, padx = self.padx, pady = self.pady)
-
-        # Entry containing the name of the file to which the figure will be
-        # saved.
-        entry = _Entry(self, width = 70)
-        entry.bind('<Return>', self._save_to_file)
-        entry.insert(0, os.path.join(mpl.rcParams['savefig.directory'], f'{self._title}.png'))
-        entry.grid(row = 2, padx = self.padx, pady = self.pady)
-
-    ###########################################################################
-
-    def _modify_xaxis_parameters(self):
-        self._modify_axis_parameters(name = 'x,Symbolic')
-
-    ###########################################################################
-
-    def _modify_yaxis_parameters(self):
-        self._modify_axis_parameters(name = 'y,Symbolic')
-
-    ###########################################################################
-
-    def _modify_zaxis_parameters(self):
-        self._modify_axis_parameters(name = 'z,Symbolic')
-
-    ###########################################################################
-
-    def _modify_axis_parameters(self, event = None, name = None):
-
-        # Either `event' will be None or `name' will be None, but both will not
-        # simultaneously be None.
-        if event is not None:
-            entry = event.widget
-            name = entry.winfo_name()
-        coordaxis, header = name.split(',')
-
-        # If the user is trying to set the label of a coordinate axis, `event'
-        # is guaranteed to not be None. Hence, `entry' is available to use.
-        if header == 'Label':
+            # Disable symbolic labelling if the symbol value is not specified.
+            symbolic = data[f'{coordaxis},Symbolic']
             try:
-                getattr(self._ax, f'set_{coordaxis}label')(entry.get())
-            except AttributeError:
-                return
+                v = float(eval(data[f'{coordaxis},Value']))
+            except (NameError, ValueError):
+                symbolic = False
+                v = 0
+
+            # Disable symbolic labelling if no symbol is specified.
+            s = data[f'{coordaxis},Symbol']
+            if s == '':
+                symbolic = False
+
+            # Set the axis limits.
+            try:
+                first, last, step = [float(eval(i)) for i in data[f'{coordaxis},Limits'].split()]
+            except (NameError, ValueError):
+                pass
             else:
-                self._update_canvas()
-                return
+                limit(ax, coordaxis, symbolic, s, v, first, last, step)
 
-        # Disable symbolic labelling if a valid number is not specified.
-        symbolic = self._widgets[f'{coordaxis},Symbolic'].get()
-        try:
-            v = eval(self._widgets[f'{coordaxis},Value'].get())
-        except ValueError:
-            symbolic = False
-            v = 0
+        if fig.stale:
+            canvas.draw_idle()
 
-        # Disable symbolic labelling if no symbol is specified.
-        s = self._widgets[f'{coordaxis},Symbol'].get()
-        if s == '':
-            symbolic = False
-
-        try:
-            first, last, step = map(eval, self._widgets[f'{coordaxis},Limits'].get().split())
-        except ValueError:
-            return
-
-        if limit(self._ax, coordaxis, symbolic, s, v, first, last, step):
-            self._update_canvas()
-
-    ###########################################################################
-
-    def _set_text_location(self, event):
-        entry = event.widget
-        name = entry.winfo_name()
-        text = self._ax.texts[int(name)]
-
-        try:
-            coords = tuple(map(float, entry.get().split()))
-            text.set_position(coords)
-        except (ValueError, IndexError):
-            return
-
-        self._update_canvas()
-
-    ###########################################################################
-
-    def _save_to_file(self, event):
-        entry = event.widget
-
-        try:
-            self._fig.savefig(entry.get())
-        except FileNotFoundError:
-            return
-        else:
-            self.focus_set()
-
-    ###########################################################################
-
-    def _unfocus_from_widget(self, event):
-        self.focus_set()
-
-    ###########################################################################
-
-    def _update_canvas(self):
-        if self._fig.stale:
-            self._canvas.draw()
-            self._canvas.flush_events()
+    # The user may close the plot window without closing the interactive GUI.
+    # In that case, the GUI must be closed automatically.
+    interactive.terminate()
 

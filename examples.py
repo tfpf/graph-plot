@@ -147,7 +147,8 @@ with plt.style.context('dandy.mplstyle'):
 # Two-dimensional interactive Cartesian plot.
 ###############################################################################
 with plt.style.context('dandy.mplstyle'):
-    ax = plt.figure().add_subplot()
+    fig = plt.figure()
+    ax = fig.add_subplot()
     customplot.limit(ax, 'x', first = -6, last = 6, step = 1)
     customplot.limit(ax, 'y', first = -3, last = 3, step = 1)
 
@@ -160,30 +161,17 @@ with plt.style.context('dandy.mplstyle'):
     customplot.polish(ax, title = 'This is an interactive plot!')
     customplot.aspect(ax, 1)
 
-    # If Matplotlib is using a Tkinter-based backend, the TCL interpreter is
-    # already running, and the plot window is the root window of the Tkinter
-    # application.
-    if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
-        toplevel = tk.Toplevel(ax.figure.canvas.get_tk_widget())
-        customplot.AxesOptions(toplevel, ax)
-        plt.show()
+    # Instead of calling `plt.show', call `customplot.show'. Provide the
+    # Matplotlib figure instance as the argument.
+    customplot.show(fig)
 
-    # If Matplotlib is not using a Tkinter-based backend, the TCL interpreter
-    # is not running. It must be started by creating a root window.
-    else:
-        plt.show(block = False)
-        plt.pause(0.1)
-        root = tk.Tk()
-        customplot.AxesOptions(root, ax)
-        root.mainloop()
-        plt.close(ax.figure)
+    # After doing this, two windows will open: the plot window and an
+    # interactive GUI. This GUI has three parts.
 
-    # After doing this, two windows will open: the plot window and a settings
-    # window. The plot window may or may not be frozen, depending on the
-    # backend Matplotlib is using. The GUI window will be active. This GUI has
-    # three parts.
+    # The upper part is a ribbon which shows all Matplotlib axes present in the
+    # figure. This is important only if you have multiple plots in the figure.
 
-    # The upper part contains twelve entries which can be used to manipulate
+    # The middle part contains twelve entries which can be used to manipulate
     # the axes of coordinates. 'Symbolic' is a checkbox indicating whether the
     # markings on the axis should be at multiples of the number entered in
     # 'Value'. 'Symbol' is a string which represents said value. 'Limits' shall
@@ -192,15 +180,9 @@ with plt.style.context('dandy.mplstyle'):
     # is used to label the axis of coordinates. After you're done typing into
     # these entries, press Enter. The plot will get updated.
 
-    # The middle part contains as many entries as there are text objects in the
+    # The lower part contains as many entries as there are text objects in the
     # plot. Specify the coordinates (again, space-separated) at which these
     # text objects must be placed, and press Enter. The plot will get updated.
-
-    # Finally, the third part contains the name of the file to which the figure
-    # will be saved. By default, it will be `mpl.rcParams["savefig.directory"]'
-    # prepended to the title of the plot window. To save the figure, click on
-    # the entry, edit the file name (or leave it unchanged) and press Enter.
-    # (There will no acknowledgement; the file will be saved silently.)
 
 ###############################################################################
 # Two-dimensional Cartesian plot (implicitly-defined functions).
