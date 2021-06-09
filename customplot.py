@@ -495,6 +495,16 @@ class _Checkbutton(tk.Checkbutton):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, bg = '#333333', borderwidth = 0, highlightthickness = 0)
 
+class _Style(ttk.Style):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.theme_create('customplot', parent = 'alt',
+                          settings = {'TNotebook.Tab':
+                                      {'configure': {'background': '#333333', 'foreground': '#CCCCCC', 'font': (mpl.rcParams['font.family'])},
+                                       'map':       {'background': [('selected', '#CCCCCC')], 'foreground': [('selected', '#333333')]}},
+                                      'TNotebook':
+                                      {'configure': {'background': '#333333', 'foreground': '#CCCCCC', 'font': (mpl.rcParams['font.family']), 'tabposition': tk.NSEW}}})
+
 ###############################################################################
 
 class _Options(mp.Process):
@@ -513,27 +523,25 @@ Args:
 
     def __init__(self, fig, queue):
         super().__init__()
-        self._fig = fig
-        self._queue = queue
-        self._headers = ['Symbolic', 'Symbol', 'Value', 'Limits', 'Label']
-        self._widgets = [dict() for _ in range(len(fig.axes))]
+        self.fig = fig
+        self.queue = queue
+        self.headers = ['Symbolic', 'Symbol', 'Value', 'Limits', 'Label']
+        self.widgets = [dict() for _ in range(len(fig.axes))]
 
     ###########################################################################
 
     def run(self):
         self.root = tk.Tk()
         self.root.resizable(False, False)
-        self.root.title(f'Options for {self._fig.canvas.get_window_title()} at 0x{id(self._fig):X}')
+        self.root.title(f'Options for {self.fig.canvas.get_window_title()} at 0x{id(self.fig):X}')
 
-        style = ttk.Style(self.root)
-        style.configure('lefttab.TNotebook', tabposition = tk.NSEW, background = '#333333', foreground = '#CCCCCC', font = ('Cochineal'))
-        style.map('lefttab.TNotebook.Tab', background = [('selected', '#CCCCCC')], foreground = [('selected', '#333333')])
-        style.configure('lefttab.TNotebook.Tab', background = '#333333', foreground = '#CCCCCC', font = ('Cochineal'))
-        self.notebook = ttk.Notebook(self.root, style = 'lefttab.TNotebook')
+        style = _Style(self.root)
+        style.theme_use('customplot')
+        self.notebook = ttk.Notebook(self.root)
         self.notebook.pack()
 
         # Create one notebook page for each Matplotlib axes in the figure.
-        for i, ax in enumerate(self._fig.axes):
+        for i, ax in enumerate(self.fig.axes):
             frame = _Frame(self.root)
 
             # Upper part of the page. Allows the user to manipulate the axes of
@@ -541,7 +549,7 @@ Args:
             upper = _Frame(frame)
 
             # Header labels for the same.
-            for j, header in enumerate(self._headers, 1):
+            for j, header in enumerate(self.headers, 1):
                 row_header = _Label(upper, text = header)
                 row_header.grid(row = j, column = 0, padx = self.padx, pady = self.pady)
             for j, coordaxis in enumerate('xyz', 1):
@@ -554,21 +562,21 @@ Args:
                 check_button = _Checkbutton(upper, variable = check_variable, offvalue = False, onvalue = True)
                 check_button.configure(command = self._put_axes_data)
                 check_button.grid(row = 1, column = j, padx = self.padx, pady = self.pady)
-                self._widgets[i][f'{coordaxis},Symbolic'] = check_variable
+                self.widgets[i][f'{coordaxis},Symbolic'] = check_variable
 
-                for k, header in enumerate(self._headers[1 :], 2):
+                for k, header in enumerate(self.headers[1 :], 2):
                     entry = _Entry(upper)
                     entry.bind('<Return>', self._focus_out)
                     entry.bind('<FocusOut>', self._put_axes_data)
                     entry.grid(row = k, column = j, padx = self.padx, pady = self.pady)
-                    self._widgets[i][f'{coordaxis},{header}'] = entry
+                    self.widgets[i][f'{coordaxis},{header}'] = entry
 
             # Set defaults for some of the above entries.
             for coordaxis in 'xyz':
-                self._widgets[i][f'{coordaxis},Symbol'].insert(0, r'\pi')
-                self._widgets[i][f'{coordaxis},Value'].insert(0, f'{np.pi}')
+                self.widgets[i][f'{coordaxis},Symbol'].insert(0, r'\pi')
+                self.widgets[i][f'{coordaxis},Value'].insert(0, f'{np.pi}')
                 try:
-                    self._widgets[i][f'{coordaxis},Label'].insert(0, getattr(ax, f'get_{coordaxis}label')())
+                    self.widgets[i][f'{coordaxis},Label'].insert(0, getattr(ax, f'get_{coordaxis}label')())
                 except AttributeError:
                     pass
 
@@ -604,18 +612,18 @@ Args:
 
     def _put_axes_data(self, event = None):
         i = self.notebook.index('current')
-        data = {key: val.get() for key, val in self._widgets[i].items()}
+        data = {key: val.get() for key, val in self.widgets[i].items()}
         data['index'] = i
-        self._queue.put(data)
+        self.queue.put(data)
 
     ###########################################################################
 
     def _put_text_data(self, event):
         entry = event.widget
-        i = self.notebook.index('current')
-        j = int(entry.winfo_name())
         coords = entry.get()
-        self._queue.put((i, j, coords))
+        j = int(entry.winfo_name())
+        i = self.notebook.index('current')
+        self.queue.put((i, j, coords))
 
 ###############################################################################
 
@@ -650,7 +658,7 @@ Args:
             try:
                 coords = tuple(float(eval(coord)) for coord in coords.split())
                 fig.axes[i].texts[j].set_position(coords)
-            except (IndexError, NameError, ValueError):
+            except (IndexError, NameError, SyntaxError, ValueError):
                 pass
 
             if fig.stale:
@@ -673,7 +681,7 @@ Args:
             symbolic = data[f'{coordaxis},Symbolic']
             try:
                 v = float(eval(data[f'{coordaxis},Value']))
-            except (NameError, ValueError):
+            except (NameError, SyntaxError, ValueError):
                 symbolic = False
                 v = 0
 
@@ -685,7 +693,7 @@ Args:
             # Set the axis limits.
             try:
                 first, last, step = [float(eval(i)) for i in data[f'{coordaxis},Limits'].split()]
-            except (NameError, ValueError):
+            except (NameError, SyntaxError, ValueError):
                 pass
             else:
                 limit(ax, coordaxis, symbolic, s, v, first, last, step)
