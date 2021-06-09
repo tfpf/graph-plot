@@ -662,7 +662,7 @@ Args:
                 pass
 
             if fig.stale:
-                canvas.draw_idle()
+                canvas.draw()
 
             continue
 
@@ -699,7 +699,7 @@ Args:
                 limit(ax, coordaxis, symbolic, s, v, first, last, step)
 
         if fig.stale:
-            canvas.draw_idle()
+            canvas.draw()
 
     # The user may close the plot window without closing the interactive GUI.
     # In that case, the GUI must be closed automatically.
