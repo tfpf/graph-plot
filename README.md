@@ -63,7 +63,6 @@ entirely.
 You have a choice of fonts available out of the box. My suggestion is to use a
 STIX font. To do so, add the following lines to the file `dandy.mplstyle`.
 ```python
-...
 font.family: STIXGeneral
 mathtext.fontset: stix
 ```
