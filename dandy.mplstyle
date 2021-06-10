@@ -29,22 +29,6 @@ patch.force_edgecolor: False
 patch.antialiased:     True
 
 ###############################################################################
-# Font.
-###############################################################################
-font.family:  Cochineal # serif, sans-serif, cursive, fantasy, monospace
-font.style:   normal    # normal, roman, italic, oblique
-font.variant: normal    # normal, small-caps
-font.weight:  normal    # 100, 200, 300, 400, 500, 600, 700, 800, 900, normal, bold, bolder, lighter
-font.stretch: normal    # ultra-condensed, extra-condensed, condensed, semi-condensed, normal, semi-expanded, expanded, extra-expanded, ultra-expanded, wider, narrower
-font.size:    10
-
-font.serif:      DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
-font.sans-serif: DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
-font.cursive:    Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, cursive
-font.fantasy:    Comic Sans MS, Chicago, Charcoal, ImpactWestern, Humor Sans, xkcd, fantasy
-font.monospace:  DejaVu Sans Mono, Bitstream Vera Sans Mono, Computer Modern Typewriter, Andale Mono, Nimbus Mono L, Courier New, Courier, Fixed, Terminal, monospace
-
-###############################################################################
 # Text.
 ###############################################################################
 text.color:          black
@@ -54,16 +38,6 @@ text.hinting:        force_autohint # default, no_autohint, force_autohint, no_h
 text.hinting_factor: 8
 text.kerning_factor: 0              # 0, 6
 text.antialiased:    True
-
-mathtext.cal:      cmsy10
-mathtext.bf:       Cochineal:bold
-mathtext.it:       Cochineal:italic
-mathtext.rm:       Cochineal
-mathtext.sf:       sans
-mathtext.tt:       monospace
-mathtext.fontset:  custom           # dejavusans, dejavuserif, cm, stix, stixsans, custom
-mathtext.fallback: stix
-mathtext.default:  it
 
 ###############################################################################
 # Axes.

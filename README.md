@@ -57,22 +57,18 @@ out the [gallery](#gallery). The font used in those plots is
 [Cochineal](https://ctan.org/pkg/cochineal).)
 
 In case you want nothing to do with fonts, you can ignore this section
-entirely. Matplotlib will warn you that Cochineal is not installed (if it
-isn't), and fall back to the default font. (Functionality remains unaffected.)
+entirely.
 
 ### Using a Built-in Font
 You have a choice of fonts available out of the box. My suggestion is to use a
-STIX font. To do so, modify the file `dandy.mplstyle` like this. (Only the
-relevant lines are shown.)
+STIX font. To do so, add the following lines to the file `dandy.mplstyle`.
 ```python
 ...
 font.family: STIXGeneral
-...
 mathtext.fontset: stix
-...
 ```
 
-I do not recommend using the built-in Computer Modern font, because it cannot
+I do not recommend using the packaged Computer Modern font, because it cannot
 render minus signs in normal text.
 
 ### Using a Custom Font
@@ -89,18 +85,15 @@ $ python3
 >>> print(matplotlib.get_cachedir())
 ```
 * Delete all font-related cache files in that location.
-* Open the file `dandy.mplstyle` and search for `Cochineal`. Replace it,
-wherever it appears, with `Libre Baskerville`. In other words, the contents of
-`dandy.mplstyle` should be something like this. (Only the relevant lines are
-shown.)
+* Add the following lines to the file `dandy.mplstyle`.
 ```python
-...
 font.family: Libre Baskerville
-...
-mathtext.bf:  Libre Baskerville:bold
-mathtext.it:  Libre Baskerville:italic
-mathtext.rm:  Libre Baskerville
-...
+mathtext.bf: Libre Baskerville:bold
+mathtext.it: Libre Baskerville:italic
+mathtext.rm: Libre Baskerville
+mathtext.fontset: custom
+mathtext.fallback: stix
+mathtext.default: it
 ```
 
 ## Subplots
