@@ -408,7 +408,8 @@ Args:
     elif ax.name == '3d':
         ax.grid(b = True, which = 'major', linewidth = 0.3, linestyle = '-')
 
-    # Key a unique ID with the figure instance in the global WeakKeyDictionary.
+    # Key a unique ID with the figure instance in the global weak key
+    # dictionary.
     fig = ax.figure
     canvas = fig.canvas
     gid = _generate_gid()
@@ -514,7 +515,8 @@ GUI window.
 
 Constructor Args:
     fig: Matplotlib figure instance
-    parent: tkinter.Toplevel
+    parent: tkinter.Tk or tkinter.Toplevel
+    queue: multiprocessing.Queue
 '''
 
     padx, pady = 10, 10
@@ -699,8 +701,8 @@ def _set_text_data(fig, data):
 
 def show(fig):
     '''\
-Open an interactive GUI which can be used to manipulate some plot elements of
-the plots in a figure.
+Open an interactive GUI which can be used to manipulate some elements of the
+plots in a figure.
 
 Args:
     fig: Matplotlib figure instance
