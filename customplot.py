@@ -539,7 +539,7 @@ Constructor Args:
         # Create one notebook page for each Matplotlib axes in the figure.
         for i, ax in enumerate(self.fig.axes):
             frame = _Frame(self.notebook)
-            frame.grid_columnconfigure(0, weight=1)
+            frame.grid_columnconfigure(0, weight = 1)
 
             # Upper part of the page. Allows the user to manipulate the axes of
             # coordinates.
