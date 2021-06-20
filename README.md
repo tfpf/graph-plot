@@ -47,9 +47,9 @@ all Matplotlib axes in a figure. To do so, just use `customplot.show(fig)`
 details can be found in `examples.py`.
 
 Interactive plots don't work too well with `*Cairo` backends (there is nothing
-Customplot can do to fix this). Try `TkAgg`, `WXAgg` or `Qt5Agg`. Normally,
-`TkAgg` is the default backend, so you probably don't have to worry about this
-at all.
+Customplot can do to fix this). Try `TkAgg`, `GTK3Agg`, `WXAgg` or `Qt5Agg`.
+Normally, `TkAgg` is the default backend, so you probably don't have to worry
+about this at all.
 
 ## Fonts
 Using a good font can significantly improve the appearance of your plot. (Check
