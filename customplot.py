@@ -481,7 +481,7 @@ Args:
 
 class _Frame(tk.Frame):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg = '#333333', borderwidth = 3, relief = tk.RAISED)
+        super().__init__(*args, **kwargs, bg = '#333333', relief = tk.RAISED)
 
 class _Label(tk.Label):
     def __init__(self, *args, **kwargs):
@@ -507,46 +507,43 @@ class _Style(ttk.Style):
 
 ###############################################################################
 
-class _Options(mp.Process):
+class _Interactive(_Frame):
     '''\
 Interactively adjust some plot elements of a Matplotlib axes instance via a
-GUI. This feature is experimental and may not be developed further.
+GUI window.
 
-Args:
-    ax: Matplotlib axes instance
-    queue: multiprocessing.Queue
+Constructor Args:
+    fig: Matplotlib figure instance
+    parent: tkinter.Toplevel
 '''
 
     padx, pady = 10, 10
+    headers = ['Symbolic', 'Symbol', 'Value', 'Limits', 'Label']
 
     ###########################################################################
 
-    def __init__(self, fig, queue):
-        super().__init__()
+    def __init__(self, fig, parent, queue = None):
+        super().__init__(parent)
         self.fig = fig
         self.queue = queue
-        self.headers = ['Symbolic', 'Symbol', 'Value', 'Limits', 'Label']
         self.widgets = [dict() for _ in range(len(fig.axes))]
 
-    ###########################################################################
+        parent.resizable(False, False)
+        parent.title(f'Options for {fig.canvas.get_window_title()} at 0x{id(self.fig):X}')
 
-    def run(self):
-        self.root = tk.Tk()
-        self.root.resizable(False, False)
-        self.root.title(f'Options for {self.fig.canvas.get_window_title()} at 0x{id(self.fig):X}')
-
-        style = _Style(self.root)
+        style = _Style(parent)
         style.theme_use('customplot')
-        self.notebook = ttk.Notebook(self.root)
-        self.notebook.pack()
+
+        self.notebook = ttk.Notebook(self)
 
         # Create one notebook page for each Matplotlib axes in the figure.
         for i, ax in enumerate(self.fig.axes):
-            frame = _Frame(self.root)
+            frame = _Frame(self.notebook)
+            frame.grid_columnconfigure(0, weight=1)
 
             # Upper part of the page. Allows the user to manipulate the axes of
             # coordinates.
-            upper = _Frame(frame)
+            upper = _Frame(frame, borderwidth = 3)
 
             # Header labels for the same.
             for j, header in enumerate(self.headers, 1):
@@ -560,14 +557,14 @@ Args:
             for j, coordaxis in enumerate('xyz', 1):
                 check_variable = tk.BooleanVar()
                 check_button = _Checkbutton(upper, variable = check_variable, offvalue = False, onvalue = True)
-                check_button.configure(command = self._put_axes_data)
+                check_button.configure(command = self.put_axes_data)
                 check_button.grid(row = 1, column = j, padx = self.padx, pady = self.pady)
                 self.widgets[i][f'{coordaxis},Symbolic'] = check_variable
 
                 for k, header in enumerate(self.headers[1 :], 2):
                     entry = _Entry(upper)
-                    entry.bind('<Return>', self._focus_out)
-                    entry.bind('<FocusOut>', self._put_axes_data)
+                    entry.bind('<Return>', self.focus_out)
+                    entry.bind('<FocusOut>', self.put_axes_data)
                     entry.grid(row = k, column = j, padx = self.padx, pady = self.pady)
                     self.widgets[i][f'{coordaxis},{header}'] = entry
 
@@ -580,128 +577,166 @@ Args:
                 except AttributeError:
                     pass
 
-            upper.grid(row = 0, padx = self.padx, pady = self.pady)
-            self.notebook.add(frame, text = f'{ax.get_title()} ({ax.name})')
-
-            if ax.texts == []:
-                continue
+            upper.grid(row = 0)
 
             # Lower part of the page. Allows the user to place Matplotlib text
             # objects.
-            lower = _Frame(frame)
+            if ax.texts != []:
+                lower = _Frame(frame, borderwidth = 3)
 
-            # Header labels and entries for the same.
-            for j, text in enumerate(ax.texts):
-                prompt = _Label(lower, text = f'Location of {text.get_text()}')
-                prompt.grid(row = j, column = 0, padx = self.padx, pady = self.pady)
-                response = _Entry(lower, name = f'{j}')
-                response.bind('<Return>', self._focus_out)
-                response.bind('<FocusOut>', self._put_text_data)
-                response.grid(row = j, column = 1, padx = self.padx, pady = self.pady)
+                # Header labels and entries.
+                for j, text in enumerate(ax.texts):
+                    prompt = _Label(lower, text = f'Location of {text.get_text()}')
+                    prompt.grid(row = j, column = 0, padx = self.padx, pady = self.pady)
+                    response = _Entry(lower, name = f'{j}')
+                    response.bind('<Return>', self.focus_out)
+                    response.bind('<FocusOut>', self.put_text_data)
+                    response.grid(row = j, column = 1, padx = self.padx, pady = self.pady)
 
-            lower.grid(row = 1, padx = self.padx, pady = self.pady)
+                lower.grid(row = 1, sticky = tk.NSEW)
+                lower.grid_columnconfigure(0, weight = 1)
+                lower.grid_columnconfigure(1, weight = 1)
 
-        self.root.mainloop()
+            frame.grid_columnconfigure(0, weight = 1)
+            self.notebook.add(frame, text = f'{ax.get_title()} ({ax.name})')
+
+        self.notebook.pack()
+        self.pack()
 
     ###########################################################################
 
-    def _focus_out(self, event):
-        self.root.focus_set()
+    def focus_out(self, event):
+        self.notebook.focus_set()
 
     ###########################################################################
 
-    def _put_axes_data(self, event = None):
+    def put_axes_data(self, event = None):
         i = self.notebook.index('current')
         data = {key: val.get() for key, val in self.widgets[i].items()}
         data['index'] = i
-        self.queue.put(data)
+
+        if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
+            _set_axes_data(self.fig, data)
+        else:
+            self.queue.put(data)
 
     ###########################################################################
 
-    def _put_text_data(self, event):
+    def put_text_data(self, event):
         entry = event.widget
         coords = entry.get()
         j = int(entry.winfo_name())
         i = self.notebook.index('current')
-        self.queue.put((i, j, coords))
+        data = (i, j, coords)
+
+        if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
+            _set_text_data(self.fig, data)
+        else:
+            self.queue.put(data)
+
+###############################################################################
+
+class _InteractiveWrapper(mp.Process):
+    def __init__(self, fig, queue):
+        super().__init__()
+        self.fig = fig
+        self.queue = queue
+    def run(self):
+        root = tk.Tk()
+        _Interactive(self.fig, root, self.queue)
+        root.mainloop()
+
+###############################################################################
+
+def _set_axes_data(fig, data):
+    ax = fig.axes[data['index']]
+
+    for coordaxis in 'xyz':
+        try:
+            getattr(ax, f'set_{coordaxis}label')(data[f'{coordaxis},Label'])
+        except AttributeError:
+            pass
+
+        # Disable symbolic labelling if the symbol value is not specified.
+        symbolic = data[f'{coordaxis},Symbolic']
+        try:
+            v = float(eval(data[f'{coordaxis},Value']))
+        except (NameError, SyntaxError, ValueError):
+            symbolic = False
+            v = 0
+
+        # Disable symbolic labelling if no symbol is specified.
+        s = data[f'{coordaxis},Symbol']
+        if s == '':
+            symbolic = False
+
+        try:
+            first, last, step = [float(eval(i)) for i in data[f'{coordaxis},Limits'].split()]
+            limit(ax, coordaxis, symbolic, s, v, first, last, step)
+        except (NameError, SyntaxError, ValueError, ZeroDivisionError):
+            pass
+
+    if fig.stale:
+        fig.canvas.draw()
+
+###############################################################################
+
+def _set_text_data(fig, data):
+    i, j, coords = data
+
+    try:
+        coords = tuple(float(eval(coord)) for coord in coords.split())
+        fig.axes[i].texts[j].set_position(coords)
+    except (IndexError, NameError, SyntaxError, ValueError):
+        pass
+
+    if fig.stale:
+        fig.canvas.draw()
 
 ###############################################################################
 
 def show(fig):
     '''\
-Open an interactive GUI in a separate process. Said GUI can be used to
-manipulate some elements of the plots in a figure.
+Open an interactive GUI which can be used to manipulate some plot elements of
+the plots in a figure.
 
 Args:
     fig: Matplotlib figure instance
 '''
 
+    plt.show(block = False)
     canvas = fig.canvas
     canvas.draw()
 
-    queue = mp.Queue()
-    interactive = _Options(fig, queue)
-    interactive.start()
+    # If Matplotlib is using a Tkinter-based backend, make the interactive GUI
+    # a child window of the figure.
+    if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
+        interactive = _Interactive(fig, tk.Toplevel(canvas.get_tk_widget()))
+        plt.show()
 
-    # Keep polling the queue for data coming from the interactive GUI.
-    while plt.fignum_exists(fig.number):
-        canvas.start_event_loop(0.1)
-        if queue.empty():
-            continue
-        data = queue.get()
+    # If Matplotlib is not using a Tkinter-based backend, run the interactive
+    # GUI in a separate process. It will communicate with this process via a
+    # queue.
+    else:
+        queue = mp.Queue()
+        interactive_wrapper = _InteractiveWrapper(fig, queue)
+        interactive_wrapper.start()
 
-        # If a tuple was received, set the location of the Matplotlib text
-        # instance indicated.
-        if isinstance(data, tuple):
-            i, j, coords = data
+        while plt.fignum_exists(fig.number):
+            canvas.start_event_loop(0.1)
+            if queue.empty():
+                continue
 
-            try:
-                coords = tuple(float(eval(coord)) for coord in coords.split())
-                fig.axes[i].texts[j].set_position(coords)
-            except (IndexError, NameError, SyntaxError, ValueError):
-                pass
-
-            if fig.stale:
-                canvas.draw()
-
-            continue
-
-        # A tuple was not received, so `data' must be a dictionary. Apply the
-        # changes (if any) to all axes of coordinates.
-        ax = fig.axes[data['index']]
-        for coordaxis in 'xyz':
-
-            # Set the axis label.
-            try:
-                getattr(ax, f'set_{coordaxis}label')(data[f'{coordaxis},Label'])
-            except AttributeError:
-                pass
-
-            # Disable symbolic labelling if the symbol value is not specified.
-            symbolic = data[f'{coordaxis},Symbolic']
-            try:
-                v = float(eval(data[f'{coordaxis},Value']))
-            except (NameError, SyntaxError, ValueError):
-                symbolic = False
-                v = 0
-
-            # Disable symbolic labelling if no symbol is specified.
-            s = data[f'{coordaxis},Symbol']
-            if s == '':
-                symbolic = False
-
-            # Set the axis limits.
-            try:
-                first, last, step = [float(eval(i)) for i in data[f'{coordaxis},Limits'].split()]
-            except (NameError, SyntaxError, ValueError):
-                pass
+            data = queue.get()
+            if isinstance(data, tuple):
+                _set_text_data(fig, data)
             else:
-                limit(ax, coordaxis, symbolic, s, v, first, last, step)
+                _set_axes_data(fig, data)
 
-        if fig.stale:
-            canvas.draw()
-
-    # The user may close the plot window without closing the interactive GUI.
-    # In that case, the GUI must be closed automatically.
-    interactive.terminate()
+    # Once the figure is closed, the interactive GUI should be closed
+    # automatically.
+    try:
+        interactive_wrapper.terminate()
+    except NameError:
+        pass
 
