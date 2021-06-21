@@ -60,23 +60,27 @@ In case you want nothing to do with fonts, you can ignore this section
 entirely.
 
 ### Using a Built-in Font
-You have a choice of fonts available out of the box. My suggestion is to use a
-STIX font. To do so, add the following lines to the file `dandy.mplstyle`.
+Some fonts are packaged with Matplotlib; you can choose one of them. My
+suggestion is a STIX font. To use it, add the following lines to the file
+`dandy.mplstyle`.
 ```python
 font.family: STIXGeneral
 mathtext.fontset: stix
 ```
 
-I do not recommend using the packaged Computer Modern font, because it cannot
-render minus signs in normal text.
+Computer Modern is also available, but I do not recommend using it, because it
+cannot render minus signs in normal text.
 
 ### Using a Custom Font
 Let's say you want to use Libre Baskerville.
 * Download the font files for Libre Baskerville. (It is a Google font. So, it
 will probably be freely available as a package containing four or more files
 with the extension `.ttf`, or perhaps `.otf`).
-* Create a new directory `~/.fonts/LibreBaskerville` and put the
-above-mentioned font files in that directory.
+* Which platform are you on?
+    * If you're using GNU/Linux, create a new directory
+`~/.fonts/LibreBaskerville` and put the above-mentioned font files in that
+directory.
+    * If you're using Windows, right-click on the files and select 'Install'.
 * Find out where Matplotlib stores its cache.
 ```console
 $ python3
