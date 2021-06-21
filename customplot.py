@@ -9,6 +9,7 @@ import numpy as np
 import os
 import time
 import tkinter as tk
+import tkinter.font as tkfont
 import tkinter.ttk as ttk
 import weakref
 
@@ -502,7 +503,7 @@ class _Style(ttk.Style):
         super().__init__(*args, **kwargs)
         self.theme_create('customplot', parent = 'alt',
                           settings = {'TNotebook.Tab':
-                                      {'configure': {'background': '#333333', 'foreground': '#CCCCCC', 'font': (mpl.rcParams['font.family'])},
+                                      {'configure': {'background': '#333333', 'foreground': '#CCCCCC', 'font': (mpl.rcParams['font.family']), 'padding': [10, 5]},
                                        'map':       {'background': [('selected', '#CCCCCC')], 'foreground': [('selected', '#333333')]}},
                                       'TNotebook':
                                       {'configure': {'background': '#333333', 'foreground': '#CCCCCC', 'font': (mpl.rcParams['font.family']), 'tabposition': tk.NSEW}}})
@@ -607,13 +608,25 @@ Constructor Args:
                 lower.grid_columnconfigure(1, weight = 1)
 
             frame.grid_columnconfigure(0, weight = 1)
-            title = f'{ax.get_title()}'
-            if len(title) > 45:
-                title = f'{title[: 20]} … {title[-20 :]}'
-            self.notebook.add(frame, text = f'{title} ({ax.name})')
+            self.notebook.add(frame, text = '')
 
         self.notebook.pack()
         self.pack()
+        self.update()
+
+        # The width of a tab of the notebook must not exceed this value.
+        width = self.winfo_width() / len(fig.axes)
+
+        # If the rendered length of the text in a notebook tab is greater than
+        # the width calculated above, truncate the text.
+        for i, ax in enumerate(fig.axes):
+            title = f'{ax.get_title()}'
+            while tkfont.Font(family = mpl.rcParams['font.family']).measure(title) > width and len(title) > 5:
+                halfway = len(title) // 2
+                title = f'{title[: halfway - 1]}…{title[halfway + 2 :]}'
+            self.notebook.tab(i, text = f'{title} ({ax.name})')
+
+        self.update()
 
     ###########################################################################
 
