@@ -615,7 +615,7 @@ Constructor Args:
         self.update()
 
         # The width of a tab of the notebook must not exceed this value.
-        width = self.winfo_width() / len(fig.axes)
+        width = self.winfo_width() / (1.5 * len(fig.axes))
 
         # If the rendered length of the text in a notebook tab is greater than
         # the width calculated above, truncate the text.
