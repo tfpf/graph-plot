@@ -420,7 +420,8 @@ Args:
         # additional beautification.
         if ax.name == 'polar':
             canvas.mpl_connect('resize_event', _draw_polar_patches)
-            canvas.resize_event()
+            if os.name != 'nt':
+                canvas.resize_event()
 
     if title is not None:
         ax.set_title(title)
@@ -581,7 +582,11 @@ Constructor Args:
                 except AttributeError:
                     pass
 
-            upper.grid(row = 0)
+            upper.grid(row = 0, sticky = tk.NSEW)
+            upper.grid_columnconfigure(0, weight = 1)
+            upper.grid_columnconfigure(1, weight = 1)
+            upper.grid_columnconfigure(2, weight = 1)
+            upper.grid_columnconfigure(3, weight = 1)
 
             # Lower part of the page. Allows the user to place Matplotlib text
             # objects.
@@ -602,7 +607,10 @@ Constructor Args:
                 lower.grid_columnconfigure(1, weight = 1)
 
             frame.grid_columnconfigure(0, weight = 1)
-            self.notebook.add(frame, text = f'{ax.get_title()} ({ax.name})')
+            title = f'{ax.get_title()}'
+            if len(title) > 45:
+                title = f'{title[: 20]} … {title[-20 :]}'
+            self.notebook.add(frame, text = f'{title} ({ax.name})')
 
         self.notebook.pack()
         self.pack()
