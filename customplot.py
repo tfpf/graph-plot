@@ -421,8 +421,6 @@ Args:
         # additional beautification.
         if ax.name == 'polar':
             canvas.mpl_connect('resize_event', _draw_polar_patches)
-            if os.name != 'nt':
-                canvas.resize_event()
 
     if title is not None:
         ax.set_title(title)
