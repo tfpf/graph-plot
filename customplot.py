@@ -443,7 +443,7 @@ Args:
         if os.name == 'nt':
             manager.window.state('zoomed')
         else:
-            manager.resize(*manager.window.maxsize())
+            manager.window.attributes('-zoomed', True)
     elif backend in {'GTK3Agg', 'GTK3Cairo'}:
         manager.window.maximize()
     elif backend in {'WXAgg', 'WXCairo'}:
