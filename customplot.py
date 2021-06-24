@@ -490,7 +490,8 @@ class _Label(tk.Label):
 
 class _Entry(tk.Entry):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', insertbackground = '#CCCCCC', font = (mpl.rcParams['font.family']))
+        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', insertbackground = '#CCCCCC',
+                         font = (mpl.rcParams['font.family']))
 
 class _Checkbutton(tk.Checkbutton):
     def __init__(self, *args, **kwargs):
@@ -501,10 +502,17 @@ class _Style(ttk.Style):
         super().__init__(*args, **kwargs)
         self.theme_create('customplot', parent = 'alt',
                           settings = {'TNotebook.Tab':
-                                      {'configure': {'background': '#333333', 'foreground': '#CCCCCC', 'font': (mpl.rcParams['font.family']), 'padding': [10, 5]},
-                                       'map':       {'background': [('selected', '#CCCCCC')], 'foreground': [('selected', '#333333')]}},
+                                      {'configure': {'background': '#333333',
+                                                     'foreground': '#CCCCCC',
+                                                     'font':       (mpl.rcParams['font.family']),
+                                                     'padding':    [10, 5]},
+                                       'map':       {'background': [('selected', '#CCCCCC')],
+                                                     'foreground': [('selected', '#333333')]}},
                                       'TNotebook':
-                                      {'configure': {'background': '#333333', 'foreground': '#CCCCCC', 'font': (mpl.rcParams['font.family']), 'tabposition': tk.NSEW}}})
+                                      {'configure': {'background':  '#333333',
+                                                     'foreground':  '#CCCCCC',
+                                                     'font':        (mpl.rcParams['font.family']),
+                                                     'tabposition': tk.NSEW}}})
 
 ###############################################################################
 
@@ -613,7 +621,7 @@ Constructor Args:
         self.update()
 
         # The width of a tab of the notebook must not exceed this value.
-        width = self.winfo_width() / (1.5 * len(fig.axes))
+        width = self.winfo_width() / (1.1 * len(fig.axes))
 
         # If the rendered length of the text in a notebook tab is greater than
         # the width calculated above, truncate the text.
@@ -622,7 +630,7 @@ Constructor Args:
             while tkfont.Font(family = mpl.rcParams['font.family']).measure(title) > width and len(title) > 5:
                 halfway = len(title) // 2
                 title = f'{title[: halfway - 1]}…{title[halfway + 2 :]}'
-            self.notebook.tab(i, text = f'{title} ({ax.name})')
+            self.notebook.tab(i, text = title)
 
         self.update()
 
