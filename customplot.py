@@ -626,8 +626,10 @@ Constructor Args:
         # If the rendered length of the text in a notebook tab is greater than
         # the width calculated above, truncate the text.
         for i, ax in enumerate(fig.axes):
-            title = f'{ax.get_title()}'
-            while tkfont.Font(family = mpl.rcParams['font.family']).measure(title) > width and len(title) > 5:
+            title = ax.get_title()
+            if not title or title.isspace():
+                title = '<untitled>'
+            while tkfont.Font(family = mpl.rcParams['font.family']).measure(title) > width and len(title) > 4:
                 halfway = len(title) // 2
                 title = f'{title[: halfway - 1]}…{title[halfway + 2 :]}'
             self.notebook.tab(i, text = title)
