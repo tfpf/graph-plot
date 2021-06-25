@@ -491,7 +491,7 @@ class _Label(tk.Label):
 class _Entry(tk.Entry):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', insertbackground = '#CCCCCC',
-                         font = (mpl.rcParams['font.family']))
+                         disabledbackground = '#CCCCCC', font = (mpl.rcParams['font.family']))
 
 class _Checkbutton(tk.Checkbutton):
     def __init__(self, *args, **kwargs):
@@ -582,10 +582,10 @@ Constructor Args:
 
             # Set defaults for some of the above entries.
             for coordaxis in 'xyz':
-                self.widgets[i][f'{coordaxis},Symbol'].insert(0, r'\pi')
-                self.widgets[i][f'{coordaxis},Value'].insert(0, f'{np.pi}')
                 try:
                     self.widgets[i][f'{coordaxis},Label'].insert(0, getattr(ax, f'get_{coordaxis}label')())
+                    self.widgets[i][f'{coordaxis},Symbol'].insert(0, r'\pi')
+                    self.widgets[i][f'{coordaxis},Value'].insert(0, f'{np.pi}')
                 except AttributeError:
                     pass
 
@@ -596,8 +596,10 @@ Constructor Args:
             upper.grid_columnconfigure(3, weight = 1)
 
             # Lower part of the page. Allows the user to place Matplotlib text
-            # objects.
-            if ax.texts != []:
+            # objects. This will not be provided for three-dimensional plots,
+            # because the `set_position' method of `Text3D' objects does not
+            # work as expected
+            if ax.texts != [] and ax.name != '3d':
                 lower = _Frame(frame, borderwidth = 3)
 
                 # Header labels and entries.
@@ -605,15 +607,19 @@ Constructor Args:
                     prompt = _Label(lower, text = f'Location of {text.get_text()}')
                     prompt.grid(row = j, column = 0, padx = self.padx, pady = self.pady)
                     response = _Entry(lower, name = f'{j}')
+                    response.insert(0, ' '.join(f'{coord}' for coord in text.get_position()))
                     response.bind('<Return>', self.focus_out)
                     response.bind('<FocusOut>', self.put_text_data)
                     response.grid(row = j, column = 1, padx = self.padx, pady = self.pady)
+
+                    lower.grid_rowconfigure(j, weight = 1)
 
                 lower.grid(row = 1, sticky = tk.NSEW)
                 lower.grid_columnconfigure(0, weight = 1)
                 lower.grid_columnconfigure(1, weight = 1)
 
             frame.grid_columnconfigure(0, weight = 1)
+            frame.grid_rowconfigure(1, weight = 1)
             self.notebook.add(frame, text = '')
 
         self.notebook.pack()
