@@ -5,10 +5,16 @@ import tkinter as tk
 
 import customplot
 
+# Globally apply the style parameters.
+plt.style.use('dandy.mplstyle')
+
 ###############################################################################
-# Two-dimensional Cartesian plot (bare minimum).
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def cartesian_2d_minimal():
+    '''\
+Example of a minimal two-dimensional Cartesian plot.
+'''
+
     ax = plt.figure().add_subplot()
 
     x = np.linspace(0, 20, 10000)
@@ -20,9 +26,11 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional Cartesian plot.
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def cartesian_2d():
+    '''\
+Example of a two-dimensional Cartesian plot.
+'''
 
     # Create a Matplotlib axes instance.
     ax = plt.figure().add_subplot()
@@ -51,9 +59,11 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional Cartesian plot (discontinuous function).
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def cartesian_2d_discontinuous():
+    '''\
+Example of a two-dimensional Cartesian plot of a discontinuous function.
+'''
 
     # Create a Matplotlib axes instance.
     ax = plt.figure().add_subplot()
@@ -91,9 +101,13 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional Cartesian plot (symbolic labels).
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def cartesian_2d_symbolic_1():
+    '''\
+Example of a two-dimensional Cartesian plot with symbolic labels on the x-axis.
+Said labels contain the symbol for pi (π).
+'''
+
     ax = plt.figure().add_subplot()
 
     # Set the locations of the grid lines on the x-axis. Note that `symbolic'
@@ -117,16 +131,20 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional Cartesian plot (symbolic labels with scaling).
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def cartesian_2d_symbolic_2():
+    '''\
+Example of a two-dimensional Cartesian plot with symbolic labels on the x-axis.
+Said labels contain the symbols for pi (π) and the Euler–Mascheroni constant
+(γ).
+'''
+
     ax = plt.figure().add_subplot()
 
     # Set the locations of the grid lines on the x-axis. Note that `symbolic'
     # has been set to True, and a value has been provided for `s' and `v'. As a
     # result, grid lines will be drawn at the following x-coordinates.
     # [-2π/γ, -1.75π/γ, -1.5π/γ, -1.25π/γ, -π/γ, -0.75π/γ, -0.5π/γ, -0.25π/γ, 0, 0.25π/γ, 0.5π/γ, 0.75π/γ, π/γ, 1.25π/γ, 1.5π/γ, 1.75π/γ, 2π/γ]
-    # Here, γ is the Euler–Mascheroni constant.
     customplot.limit(ax, 'x', symbolic = True, s = r'\pi/\gamma', v = np.pi / np.euler_gamma, first = -2, last = 2, step = 0.25)
 
     # Set the locations of the grid lines on the y-axis. Grid lines will be
@@ -144,9 +162,20 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional interactive Cartesian plot.
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def interactive():
+    '''\
+Example of an interactive plot.
+
+Note that an interactive plot should be created only inside a function (like it
+has been done here). At the very least, it should be done in a function called
+`main', and
+    if __name__ == '__main__':
+        main()
+should be used. If this is not done, Python may complain about problems with
+starting a process.
+'''
+
     fig = plt.figure()
     ax = fig.add_subplot()
     customplot.limit(ax, 'x', first = -6, last = 6, step = 1)
@@ -171,23 +200,27 @@ with plt.style.context('dandy.mplstyle'):
     # The upper part is a ribbon where you can select one of the Matplotlib
     # axes present in the figure.
 
-    # The middle part contains twelve entries which can be used to manipulate
-    # the axes of coordinates. 'Symbolic' is a checkbox indicating whether the
-    # markings on the axis should be at multiples of the number entered in
-    # 'Value'. 'Symbol' is a string which represents said value. 'Limits' shall
-    # contain three space-separated numbers, which are used as the arguments
-    # `first', `last' and `step' for the function `customplot.limit'. 'Label'
-    # is used to label the axis of coordinates. After you're done typing into
-    # these entries, press Enter. The plot will get updated.
+    # The middle part contains twelve entries and three checkboxes which can be
+    # used to manipulate the axes of coordinates. 'Symbolic' is a checkbox
+    # indicating whether the markings on the axis should be at multiples of the
+    # number entered in 'Value'. 'Symbol' is a string which represents said
+    # value. 'Limits' shall contain three space-separated numbers, which are
+    # used as the arguments `first', `last' and `step' for the function
+    # `customplot.limit'. 'Label' is used to label the axis of coordinates.
+    # After you're done typing into any entry, press Enter. The plot will get
+    # updated.
 
     # The lower part contains as many entries as there are text objects in the
     # plot. Specify the coordinates (again, space-separated) at which these
     # text objects must be placed, and press Enter. The plot will get updated.
 
 ###############################################################################
-# Two-dimensional Cartesian plot (implicitly-defined functions).
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def cartesian_2d_ellipse():
+    '''\
+Example of a two-dimensional Cartesian plot of an ellipse.
+'''
+
     ax = plt.figure().add_subplot()
     customplot.limit(ax, 'x', first = -3, last = 5, step = 1)
     customplot.limit(ax, 'y', first = -9, last = 4, step = 1)
@@ -203,9 +236,12 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional polar plot.
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def polar():
+    '''\
+Example of a polar plot.
+'''
+
     ax = plt.figure().add_subplot(projection = 'polar')
 
     # In a polar plot, the y-axis is actually the radial axis. In most cases,
@@ -231,9 +267,13 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional polar plot (symbolic labels).
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def polar_symbolic():
+    '''\
+Example of a polar plot with symbolic labels on the angular axis. Said labels
+contain the symbol for pi (π).
+'''
+
     ax = plt.figure().add_subplot(projection = 'polar')
 
     # In a polar plot, the x-axis is actually the angular axis. Note that
@@ -271,9 +311,12 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Two-dimensional subplots.
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def subplots():
+    '''\
+Example of subplots.
+'''
+
     fig = plt.figure()
     axs = [None] * 3
     axs[0] = fig.add_subplot(2, 2, 1, projection = 'polar')
@@ -305,9 +348,12 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Three-dimensional Cartesian plot (curve).
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def cartesian_3d_curve():
+    '''\
+Example of a three-dimensional Cartesian plot of a curve.
+'''
+
     ax = plt.figure().add_subplot(projection = '3d')
     customplot.limit(ax, 'x', first = 0, last = 12, step = 1)
     customplot.limit(ax, 'y', first = -2, last = 2, step = 1)
@@ -329,9 +375,13 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Three-dimensional Cartesian plot (curve) (symbolic labels).
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def cartesian_3d_curve_symbolic():
+    '''\
+Example of a three-dimensional Cartesian plot of a curve with symbolic labels
+on the x-axis. Said labels contain the symbol for pi (π).
+'''
+
     ax = plt.figure().add_subplot(projection = '3d')
     customplot.limit(ax, 'x', symbolic = True, first = -4, last = 4, step = 0.5)
     customplot.limit(ax, 'y', first = -3, last = 3, step = 1)
@@ -353,9 +403,13 @@ with plt.style.context('dandy.mplstyle'):
     plt.show()
 
 ###############################################################################
-# Three-dimensional Cartesian plot (surface) (symbolic labels).
-###############################################################################
-with plt.style.context('dandy.mplstyle'):
+
+def cartesian_3d_surface_symbolic():
+    '''\
+Example of a three-dimensional Cartesian plot of a surface with symbolic labels
+on the x-axis and the y-axis. Said labels contain the symbol for pi (π).
+'''
+
     ax = plt.figure().add_subplot(projection = '3d')
     customplot.limit(ax, 'x', symbolic = True, first = -6, last = 6, step = 1)
     customplot.limit(ax, 'y', symbolic = True, first = -6, last = 6, step = 1)
@@ -374,4 +428,21 @@ with plt.style.context('dandy.mplstyle'):
     customplot.aspect(ax, 1)
 
     plt.show()
+
+###############################################################################
+
+if __name__ == '__main__':
+    cartesian_2d_minimal()
+    cartesian_2d()
+    cartesian_2d_discontinuous()
+    cartesian_2d_symbolic_1()
+    cartesian_2d_symbolic_2()
+    interactive()
+    cartesian_2d_ellipse()
+    polar()
+    polar_symbolic()
+    subplots()
+    cartesian_3d_curve()
+    cartesian_3d_curve_symbolic()
+    cartesian_3d_surface_symbolic()
 
