@@ -626,20 +626,23 @@ Constructor Args:
         self.pack()
         self.update()
 
-        # The width of a tab of the notebook must not exceed this value.
-        width = self.winfo_width() / (1.1 * len(fig.axes))
+        # The sum of the widths of the titles of the notebook tabs must not
+        # exceed a certain fraction of the width of the window.
+        width = self.winfo_width() * 0.9
 
-        # If the rendered length of the text in a notebook tab is greater than
-        # the width calculated above, truncate the text.
-        for i, ax in enumerate(fig.axes):
-            title = ax.get_title()
-            if not title or title.isspace():
-                title = '<untitled>'
-            while tkfont.Font(family = mpl.rcParams['font.family']).measure(title) > width and len(title) > 4:
-                halfway = len(title) // 2
-                title = f'{title[: halfway - 1]}…{title[halfway + 2 :]}'
-            self.notebook.tab(i, text = title)
+        # During each iteration of the below loop, truncate the widest title.
+        # Keep doing this until the condition described above is satisfied.
+        titles = [ax.get_title() for ax in fig.axes]
+        measurer = lambda title: tkfont.Font(family = mpl.rcParams['font.family']).measure(title)
+        measures = list(map(measurer, titles))
+        while sum(measures) > width:
+            i = measures.index(max(measures))
+            halfway = len(titles[i]) // 2
+            titles[i] = f'{titles[i][: halfway - 1]}…{titles[i][halfway + 2 :]}'
+            measures = list(map(measurer, titles))
 
+        for i in range(len(fig.axes)):
+            self.notebook.tab(i, text = titles[i])
         self.update()
 
     ###########################################################################
