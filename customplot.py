@@ -626,13 +626,20 @@ Constructor Args:
         self.pack()
         self.update()
 
+        titles = [None] * len(fig.axes)
+        for i, ax in enumerate(fig.axes):
+            title = ax.get_title()
+            if not title or title.isspace():
+                titles[i] = '<untitled>'
+            else:
+                titles[i] = title
+
         # The sum of the widths of the titles of the notebook tabs must not
         # exceed a certain fraction of the width of the window.
         width = self.winfo_width() * 0.9
 
         # During each iteration of the below loop, truncate the widest title.
         # Keep doing this until the condition described above is satisfied.
-        titles = [ax.get_title() for ax in fig.axes]
         measurer = lambda title: tkfont.Font(family = mpl.rcParams['font.family']).measure(title)
         measures = list(map(measurer, titles))
         while sum(measures) > width:
