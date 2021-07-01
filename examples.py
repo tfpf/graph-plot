@@ -323,11 +323,12 @@ Example of subplots.
     axs[1] = fig.add_subplot(2, 2, 2)
     axs[2] = fig.add_subplot(2, 1, 2)
 
-    customplot.limit(axs[0], 'y', first = 0, last = 1.5, step = 0.5)
+    customplot.limit(axs[0], 'x', first = 0, last = 2 * np.pi, step = np.pi / 6)
+    customplot.limit(axs[0], 'y', first = 0, last = 5, step = 1)
     phi = np.linspace(0, 2 * np.pi, 10000)
-    r = np.sin(3 * phi)
-    axs[0].plot(phi, r, color = 'red', label = r'$r=\sin\,3\varphi$')
-    customplot.polish(axs[0], labels = (r'$\varphi$', '$r$'), title = 'This is a flower!')
+    rho = 4 * np.sin(3 * phi)
+    axs[0].plot(phi, rho, color = 'red', label = r'$\rho=4\,\sin\,3\varphi$')
+    customplot.polish(axs[0], labels = (r'$\varphi$', r'$\rho$'), title = 'This is a flower!')
 
     customplot.limit(axs[1], 'x', first = 0, last = 8, step = 1)
     customplot.limit(axs[1], 'y', first = 0, last = 4, step = 1)
@@ -341,8 +342,8 @@ Example of subplots.
     customplot.limit(axs[2], 'y', first = -1, last = 1, step = 0.5)
     x = np.linspace(0, 8, 4000)
     y = np.random.randn(len(x)) / 10
-    axs[2].plot(x, y, label = r'Noise')
-    customplot.polish(axs[2], labels = (r'$\tau$', r'$\nu$'), title = 'This is a random signal!')
+    axs[2].plot(x, y, label = r'$\nu=\psi(\tau)$')
+    customplot.polish(axs[2], labels = (r'$\tau$', r'$\nu$'), title = 'This is random noise!')
     customplot.aspect(axs[2], 1)
 
     plt.show()
