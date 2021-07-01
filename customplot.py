@@ -410,17 +410,17 @@ Args:
         ax.grid(b = True, which = 'major', linewidth = 0.3, linestyle = '-')
 
     # Key a unique ID with the figure instance in the global weak key
-    # dictionary.
+    # dictionary. Doing so ensures that the following operations are performed
+    # only once.
     fig = ax.figure
     canvas = fig.canvas
-    gid = _generate_gid()
-    if fig not in _gid:
-        _gid[fig] = gid
+    if any(_ax.name == 'polar' for _ax in fig.axes) and fig not in _gid:
+        _gid[fig] = _generate_gid()
 
-        # Connect the resize event of the canvas to a callback which does some
-        # additional beautification.
-        if ax.name == 'polar':
-            canvas.mpl_connect('resize_event', _draw_polar_patches)
+        # Connect the resize event of the canvas to a callback which
+        # illustrates the axes of coordinates of all polar graphs (if any) in
+        # this figure.
+        canvas.mpl_connect('resize_event', _draw_polar_patches)
 
     if title is not None:
         ax.set_title(title)
