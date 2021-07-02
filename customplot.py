@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import multiprocessing as mp
 import numpy as np
-import os
+import platform
 import time
 import tkinter as tk
 import tkinter.font as tkfont
@@ -16,11 +16,6 @@ import weakref
 ###############################################################################
 
 _gid = weakref.WeakKeyDictionary()
-
-###############################################################################
-
-def _generate_gid():
-    return f'cp_{time.time_ns()}_{np.random.randint(100000, 999999)}'
 
 ###############################################################################
 
@@ -415,7 +410,7 @@ Args:
     fig = ax.figure
     canvas = fig.canvas
     if any(_ax.name == 'polar' for _ax in fig.axes) and fig not in _gid:
-        _gid[fig] = _generate_gid()
+        _gid[fig] = f'cp_{time.time_ns()}_{np.random.randint(100, 999)}'
 
         # Connect the resize event of the canvas to a callback which
         # illustrates the axes of coordinates of all polar graphs (if any) in
@@ -440,7 +435,7 @@ Args:
     manager = canvas.manager
     backend = mpl.get_backend()
     if backend in {'TkAgg', 'TkCairo'}:
-        if os.name == 'nt':
+        if platform.system() in {'Darwin', 'Windows'}:
             manager.window.state('zoomed')
         else:
             manager.window.attributes('-zoomed', True)
