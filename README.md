@@ -81,6 +81,8 @@ with the extension `.ttf`, or perhaps `.otf`).
 `~/.fonts/LibreBaskerville` and put the above-mentioned font files in that
 directory.
     * If you're using Windows, right-click on the files and select 'Install'.
+    * If you're using macOS, right-click on the files and select 'Open'. Click
+on 'Install font' in the window that opens.
 * Find out where Matplotlib stores its cache.
 ```console
 $ python3
