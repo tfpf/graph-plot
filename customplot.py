@@ -445,6 +445,9 @@ Args:
         manager.frame.Maximize(True)
     elif backend in {'Qt5Agg', 'Qt5Cairo'}:
         manager.window.showMaximized()
+    elif backend == 'MacOSX':
+        manager.resize(1568, 882) # TODO Find out if there is a better way.
+
 
 ###############################################################################
 
