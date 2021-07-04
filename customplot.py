@@ -758,7 +758,9 @@ Args:
     # If Matplotlib is using a Tkinter-based backend, make the interactive GUI
     # a child window of the figure.
     if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
-        interactive = _Interactive(fig, tk.Toplevel(canvas.get_tk_widget()))
+        toplevel = tk.Toplevel(canvas.get_tk_widget())
+        interactive = _Interactive(fig, toplevel)
+        interactive.after(2000, toplevel.lift)
         plt.show()
 
     # If Matplotlib is not using a Tkinter-based backend, run the interactive
