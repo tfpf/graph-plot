@@ -40,6 +40,9 @@ Only `rectilinear`, `polar` and `3d` projections of Matplotlib axes are
 supported. Other projections can also be used, but their beautification may not
 happen automatically.
 
+Except interactive plotting (see below), everything should work out of the box
+with any Matplotlib backend on any platform.
+
 ## Interactive Plots
 As seen in the image above, you can interactively adjust some plot elements of
 all Matplotlib axes in a figure. To do so, just use `customplot.show(fig)`
@@ -48,8 +51,8 @@ details can be found in `examples.py`.
 
 Interactive plots should work well with not only the `TkAgg` and `TkCairo`
 backends, but also some others, like `GTK3Agg`, `GTK3Cairo`, `WXAgg`,
-`WXCairo`, `Qt5Agg` and `Qt5Cairo` on GNU/Linux and Windows. (I have not tested
-them on macOS.)
+`WXCairo`, `Qt5Agg` and `Qt5Cairo` on GNU/Linux and Windows. On macOS, they
+currently work only with `TkAgg` and `TkCairo`.
 
 ## Fonts
 Using a good font can significantly improve the appearance of your plot. (Check
