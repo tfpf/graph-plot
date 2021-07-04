@@ -174,6 +174,13 @@ has been done here). At the very least, it should be done in a function called
         main()
 should be used. If this is not done, Python may complain about problems with
 starting a process.
+
+Further, this won't work on macOS unless you use a Tkinter-based backend. To do
+so, add
+    import matplotlib as mpl; mpl.use('TkAgg')
+or
+    import matplotlib as mpl; mpl.use('TkCairo')
+before importing anything else.
 '''
 
     fig = plt.figure()
