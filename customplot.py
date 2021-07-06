@@ -534,7 +534,7 @@ Constructor Args:
         super().__init__(parent)
         self.fig = fig
         self.queue = queue
-        self.widgets = [dict() for _ in range(len(fig.axes))]
+        self.widgets = [{} for _ in range(len(fig.axes))]
 
         icon_data = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x14\x00\x00\x00\x14\x08\x06\x00\x00\x00\x8d\x89\x1d\r\x00\x00\x00IIDATx\x9cc\xfc\xff\xff?\x039`\xd6\xad\xd7X52\x91e\x1a\x1e@u\x03Y\xde\xc9\xaabu\xba\xd0\xe3\xdb\x8c\xe4\x188\xf8\xbd<\xf8\rd\xc1'\xa9\xbc\xc9\x17k\x84\xdd\xf5\xdb\x8c3\xc2\x06\xbf\x97G\r\x1c5pX\x1a\x08\x00\xdfj\x0e\x87\x02\xbc\xb5L\x00\x00\x00\x00IEND\xaeB`\x82"
         parent.iconphoto(True, tk.PhotoImage(data = icon_data))
@@ -597,7 +597,7 @@ Constructor Args:
             # objects. This will not be provided for three-dimensional plots,
             # because the `set_position' method of `Text3D' objects does not
             # work as expected
-            if ax.texts != [] and ax.name != '3d':
+            if ax.texts and ax.name != '3d':
                 lower = _Frame(frame, borderwidth = 3)
 
                 # Header labels and entries.
