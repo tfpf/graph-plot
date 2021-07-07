@@ -26,7 +26,7 @@ if _system == 'Darwin':
 def _font_tuple():
     font_family = mpl.rcParams['font.family'][0]
     if _system == 'Darwin':
-        font_size = 20
+        font_size = 18
     else:
         font_size = 12
     font_style = tkfont.NORMAL
