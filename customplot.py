@@ -17,17 +17,21 @@ import weakref
 
 _gid = weakref.WeakKeyDictionary()
 
+_system = platform.system()
+if _system == 'Darwin':
+    mpl.use('TkAgg')
+
 ###############################################################################
 
 def _font_tuple():
-    _font_family = mpl.rcParams['font.family']
-    if platform.system() == 'Darwin':
-        _font_size = 20
+    font_family = mpl.rcParams['font.family'][0]
+    if _system == 'Darwin':
+        font_size = 20
     else:
-        _font_size = 12
-    _font_style = tkfont.NORMAL
+        font_size = 12
+    font_style = tkfont.NORMAL
 
-    return (_font_family, _font_size, _font_style)
+    return (font_family, font_size, font_style)
 
 ###############################################################################
 
@@ -448,7 +452,7 @@ Args:
     manager = canvas.manager
     backend = mpl.get_backend()
     if backend in {'TkAgg', 'TkCairo'}:
-        if platform.system() in {'Darwin', 'Windows'}:
+        if _system in {'Darwin', 'Windows'}:
             manager.window.state('zoomed')
         else:
             manager.window.attributes('-zoomed', True)
