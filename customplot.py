@@ -19,6 +19,18 @@ _gid = weakref.WeakKeyDictionary()
 
 ###############################################################################
 
+def _font_tuple():
+    _font_family = mpl.rcParams['font.family']
+    if platform.system() == 'Darwin':
+        _font_size = 20
+    else:
+        _font_size = 12
+    _font_style = tkfont.NORMAL
+
+    return (_font_family, _font_size, _font_style)
+
+###############################################################################
+
 def _iprint(items, columns = 3, align_method = 'center'):
     '''\
 Display an iterable in neat columns.
@@ -122,14 +134,15 @@ Returns:
         builder.append('$')
         labels[i] = ''.join(builder)
 
-    return labels, symval * coefficients
+    return (labels, symval * coefficients)
 
 ###############################################################################
 
 def _get_axes_size_in_inches(ax):
     bbox = ax.get_window_extent()
     transformed = bbox.transformed(ax.figure.dpi_scale_trans.inverted())
-    return transformed.width, transformed.height
+
+    return (transformed.width, transformed.height)
 
 ###############################################################################
 
@@ -484,12 +497,12 @@ class _Frame(tk.Frame):
 
 class _Label(tk.Label):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', font = (mpl.rcParams['font.family']))
+        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', font = _font_tuple())
 
 class _Entry(tk.Entry):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', insertbackground = '#CCCCCC',
-                         disabledbackground = '#CCCCCC', font = (mpl.rcParams['font.family']))
+                         disabledbackground = '#CCCCCC', font = _font_tuple())
 
 class _Checkbutton(tk.Checkbutton):
     def __init__(self, *args, **kwargs):
@@ -502,14 +515,14 @@ class _Style(ttk.Style):
                           settings = {'TNotebook.Tab':
                                       {'configure': {'background': '#333333',
                                                      'foreground': '#CCCCCC',
-                                                     'font':       (mpl.rcParams['font.family']),
+                                                     'font':       _font_tuple(),
                                                      'padding':    [10, 5]},
                                        'map':       {'background': [('selected', '#CCCCCC')],
                                                      'foreground': [('selected', '#333333')]}},
                                       'TNotebook':
                                       {'configure': {'background':  '#333333',
                                                      'foreground':  '#CCCCCC',
-                                                     'font':        (mpl.rcParams['font.family']),
+                                                     'font':        _font_tuple(),
                                                      'tabposition': tk.NSEW}}})
 
 ###############################################################################
@@ -638,7 +651,7 @@ Constructor Args:
 
         # During each iteration of the below loop, truncate the widest title.
         # Keep doing this until the condition described above is satisfied.
-        measurer = lambda title: tkfont.Font(family = mpl.rcParams['font.family']).measure(title)
+        measurer = lambda title: tkfont.Font(font = _font_tuple()).measure(title)
         measures = list(map(measurer, titles))
         while sum(measures) > width:
             i = measures.index(max(measures))
