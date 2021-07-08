@@ -1,7 +1,5 @@
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import tkinter as tk
 
 import customplot
 
