@@ -462,9 +462,6 @@ Args:
         manager.frame.Maximize(True)
     elif backend in {'Qt5Agg', 'Qt5Cairo'}:
         manager.window.showMaximized()
-    elif backend == 'MacOSX':
-        manager.resize(1568, 882) # TODO Find out if there is a better way.
-
 
 ###############################################################################
 
@@ -537,7 +534,7 @@ Interactively adjust some plot elements of a Matplotlib axes instance via a
 GUI window.
 
 Constructor Args:
-    fig: Matplotlib figure instance
+    fig: matplotlib.figure.Figure
     parent: tkinter.Tk or tkinter.Toplevel
     queue: multiprocessing.Queue
 '''
@@ -765,7 +762,7 @@ Open an interactive GUI which can be used to manipulate some elements of the
 plots in a figure.
 
 Args:
-    fig: Matplotlib figure instance
+    fig: matplotlib.figure.Figure
 '''
 
     plt.show(block = False)
