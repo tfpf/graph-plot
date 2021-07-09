@@ -21,6 +21,8 @@ _system = platform.system()
 if _system == 'Darwin':
     mpl.use('TkAgg')
 
+_backend = mpl.get_backend()
+
 ###############################################################################
 
 def _font_tuple():
@@ -450,17 +452,16 @@ Args:
 
     # Maximise the figure window.
     manager = canvas.manager
-    backend = mpl.get_backend()
-    if backend in {'TkAgg', 'TkCairo'}:
+    if _backend in {'TkAgg', 'TkCairo'}:
         if _system in {'Darwin', 'Windows'}:
             manager.window.state('zoomed')
         else:
             manager.window.attributes('-zoomed', True)
-    elif backend in {'GTK3Agg', 'GTK3Cairo'}:
+    elif _backend in {'GTK3Agg', 'GTK3Cairo'}:
         manager.window.maximize()
-    elif backend in {'WXAgg', 'WXCairo'}:
+    elif _backend in {'WXAgg', 'WXCairo'}:
         manager.frame.Maximize(True)
-    elif backend in {'Qt5Agg', 'Qt5Cairo'}:
+    elif _backend in {'Qt5Agg', 'Qt5Cairo'}:
         manager.window.showMaximized()
 
 ###############################################################################
@@ -676,7 +677,7 @@ Constructor Args:
         data = {key: val.get() for key, val in self.widgets[i].items()}
         data['index'] = i
 
-        if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
+        if _backend in {'TkAgg', 'TkCairo'}:
             _set_axes_data(self.fig, data)
         else:
             self.queue.put(data)
@@ -690,7 +691,7 @@ Constructor Args:
         i = self.notebook.index('current')
         data = (i, j, coords)
 
-        if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
+        if _backend in {'TkAgg', 'TkCairo'}:
             _set_text_data(self.fig, data)
         else:
             self.queue.put(data)
@@ -771,7 +772,7 @@ Args:
 
     # If Matplotlib is using a Tkinter-based backend, make the interactive GUI
     # a child window of the figure.
-    if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
+    if _backend in {'TkAgg', 'TkCairo'}:
         toplevel = tk.Toplevel(canvas.get_tk_widget())
         interactive = _Interactive(fig, toplevel)
         interactive.after(2000, toplevel.lift)
