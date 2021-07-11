@@ -37,7 +37,7 @@ def _font_tuple():
 
 ###############################################################################
 
-def _iprint(items, columns = 3, align_method = 'center'):
+def _iprint(items, columns=3, align_method='center'):
     '''\
 Display an iterable in neat columns.
 
@@ -59,12 +59,12 @@ Args:
 
     for row in items:
         for r, width in zip(row, widths):
-            print(getattr(r, align_method)(width, ' '), end = '')
+            print(getattr(r, align_method)(width, ' '), end='')
         print()
 
 ###############################################################################
 
-def _labels_and_ticks(first, last, step, symbol = r'\pi', symval = np.pi):
+def _labels_and_ticks(first, last, step, symbol=r'\pi', symval=np.pi):
     r'''
 Create a list of LaTeX-formatted strings and a NumPy array of floats for values
 from one rational multiple of π (or some other number) to another.
@@ -75,7 +75,7 @@ from one rational multiple of π (or some other number) to another.
 (['$-\\pi$', '$-\\dfrac{3\\pi}{4}$', '$-\\dfrac{\\pi}{2}$', '$-\\dfrac{\\pi}{4}$'], array([-3.14159265, -2.35619449, -1.57079633, -0.78539816]))
 >>> _labels_and_ticks(-2, 2, 1)
 (['$-2\\pi$', '$-\\pi$', '$0$', '$\\pi$', '$2\\pi$'], array([-6.28318531, -3.14159265,  0.        ,  3.14159265,  6.28318531]))
->>> _labels_and_ticks(2, 4, 1 / 2, symbol = r'\pi/\omega', symval = np.pi / 2)
+>>> _labels_and_ticks(2, 4, 1 / 2, symbol=r'\pi/\omega', symval=np.pi / 2)
 (['$\\dfrac{2\\pi}{\\omega}$', '$\\dfrac{5\\pi}{2\\omega}$', '$\\dfrac{3\\pi}{\\omega}$', '$\\dfrac{7\\pi}{2\\omega}$', '$\\dfrac{4\\pi}{\\omega}$'], array([3.14159265, 3.92699082, 4.71238898, 5.49778714, 6.28318531]))
 
 Args:
@@ -233,7 +233,7 @@ Args:
 
 ###############################################################################
 
-def sanitise(y, maximum_diff = 5):
+def sanitise(y, maximum_diff=5):
     '''\
 At a point of essential or jump discontinuity, Matplotlib draws a vertical line
 automatically. This vertical line joins the two points around the
@@ -257,7 +257,7 @@ Returns:
 
 ###############################################################################
 
-def limit(ax, coordaxis = None, symbolic = False, s = r'\pi', v = np.pi, first = None, last = None, step = None):
+def limit(ax, coordaxis=None, symbolic=False, s=r'\pi', v=np.pi, first=None, last=None, step=None):
     '''\
 Limit the specified axis of coordinates to the range given. Draw grid lines as
 indicated.
@@ -324,7 +324,7 @@ Returns:
         # quite good). Do not do this for three-dimensional plots, either
         # (Matplotlib messes up the spacing).
         if ax.name == 'rectilinear' and coordaxis == 'x' and not all(isinstance(t, int) for t in [first, last, step]):
-            ax.tick_params(axis = coordaxis, which = 'major', pad = 20)
+            ax.tick_params(axis=coordaxis, which='major', pad=20)
             for label in labels_getter():
                 label.set_horizontalalignment('center')
                 label.set_verticalalignment('center')
@@ -367,7 +367,7 @@ Returns:
 
 ###############################################################################
 
-def polish(ax, labels = None, title = None, suptitle = None):
+def polish(ax, labels=None, title=None, suptitle=None):
     '''\
 Label the axes of coordinates. Give the plot a title. Add a legend. Draw grid
 lines. Make some minor appearance enhancements.
@@ -390,38 +390,38 @@ Args:
                   'labelsize': 'small',
                   'length':    4,
                   'direction': 'in'}
-        ax.xaxis.set_tick_params(pad = 1, **kwargs)
-        ax.yaxis.set_tick_params(pad = 1, **kwargs)
-        ax.zaxis.set_tick_params(pad = 1, **kwargs)
+        ax.xaxis.set_tick_params(pad=1, **kwargs)
+        ax.yaxis.set_tick_params(pad=1, **kwargs)
+        ax.zaxis.set_tick_params(pad=1, **kwargs)
         ax.set_facecolor('white')
 
         # A new line character is used here because the `labelpad' argument
         # does not work.
         for label, coordaxis in zip(labels, 'xyz'):
-            getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad = 10, linespacing = 3)
+            getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad=10, linespacing=3)
 
     elif ax.name == 'rectilinear':
         kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
         ax.axhline(**kwargs)
         ax.axvline(**kwargs)
         ax.set_xlabel(labels[0])
-        ax.set_ylabel(labels[1], rotation = 90)
+        ax.set_ylabel(labels[1], rotation=90)
 
     # The labels of the polar axes of coordinates will initially not be
     # visible. They will be made visible after they have been placed in their
     # correct locations by a callback.
     elif ax.name == 'polar':
         ax.set_rlabel_position(0)
-        ax.set_xlabel(labels[0], visible = False)
-        ax.set_ylabel(labels[1], rotation = 0, visible = False)
+        ax.set_xlabel(labels[0], visible=False)
+        ax.set_ylabel(labels[1], rotation=0, visible=False)
 
     # Minor grid lines don't look good in three-dimensional plots.
     if ax.name in {'rectilinear', 'polar'}:
-        ax.grid(b = True, which = 'major', linewidth = 0.8, linestyle = ':')
-        ax.grid(b = True, which = 'minor', linewidth = 0.1, linestyle = '-')
+        ax.grid(b=True, which='major', linewidth=0.8, linestyle=':')
+        ax.grid(b=True, which='minor', linewidth=0.1, linestyle='-')
         ax.minorticks_on()
     elif ax.name == '3d':
-        ax.grid(b = True, which = 'major', linewidth = 0.3, linestyle = '-')
+        ax.grid(b=True, which='major', linewidth=0.3, linestyle='-')
 
     # Key a unique ID with the figure instance in the global weak key
     # dictionary. Doing so ensures that the following operations are performed
@@ -466,7 +466,7 @@ Args:
 
 ###############################################################################
 
-def aspect(ax, ratio = 0):
+def aspect(ax, ratio=0):
     '''\
 Set the aspect ratio. If `ax' is being used for two-dimensional Cartesian
 plots, the ratio of the scales on the x-axis and y-axis will be set to `ratio'
@@ -486,46 +486,46 @@ Args:
         return
 
     if ax.name == 'rectilinear':
-        ax.set_aspect(aspect = ratio, adjustable = 'box')
+        ax.set_aspect(aspect=ratio, adjustable='box')
     elif ax.name == '3d':
         limits = np.array([getattr(ax, f'get_{coordaxis}lim')() for coordaxis in 'xyz'])
-        ax.set_box_aspect(np.ptp(limits, axis = 1))
+        ax.set_box_aspect(np.ptp(limits, axis=1))
 
 ###############################################################################
 
 class _Frame(tk.Frame):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg = '#333333', relief = tk.RAISED)
+        super().__init__(*args, **kwargs, bg='#333333', relief=tk.RAISED)
 
 class _Label(tk.Label):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', font = _font_tuple())
+        super().__init__(*args, **kwargs, bg='#333333', fg='#CCCCCC', font=_font_tuple())
 
 class _Entry(tk.Entry):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg = '#333333', fg = '#CCCCCC', insertbackground = '#CCCCCC',
-                         disabledbackground = '#CCCCCC', font = _font_tuple())
+        super().__init__(*args, **kwargs, bg='#333333', fg='#CCCCCC', insertbackground='#CCCCCC',
+                         disabledbackground='#CCCCCC', font=_font_tuple())
 
 class _Checkbutton(tk.Checkbutton):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg = '#333333', borderwidth = 0, highlightthickness = 0)
+        super().__init__(*args, **kwargs, bg='#333333', borderwidth=0, highlightthickness=0)
 
 class _Style(ttk.Style):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.theme_create('customplot', parent = 'alt',
-                          settings = {'TNotebook.Tab':
-                                      {'configure': {'background': '#333333',
-                                                     'foreground': '#CCCCCC',
-                                                     'font':       _font_tuple(),
-                                                     'padding':    [10, 5]},
-                                       'map':       {'background': [('selected', '#CCCCCC')],
-                                                     'foreground': [('selected', '#333333')]}},
-                                      'TNotebook':
-                                      {'configure': {'background':  '#333333',
-                                                     'foreground':  '#CCCCCC',
-                                                     'font':        _font_tuple(),
-                                                     'tabposition': tk.NSEW}}})
+        self.theme_create('customplot', parent='alt',
+                          settings={'TNotebook.Tab':
+                                    {'configure': {'background': '#333333',
+                                                   'foreground': '#CCCCCC',
+                                                   'font':       _font_tuple(),
+                                                   'padding':    [10, 5]},
+                                     'map':       {'background': [('selected', '#CCCCCC')],
+                                                   'foreground': [('selected', '#333333')]}},
+                                    'TNotebook':
+                                    {'configure': {'background':  '#333333',
+                                                   'foreground':  '#CCCCCC',
+                                                   'font':        _font_tuple(),
+                                                   'tabposition': tk.NSEW}}})
 
 ###############################################################################
 
@@ -545,14 +545,14 @@ Constructor Args:
 
     ###########################################################################
 
-    def __init__(self, fig, parent, queue = None):
+    def __init__(self, fig, parent, queue=None):
         super().__init__(parent)
         self.fig = fig
         self.queue = queue
         self.widgets = [{} for _ in range(len(fig.axes))]
 
         icon_data = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x14\x00\x00\x00\x14\x08\x06\x00\x00\x00\x8d\x89\x1d\r\x00\x00\x00IIDATx\x9cc\xfc\xff\xff?\x039`\xd6\xad\xd7X52\x91e\x1a\x1e@u\x03Y\xde\xc9\xaabu\xba\xd0\xe3\xdb\x8c\xe4\x188\xf8\xbd<\xf8\rd\xc1'\xa9\xbc\xc9\x17k\x84\xdd\xf5\xdb\x8c3\xc2\x06\xbf\x97G\r\x1c5pX\x1a\x08\x00\xdfj\x0e\x87\x02\xbc\xb5L\x00\x00\x00\x00IEND\xaeB`\x82"
-        parent.iconphoto(True, tk.PhotoImage(data = icon_data))
+        parent.iconphoto(True, tk.PhotoImage(data=icon_data))
         parent.resizable(False, False)
         parent.title(f'Options for {fig.canvas.manager.get_window_title()} at 0x{id(self.fig):X}')
 
@@ -564,33 +564,33 @@ Constructor Args:
         # Create one notebook page for each Matplotlib axes in the figure.
         for i, ax in enumerate(self.fig.axes):
             frame = _Frame(self.notebook)
-            frame.grid_columnconfigure(0, weight = 1)
+            frame.grid_columnconfigure(0, weight=1)
 
             # Upper part of the page. Allows the user to manipulate the axes of
             # coordinates.
-            upper = _Frame(frame, borderwidth = 3)
+            upper = _Frame(frame, borderwidth=3)
 
             # Header labels for the same.
             for j, header in enumerate(self.headers, 1):
-                row_header = _Label(upper, text = header)
-                row_header.grid(row = j, column = 0, padx = self.padx, pady = self.pady)
+                row_header = _Label(upper, text=header)
+                row_header.grid(row=j, column=0, padx=self.padx, pady=self.pady)
             for j, coordaxis in enumerate('xyz', 1):
-                column_header = _Label(upper, text = f'{coordaxis}-axis')
-                column_header.grid(row = 0, column = j, padx = self.padx, pady = self.pady)
+                column_header = _Label(upper, text=f'{coordaxis}-axis')
+                column_header.grid(row=0, column=j, padx=self.padx, pady=self.pady)
 
             # Widgets organised according to above headers.
             for j, coordaxis in enumerate('xyz', 1):
                 check_variable = tk.BooleanVar()
-                check_button = _Checkbutton(upper, variable = check_variable, offvalue = False, onvalue = True)
-                check_button.configure(command = self.put_axes_data)
-                check_button.grid(row = 1, column = j, padx = self.padx, pady = self.pady)
+                check_button = _Checkbutton(upper, variable=check_variable, offvalue=False, onvalue=True)
+                check_button.configure(command=self.put_axes_data)
+                check_button.grid(row=1, column=j, padx=self.padx, pady=self.pady)
                 self.widgets[i][f'{coordaxis},Symbolic'] = check_variable
 
                 for k, header in enumerate(self.headers[1 :], 2):
                     entry = _Entry(upper)
                     entry.bind('<Return>', self.focus_out)
                     entry.bind('<FocusOut>', self.put_axes_data)
-                    entry.grid(row = k, column = j, padx = self.padx, pady = self.pady)
+                    entry.grid(row=k, column=j, padx=self.padx, pady=self.pady)
                     self.widgets[i][f'{coordaxis},{header}'] = entry
 
             # Set defaults for some of the above entries.
@@ -602,38 +602,38 @@ Constructor Args:
                 except AttributeError:
                     pass
 
-            upper.grid(row = 0, sticky = tk.NSEW)
-            upper.grid_columnconfigure(0, weight = 1)
-            upper.grid_columnconfigure(1, weight = 1)
-            upper.grid_columnconfigure(2, weight = 1)
-            upper.grid_columnconfigure(3, weight = 1)
+            upper.grid(row=0, sticky=tk.NSEW)
+            upper.grid_columnconfigure(0, weight=1)
+            upper.grid_columnconfigure(1, weight=1)
+            upper.grid_columnconfigure(2, weight=1)
+            upper.grid_columnconfigure(3, weight=1)
 
             # Lower part of the page. Allows the user to place Matplotlib text
             # objects. This will not be provided for three-dimensional plots,
             # because the `set_position' method of `Text3D' objects does not
             # work as expected
             if ax.texts and ax.name != '3d':
-                lower = _Frame(frame, borderwidth = 3)
+                lower = _Frame(frame, borderwidth=3)
 
                 # Header labels and entries.
                 for j, text in enumerate(ax.texts):
-                    prompt = _Label(lower, text = f'Location of {text.get_text()}')
-                    prompt.grid(row = j, column = 0, padx = self.padx, pady = self.pady)
-                    response = _Entry(lower, name = f'{j}')
+                    prompt = _Label(lower, text=f'Location of {text.get_text()}')
+                    prompt.grid(row=j, column=0, padx=self.padx, pady=self.pady)
+                    response = _Entry(lower, name=f'{j}')
                     response.insert(0, ' '.join(f'{coord}' for coord in text.get_position()))
                     response.bind('<Return>', self.focus_out)
                     response.bind('<FocusOut>', self.put_text_data)
-                    response.grid(row = j, column = 1, padx = self.padx, pady = self.pady)
+                    response.grid(row=j, column=1, padx=self.padx, pady=self.pady)
 
-                    lower.grid_rowconfigure(j, weight = 1)
+                    lower.grid_rowconfigure(j, weight=1)
 
-                lower.grid(row = 1, sticky = tk.NSEW)
-                lower.grid_columnconfigure(0, weight = 1)
-                lower.grid_columnconfigure(1, weight = 1)
+                lower.grid(row=1, sticky=tk.NSEW)
+                lower.grid_columnconfigure(0, weight=1)
+                lower.grid_columnconfigure(1, weight=1)
 
-            frame.grid_columnconfigure(0, weight = 1)
-            frame.grid_rowconfigure(1, weight = 1)
-            self.notebook.add(frame, text = '')
+            frame.grid_columnconfigure(0, weight=1)
+            frame.grid_rowconfigure(1, weight=1)
+            self.notebook.add(frame, text='')
 
         self.notebook.pack()
         self.pack()
@@ -653,7 +653,7 @@ Constructor Args:
 
         # During each iteration of the below loop, truncate the widest title.
         # Keep doing this until the condition described above is satisfied.
-        measurer = lambda title: tkfont.Font(font = _font_tuple()).measure(title)
+        measurer = lambda title: tkfont.Font(font=_font_tuple()).measure(title)
         measures = list(map(measurer, titles))
         while sum(measures) > width:
             i = measures.index(max(measures))
@@ -662,7 +662,7 @@ Constructor Args:
             measures = list(map(measurer, titles))
 
         for i in range(len(fig.axes)):
-            self.notebook.tab(i, text = titles[i])
+            self.notebook.tab(i, text=titles[i])
         self.update()
 
     ###########################################################################
@@ -672,7 +672,7 @@ Constructor Args:
 
     ###########################################################################
 
-    def put_axes_data(self, event = None):
+    def put_axes_data(self, event=None):
         i = self.notebook.index('current')
         data = {key: val.get() for key, val in self.widgets[i].items()}
         data['index'] = i
@@ -766,9 +766,9 @@ Args:
     fig: matplotlib.figure.Figure
 '''
 
-    plt.show(block = False)
+    plt.show(block=False)
+
     canvas = fig.canvas
-    canvas.draw()
 
     # If Matplotlib is using a Tkinter-based backend, make the interactive GUI
     # a child window of the figure.
