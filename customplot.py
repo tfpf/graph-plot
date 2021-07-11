@@ -182,9 +182,10 @@ Args:
             continue
 
         # Remove the previously added arrow patches (if any). Do not remove any
-        # other patches.
+        # other patches. Since the original list (namely `ax.patches') gets
+        # mutated whenever any patch is removed, make a shallow copy of it.
         gid = _gid[fig]
-        for patch in ax.patches:
+        for patch in ax.patches.copy():
             if patch.get_gid() == gid:
                 patch.remove()
 
