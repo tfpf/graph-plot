@@ -90,9 +90,9 @@ Returns:
     tuple of a list of labels and a NumPy array of the respective values
 '''
 
-    if '/' in symbol:
+    try:
         s_num, s_den = symbol.split('/')
-    else:
+    except ValueError:
         s_num = symbol
         s_den = '1'
 
@@ -184,10 +184,9 @@ Args:
         # Remove the previously added arrow patches (if any). Do not remove any
         # other patches.
         gid = _gid[fig]
-        comparer = lambda patch: patch.get_gid() == gid
-        patches_to_remove = list(filter(comparer, ax.patches))
-        for patch in patches_to_remove:
-            patch.remove()
+        for patch in ax.patches:
+            if patch.get_gid() == gid:
+                patch.remove()
 
         # Obtain the current size of the Matplotlib axes instance. This is used
         # to calculate the sizes of the arrows.
@@ -205,8 +204,8 @@ Args:
         wd = xlabel_offset_inches / ax_width_inches
         kwargs = {'posA':            (x, y - ht / 2),
                   'posB':            (x, y + ht / 2),
-                  'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
-                  'connectionstyle': 'arc3, rad = 0.15',
+                  'arrowstyle':      'Simple, tail_width=0.6, head_width=4, head_length=8',
+                  'connectionstyle': 'arc3, rad=0.15',
                   'clip_on':         False,
                   'transform':       ax.transAxes,
                   'gid':             gid}
@@ -220,7 +219,7 @@ Args:
         ht = ylabel_offset_inches / ax_height_inches
         kwargs = {'posA':            (x - wd / 3, y),
                   'posB':            (x + 2 * wd / 3, y),
-                  'arrowstyle':      'Simple, tail_width = 0.6, head_width = 4, head_length = 8',
+                  'arrowstyle':      'Simple, tail_width=0.6, head_width=4, head_length=8',
                   'clip_on':         False,
                   'transform':       ax.transAxes,
                   'gid':             gid}
