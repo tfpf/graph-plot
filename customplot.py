@@ -21,8 +21,6 @@ _system = platform.system()
 if _system == 'Darwin':
     mpl.use('TkAgg')
 
-_backend = mpl.get_backend()
-
 ###############################################################################
 
 def _font_tuple():
@@ -328,6 +326,8 @@ Returns:
             for label in labels_getter():
                 label.set_horizontalalignment('center')
                 label.set_verticalalignment('center')
+        else:
+            ax.tick_params(axis=coordaxis, which='major', pad=9.9)
 
     # Case 2: allow tick labels to be set automatically.
     else:
@@ -449,20 +449,6 @@ Args:
         if ax.name in {'polar', '3d'}:
             kwargs['facecolor'] = 'lightgray'
         ax.legend(**kwargs)
-
-    # Maximise the figure window.
-    manager = canvas.manager
-    if _backend in {'TkAgg', 'TkCairo'}:
-        if _system in {'Darwin', 'Windows'}:
-            manager.window.state('zoomed')
-        else:
-            manager.window.attributes('-zoomed', True)
-    elif _backend in {'GTK3Agg', 'GTK3Cairo'}:
-        manager.window.maximize()
-    elif _backend in {'WXAgg', 'WXCairo'}:
-        manager.frame.Maximize(True)
-    elif _backend in {'Qt5Agg', 'Qt5Cairo'}:
-        manager.window.showMaximized()
 
 ###############################################################################
 
@@ -677,7 +663,7 @@ Constructor Args:
         data = {key: val.get() for key, val in self.widgets[i].items()}
         data['index'] = i
 
-        if _backend in {'TkAgg', 'TkCairo'}:
+        if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
             _set_axes_data(self.fig, data)
         else:
             self.queue.put(data)
@@ -691,7 +677,7 @@ Constructor Args:
         i = self.notebook.index('current')
         data = (i, j, coords)
 
-        if _backend in {'TkAgg', 'TkCairo'}:
+        if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
             _set_text_data(self.fig, data)
         else:
             self.queue.put(data)
@@ -757,22 +743,58 @@ def _set_text_data(fig, data):
 
 ###############################################################################
 
-def show(fig):
+def show(fig=None):
     '''\
-Open an interactive GUI which can be used to manipulate some elements of the
-plots in a figure.
+Display one or more figures.
+
+If this function is called without arguments, it is similar to calling
+`matplotlib.pyplot.show': all figures will be displayed. The difference is that
+these figures will all be maximised.
+
+If this function is called with an existing figure as an argument, that figure
+will be displayed, along with an interactive GUI, which can be used to
+manipulate some plot elements of all axes in said figure.
 
 Args:
     fig: matplotlib.figure.Figure
 '''
 
-    plt.show(block=False)
+    if fig is None:
+        figs = map(plt.figure, plt.get_fignums())
+    else:
+        figs = [fig]
+
+    # Maximise the figure or figures. (This is not the same as going
+    # fullscreen.)
+    backend = mpl.get_backend()
+    if backend in {'TkAgg', 'TkCairo'}:
+        if _system in {'Darwin', 'Windows'}:
+            for _fig in figs:
+                _fig.show()
+                _fig.canvas.manager.window.state('zoomed')
+        else:
+            for _fig in figs:
+                _fig.canvas.manager.window.attributes('-zoomed', True)
+    elif backend in {'GTK3Agg', 'GTK3Cairo'}:
+        for _fig in figs:
+            _fig.canvas.manager.window.maximize()
+    elif backend in {'WXAgg', 'WXCairo'}:
+        for _fig in figs:
+            _fig.canvas.manager.frame.Maximize(True)
+    elif backend in {'Qt5Agg', 'Qt5Cairo'}:
+        for _fig in figs:
+            _fig.canvas.manager.window.showMaximized()
+
+    if fig is None:
+        plt.show()
+        return
 
     canvas = fig.canvas
+    fig.show()
 
     # If Matplotlib is using a Tkinter-based backend, make the interactive GUI
     # a child window of the figure.
-    if _backend in {'TkAgg', 'TkCairo'}:
+    if backend in {'TkAgg', 'TkCairo'}:
         toplevel = tk.Toplevel(canvas.get_tk_widget())
         interactive = _Interactive(fig, toplevel)
         interactive.after(2000, toplevel.lift)

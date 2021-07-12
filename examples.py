@@ -21,7 +21,7 @@ Example of a minimal two-dimensional Cartesian plot.
 
     customplot.polish(ax, title='This is a bare minimum example!')
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
@@ -54,7 +54,9 @@ Example of a two-dimensional Cartesian plot.
     # distorted).
     customplot.aspect(ax, 1)
 
-    plt.show()
+    # Use either `plt.show' or `customplot.show'. The latter will maximise the
+    # figure window; the former won't.
+    customplot.show()
 
 ###############################################################################
 
@@ -96,7 +98,9 @@ Example of a two-dimensional Cartesian plot of a discontinuous function.
     # distorted).
     customplot.aspect(ax, 1)
 
-    plt.show()
+    # Use either `plt.show' or `customplot.show'. The latter will maximise the
+    # figure window; the former won't.
+    customplot.show()
 
 ###############################################################################
 
@@ -126,7 +130,7 @@ Said labels contain the symbol for pi (π).
     customplot.polish(ax, title='This is a trigonometric function!')
     customplot.aspect(ax, 1)
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
@@ -157,7 +161,7 @@ Said labels contain the symbols for pi (π) and the Euler–Mascheroni constant
     customplot.polish(ax, title='This is a horizontally-scaled trigonometric function!')
     customplot.aspect(ax, 1)
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
@@ -190,8 +194,7 @@ is handled automatically, so there should be no problems.
     customplot.polish(ax, title='This is an interactive plot!')
     customplot.aspect(ax, 1)
 
-    # Instead of calling `plt.show', call `customplot.show' with the Matplotlib
-    # figure instance as an argument.
+    # Call `customplot.show' with the figure instance as an argument.
     customplot.show(fig)
 
     # After doing this, two windows will open: the plot window and an
@@ -233,7 +236,7 @@ Example of a two-dimensional Cartesian plot of an ellipse.
     customplot.polish(ax, title='This is an ellipse!')
     customplot.aspect(ax, 1)
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
@@ -265,7 +268,7 @@ Example of a polar plot.
     # An aspect ratio is meaningless in polar plots. Hence, `ax.set_aspect' is
     # not called.
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
@@ -310,7 +313,7 @@ contain the symbol for pi (π).
     # An aspect ratio is meaningless in polar plots. Hence, `ax.set_aspect' is
     # not called.
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
@@ -348,7 +351,7 @@ Example of subplots.
     axs[2].plot(phi, rho, color='red', label=r'$\rho=4\,\sin\,3\varphi$')
     customplot.polish(axs[2], labels=(r'$\varphi$', r'$\rho$'), title='This is a flower!')
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
@@ -376,7 +379,7 @@ Example of a three-dimensional Cartesian plot of a curve.
     # made equal.
     customplot.aspect(ax, 1)
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
@@ -405,7 +408,7 @@ on the x-axis. Said labels contain the symbol for pi (π).
     # made equal.
     customplot.aspect(ax, 1)
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
@@ -433,7 +436,7 @@ on the x-axis and the y-axis. Said labels contain the symbol for pi (π).
     customplot.polish(ax, title='This is an interference pattern!')
     customplot.aspect(ax, 1)
 
-    plt.show()
+    customplot.show()
 
 ###############################################################################
 
