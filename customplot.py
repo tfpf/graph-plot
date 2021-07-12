@@ -770,7 +770,6 @@ Args:
     if backend in {'TkAgg', 'TkCairo'}:
         if _system in {'Darwin', 'Windows'}:
             for _fig in figs:
-                _fig.show()
                 _fig.canvas.manager.window.state('zoomed')
         else:
             for _fig in figs:
