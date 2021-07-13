@@ -779,6 +779,7 @@ Args:
             _fig.canvas.manager.window.maximize()
     elif backend in {'WXAgg', 'WXCairo'}:
         for _fig in figs:
+            _fig.show()
             _fig.canvas.manager.frame.Maximize(True)
     elif backend in {'Qt5Agg', 'Qt5Cairo'}:
         for _fig in figs:
