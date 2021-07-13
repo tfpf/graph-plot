@@ -267,7 +267,7 @@ mpl_toolkits/mplot3d/axis3d.py as of version 3.3.4 of Matplotlib). If you don't
 like this, you must modify the source code.
 
 Args:
-    ax: Matplotlib axes instance
+    ax: matplotlib.axes.Axes
     coordaxis: str (which axis of coordinates to limit: 'x', 'y' or 'z')
     symbolic: bool (whether ticks are at rational multiples of `v')
     s: str (LaTeX code or two slash-separated LaTeX codes of the symbol or
@@ -373,7 +373,7 @@ Label the axes of coordinates. Give the plot a title. Add a legend. Draw grid
 lines. Make some minor appearance enhancements.
 
 Args:
-    ax: Matplotlib axes instance
+    ax: matplotlib.axes.Axes
     labels: tuple (strings to label the axes of coordinates)
     title: str (title of the graph plotted in `ax')
     suptitle: str (title of the figure `ax' is in)
@@ -464,7 +464,7 @@ are three axes of coordinates. Hence, in this case, the scales on those axes
 will be made equal if `ratio' is any non-zero number.
 
 Args:
-    ax: Matplotlib axes instance
+    ax: matplotlib.axes.Axes
     ratio: float (ratio of the scale on the x-axis to that on the y-axis)
 '''
 
