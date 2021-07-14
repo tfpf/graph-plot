@@ -633,22 +633,29 @@ Constructor Args:
             else:
                 titles[i] = title
 
-        # The sum of the widths of the titles of the notebook tabs must not
-        # exceed a certain fraction of the width of the window.
-        width = self.winfo_width() * 0.9
+        # The width of a notebook tab will be 24 pixels more than the width of
+        # the text in the tab. (10 pixels of padding, 1 pixel for some obscure
+        # reason I don't know, and 1 pixel for the tab border. Times two,
+        # because this space is present on both sides of the tab text.) Find
+        # out the maximum width the text is allowed to have if the width of the
+        # notebook must remain the same.
+        width = self.winfo_width() - 24 * len(fig.axes)
 
         # During each iteration of the below loop, truncate the widest title.
         # Keep doing this until the condition described above is satisfied.
+        # If that is not possible, do not put any text in the notebook tabs.
         measurer = lambda title: tkfont.Font(font=_font_tuple()).measure(title)
         measures = list(map(measurer, titles))
         while sum(measures) > width:
             i = measures.index(max(measures))
             halfway = len(titles[i]) // 2
+            if halfway <= 2:
+                break
             titles[i] = f'{titles[i][: halfway - 1]}…{titles[i][halfway + 2 :]}'
             measures = list(map(measurer, titles))
-
-        for i in range(len(fig.axes)):
-            self.notebook.tab(i, text=titles[i])
+        else:
+            for i in range(len(fig.axes)):
+                self.notebook.tab(i, text=titles[i])
         self.update()
 
     ###########################################################################
