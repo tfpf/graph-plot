@@ -430,8 +430,11 @@ on the x-axis and the y-axis. Said labels contain the symbol for pi (π).
     Z = 1.5 * np.cos(X / 2) * np.sin(Y / 5)
     surf = ax.plot_surface(X, Y, Z, color='skyblue', label=r'$z=1.5\cdot\cos\,0.5x\cdot\sin\,0.2y$')
 
-    # This line is required because of a library bug.
-    surf._facecolors2d = surf._edgecolors2d = None
+    # https://github.com/matplotlib/matplotlib/issues/4067
+    # The following two lines prevent the program from encountering the error
+    # described in the above issue.
+    surf._facecolors2d = surf._facecolor3d
+    surf._edgecolors2d = surf._edgecolor3d
 
     customplot.polish(ax, title='This is an interference pattern!')
     customplot.aspect(ax, 1)
