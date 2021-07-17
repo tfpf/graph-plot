@@ -183,7 +183,7 @@ Args:
         # other patches. Since the original list (namely `ax.patches') gets
         # mutated whenever any patch is removed, make a shallow copy of it.
         gid = _gid[fig]
-        for patch in ax.patches.copy():
+        for patch in ax.patches[:]:
             if patch.get_gid() == gid:
                 patch.remove()
 
