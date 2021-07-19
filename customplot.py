@@ -490,7 +490,7 @@ class _Label(tk.Label):
 class _Entry(tk.Entry):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, bg='#333333', fg='#CCCCCC', insertbackground='#CCCCCC',
-                         disabledbackground='#CCCCCC', font=_font_tuple())
+                         selectforeground='#333333', selectbackground='#CCCCCC', font=_font_tuple())
 
 class _Checkbutton(tk.Checkbutton):
     def __init__(self, *args, **kwargs):
