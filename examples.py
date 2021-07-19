@@ -265,8 +265,8 @@ Example of a polar plot.
     # rendered the way mathematical expressions would be rendered.
     customplot.polish(ax, labels=('$t$', '$r$'), title='This is a cardioid!')
 
-    # An aspect ratio is meaningless in polar plots. Hence, `ax.set_aspect' is
-    # not called.
+    # An aspect ratio is meaningless in polar plots. Hence, `customplot.aspect'
+    # is not called.
 
     customplot.show()
 
@@ -310,8 +310,8 @@ contain the symbol for pi (π).
     # rendered the way mathematical expressions would be rendered.
     customplot.polish(ax, labels=('$t$', '$r$'), title='This is a spiral!')
 
-    # An aspect ratio is meaningless in polar plots. Hence, `ax.set_aspect' is
-    # not called.
+    # An aspect ratio is meaningless in polar plots. Hence, `customplot.aspect'
+    # is not called.
 
     customplot.show()
 
@@ -374,9 +374,9 @@ Example of a three-dimensional Cartesian plot of a curve.
     customplot.polish(ax, title='This is a helix!')
 
     # An aspect ratio is meaningless in three-dimensional plots, because there
-    # are three axes of coordinates. Hence, if `ax.set_aspect' is called with
-    # any non-zero ratio, the scales on the x-axis, y-axis and z-axis will be
-    # made equal.
+    # are three axes of coordinates. Hence, if the second argument of
+    # `customplot.aspect' is any non-zero number, the scales on the x-axis,
+    # y-axis and z-axis will be made equal.
     customplot.aspect(ax, 1)
 
     customplot.show()
@@ -403,9 +403,9 @@ on the x-axis. Said labels contain the symbol for pi (π).
     customplot.polish(ax, title='This is a spring!')
 
     # An aspect ratio is meaningless in three-dimensional plots, because there
-    # are three axes of coordinates. Hence, if `ax.set_aspect' is called with
-    # any non-zero ratio, the scales on the x-axis, y-axis and z-axis will be
-    # made equal.
+    # are three axes of coordinates. Hence, if the second argument of
+    # `customplot.aspect' is any non-zero number, the scales on the x-axis,
+    # y-axis and z-axis will be made equal.
     customplot.aspect(ax, 1)
 
     customplot.show()
