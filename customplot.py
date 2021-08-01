@@ -317,17 +317,21 @@ Returns:
         labels_setter(labels)
         limits_setter(v * first, v * last)
 
-        # If the x-axis labels will contain fractions, increase the padding
-        # slightly. Do not do this for polar plots (the spacing is already
-        # quite good). Do not do this for three-dimensional plots, either
-        # (Matplotlib messes up the spacing).
-        if ax.name == 'rectilinear' and coordaxis == 'x' and not all(isinstance(t, int) for t in [first, last, step]):
-            ax.tick_params(axis=coordaxis, which='major', pad=20)
-            for label in labels_getter():
-                label.set_horizontalalignment('center')
-                label.set_verticalalignment('center')
-        else:
-            ax.tick_params(axis=coordaxis, which='major', pad=9.9)
+        # If the x-axis labels will contain fractions, adjust the tick padding.
+        if coordaxis == 'x':
+            if not all(isinstance(t, int) for t in [first, last, step]):
+                if ax.name == 'rectilinear':
+                    ax.tick_params(axis=coordaxis, which='major', pad=24)
+                    for label in labels_getter():
+                        label.set_verticalalignment('center')
+                elif ax.name == 'polar':
+                    ax.tick_params(axis=coordaxis, which='major', pad=14)
+                    for label in labels_getter():
+                        label.set_verticalalignment('center')
+            else:
+                ax.tick_params(axis=coordaxis, which='major', pad=9.9)
+                for label in labels_getter():
+                    label.set_verticalalignment('top')
 
     # Case 2: allow tick labels to be set automatically.
     else:
@@ -336,12 +340,20 @@ Returns:
         if all(arg is not None for arg in [first, last]):
             limits_setter(first, last)
 
-        # Generate the axis labels in case they were erased because of a
+        # Generate the axis tick labels in case they were erased because of a
         # previous call to this function.
         if ax.name in {'rectilinear', '3d'} or ax.name == 'polar' and coordaxis == 'y':
             axis.set_major_formatter(mticker.ScalarFormatter())
         elif ax.name == 'polar' and coordaxis == 'x':
             axis.set_major_formatter(mprojections.polar.ThetaFormatter())
+        if coordaxis == 'x':
+            ax.tick_params(axis=coordaxis, which='major', pad=9.9)
+            if ax.name == 'polar':
+                for label in labels_getter():
+                    label.set_verticalalignment('center')
+            else:
+                for label in labels_getter():
+                    label.set_verticalalignment('top')
 
         if ax.name == 'polar':
             ax.figure.canvas.draw()
