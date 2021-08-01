@@ -35,7 +35,7 @@ def _font_tuple():
 
 ###############################################################################
 
-def _iprint(items, columns=3, align_method='center'):
+def iprint(items, columns=3, align_method='center'):
     '''\
 Display an iterable in neat columns.
 
@@ -47,8 +47,9 @@ Args:
 
     # Convert the iterable into a two-dimensional list.
     items = list(map(str, items))
-    if len(items) % columns != 0:
-        items.extend([''] * (columns - len(items) % columns))
+    num_items = len(items)
+    if num_items % columns:
+        items.extend([''] * (columns - num_items % columns))
     items = [items[i : i + columns] for i in range(0, len(items), columns)]
 
     # The required width of a column is the width of the longest string in that
