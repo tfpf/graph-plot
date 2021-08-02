@@ -336,12 +336,12 @@ Example of subplots.
     customplot.polish(axs[0], title='This is a line!')
     customplot.aspect(axs[0], 1)
 
-    customplot.limit(axs[1], 'x', first=0, last=8, step=0.5)
-    customplot.limit(axs[1], 'y', first=-1, last=1, step=0.5)
-    x = np.linspace(0, 8, 4000)
-    y = np.random.randn(len(x)) / 10
+    customplot.limit(axs[1], 'x', first=0, last=10, step=1)
+    customplot.limit(axs[1], 'y', first=-2, last=2, step=1)
+    x = np.linspace(0, 10, 4000)
+    y = np.random.normal(scale=0.2, size=4000)
     axs[1].plot(x, y, label=r'$\nu=\psi(\tau)$')
-    customplot.polish(axs[1], labels=(r'$\tau$', r'$\nu$'), title='This is random noise!')
+    customplot.polish(axs[1], labels=(r'$\tau$', r'$\nu$'), title='This is Gaussian noise!')
     customplot.aspect(axs[1], 1)
 
     customplot.limit(axs[2], 'x', first=0, last=2 * np.pi, step=np.pi / 6)
