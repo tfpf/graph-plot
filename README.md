@@ -4,8 +4,9 @@ publication-quality graphs, which can optionally be controlled interactively.
 
 ![Interactive Screengrab](gallery/00_interactive_screengrab.png)
 
-I mainly wrote this to plot graphs of functions, but it can be used for almost
-anything, really. (Take a gander at the [gallery](#gallery).)
+I mainly wrote this to plot graphs of functions in the Cartesian plane, but it
+can be used for many other things, too. (Take a gander at the
+[gallery](#gallery).)
 
 # Requirements
 | Name       | Version  |
