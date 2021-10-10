@@ -125,7 +125,7 @@ Said labels contain the symbol for pi (π).
 
     x = np.linspace(-2 * np.pi, 2 * np.pi, 10000)
     y = np.cos(x)
-    ax.plot(x, y, color='green', label=r'$y=\cos\,x$')
+    ax.plot(x, y, color='green', label=r'$y=\cos x$')
 
     customplot.polish(ax, title='This is a trigonometric function!')
     customplot.aspect(ax, 1)
@@ -156,7 +156,7 @@ Said labels contain the symbols for pi (π) and the Euler–Mascheroni constant
 
     x = np.linspace(-12, 12, 10000)
     y = np.cos(np.euler_gamma * x)
-    ax.plot(x, y, color='green', label=r'$y=\cos\,\gamma x$')
+    ax.plot(x, y, color='green', label=r'$y=\cos\gamma x$')
 
     customplot.polish(ax, title='This is a horizontally-scaled trigonometric function!')
     customplot.aspect(ax, 1)
@@ -187,7 +187,7 @@ is handled automatically, so there should be no problems.
 
     x = np.linspace(-8, 8, 10000)
     y = np.sin(x)
-    ax.plot(x, y, label=r'$y=\sin\,x$')
+    ax.plot(x, y, label=r'$y=\sin x$')
     ax.text(0, 0, r'$(0,0)$', size='large')
     ax.text(np.pi, 0, r'$(\pi,0)$', size='large')
 
@@ -258,7 +258,7 @@ Example of a polar plot.
 
     t = np.linspace(0, 2 * np.pi, 10000)
     r = 1 - np.cos(t)
-    ax.plot(t, r, label=r'$r=1-\cos\,t$')
+    ax.plot(t, r, label=r'$r=1-\cos t$')
 
     # The polar coordinate axes should be labelled 't' and 'r', not 'x' and
     # 'y'. These labels are surrounded by dollar signs so that they are
@@ -348,7 +348,7 @@ Example of subplots.
     customplot.limit(axs[2], 'y', first=0, last=5, step=1)
     phi = np.linspace(0, 2 * np.pi, 10000)
     rho = 4 * np.sin(3 * phi)
-    axs[2].plot(phi, rho, color='red', label=r'$\rho=4\,\sin\,3\varphi$')
+    axs[2].plot(phi, rho, color='red', label=r'$\rho=4\,\sin 3\varphi$')
     customplot.polish(axs[2], labels=(r'$\varphi$', r'$\rho$'), title='This is a flower!')
 
     customplot.show()
