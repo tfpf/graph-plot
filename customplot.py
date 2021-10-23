@@ -322,15 +322,15 @@ Returns:
         if coordaxis == 'x':
             if not all(isinstance(t, int) for t in [first, last, step]):
                 if ax.name == 'rectilinear':
-                    ax.tick_params(axis=coordaxis, which='major', pad=24)
+                    ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 2.4)
                     for label in labels_getter():
                         label.set_verticalalignment('center')
                 elif ax.name == 'polar':
-                    ax.tick_params(axis=coordaxis, which='major', pad=14)
+                    ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 1.4)
                     for label in labels_getter():
                         label.set_verticalalignment('center')
             else:
-                ax.tick_params(axis=coordaxis, which='major', pad=9.9)
+                ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'])
                 for label in labels_getter():
                     label.set_verticalalignment('top')
 
@@ -348,7 +348,7 @@ Returns:
         elif ax.name == 'polar' and coordaxis == 'x':
             axis.set_major_formatter(mprojections.polar.ThetaFormatter())
         if coordaxis == 'x':
-            ax.tick_params(axis=coordaxis, which='major', pad=9.9)
+            ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'])
             if ax.name == 'polar':
                 for label in labels_getter():
                     label.set_verticalalignment('center')
@@ -414,7 +414,7 @@ Args:
             getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad=10, linespacing=3)
 
     elif ax.name == 'rectilinear':
-        kwargs = {'alpha': 0.6, 'linewidth': 1.2, 'color': 'gray'}
+        kwargs = {'alpha': 0.6, 'linewidth': mpl.rcParams['axes.linewidth'], 'color': 'gray'}
         ax.axhline(**kwargs)
         ax.axvline(**kwargs)
         ax.set_xlabel(labels[0])
@@ -434,7 +434,7 @@ Args:
         ax.grid(b=True, which='minor', linewidth=0.1, linestyle='-')
         ax.minorticks_on()
     elif ax.name == '3d':
-        ax.grid(b=True, which='major', linewidth=0.3, linestyle='-')
+        ax.grid(b=True, which='major', linewidth=mpl.rcParams['grid.linewidth'], linestyle='-')
 
     # Key a unique ID with the figure instance in the global weak key
     # dictionary. Doing so ensures that the following operations are performed
