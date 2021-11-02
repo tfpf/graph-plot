@@ -322,11 +322,11 @@ Returns:
         if coordaxis == 'x':
             if not all(isinstance(t, int) for t in [first, last, step]):
                 if ax.name == 'rectilinear':
-                    ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 2.4)
+                    ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 3.5)
                     for label in labels_getter():
                         label.set_verticalalignment('center')
                 elif ax.name == 'polar':
-                    ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 1.4)
+                    ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 2)
                     for label in labels_getter():
                         label.set_verticalalignment('center')
             else:
@@ -348,11 +348,12 @@ Returns:
         elif ax.name == 'polar' and coordaxis == 'x':
             axis.set_major_formatter(mprojections.polar.ThetaFormatter())
         if coordaxis == 'x':
-            ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'])
             if ax.name == 'polar':
+                ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 1.5)
                 for label in labels_getter():
                     label.set_verticalalignment('center')
             else:
+                ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'])
                 for label in labels_getter():
                     label.set_verticalalignment('top')
 
@@ -430,8 +431,8 @@ Args:
 
     # Minor grid lines don't look good in three-dimensional plots.
     if ax.name in {'rectilinear', 'polar'}:
-        ax.grid(b=True, which='major', linewidth=0.8, linestyle=':')
-        ax.grid(b=True, which='minor', linewidth=0.1, linestyle='-')
+        ax.grid(b=True, which='major', linewidth=0.5, linestyle=':')
+        ax.grid(b=True, which='minor', linewidth=0.0625, linestyle='-')
         ax.minorticks_on()
     elif ax.name == '3d':
         ax.grid(b=True, which='major', linewidth=mpl.rcParams['grid.linewidth'], linestyle='-')
