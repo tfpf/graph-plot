@@ -49,12 +49,12 @@ axes.grid:          True
 axes.grid.axis:     both
 axes.grid.which:    major    # major, minor, both
 axes.titlelocation: center
-axes.titlesize:     xx-large # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
+axes.titlesize:     x-large  # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
 axes.titleweight:   normal   # 100, 200, 300, 400, 500, 600, 700, 800, 900, normal, bold, bolder, lighter
 axes.titlecolor:    auto
 axes.titley:        None
 axes.titlepad:      8.75
-axes.labelsize:     x-large  # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
+axes.labelsize:     large    # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
 axes.labelpad:      2.5
 axes.labelweight:   normal   # 100, 200, 300, 400, 500, 600, 700, 800, 900, normal, bold, bolder, lighter
 axes.labelcolor:    666666
@@ -99,7 +99,7 @@ xtick.minor.width:   0.5
 xtick.major.pad:     6.1875
 xtick.minor.pad:     2.125
 xtick.color:         black
-xtick.labelsize:     x-large # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
+xtick.labelsize:     large   # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
 xtick.direction:     in      # in, out, inout
 xtick.minor.visible: False
 xtick.major.top:     False
@@ -119,7 +119,7 @@ ytick.minor.width:   0.5
 ytick.major.pad:     6.1875
 ytick.minor.pad:     2.125
 ytick.color:         black
-ytick.labelsize:     x-large # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
+ytick.labelsize:     large   # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
 ytick.direction:     in      # in, out, inout
 ytick.minor.visible: False
 ytick.major.left:    True
@@ -150,7 +150,7 @@ legend.shadow:         False
 legend.numpoints:      1
 legend.scatterpoints:  1
 legend.markerscale:    1
-legend.fontsize:       x-large # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
+legend.fontsize:       large   # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
 legend.title_fontsize: None
 
 legend.borderpad:     0.25
@@ -164,7 +164,7 @@ legend.columnspacing: 1.25
 ###############################################################################
 # Figure.
 ###############################################################################
-figure.titlesize:   xx-large # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
+figure.titlesize:   x-large  # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
 figure.titleweight: normal   # 100, 200, 300, 400, 500, 600, 700, 800, 900, normal, bold, bolder, lighter
 figure.figsize:     15, 8
 figure.dpi:         192
