@@ -460,8 +460,6 @@ Args:
         if ax.name == 'polar':
             kwargs['loc'] = 'lower left'
             kwargs['bbox_to_anchor'] = (1, 1)
-        if ax.name in {'polar', '3d'}:
-            kwargs['facecolor'] = 'lightgray'
         ax.legend(**kwargs)
 
 ###############################################################################

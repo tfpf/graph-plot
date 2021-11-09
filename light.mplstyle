@@ -142,8 +142,8 @@ grid.alpha:     0.9
 legend.loc:        best  # best, upper right, upper left, lower left, lower right, right, center left, center right, lower center, upper center, center
 legend.frameon:    True
 legend.framealpha: 0.5
-legend.facecolor:  white
-legend.edgecolor:  white
+legend.facecolor:  D5D5D5
+legend.edgecolor:  D5D5D5
 legend.fancybox:   True
 
 legend.shadow:         False
