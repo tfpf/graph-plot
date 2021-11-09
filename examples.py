@@ -4,7 +4,7 @@ import numpy as np
 import customplot
 
 # Apply the style parameters globally.
-plt.style.use('dandy.mplstyle')
+plt.style.use('light.mplstyle')
 
 ###############################################################################
 

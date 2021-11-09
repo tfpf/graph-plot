@@ -67,7 +67,7 @@ entirely.
 ### Using a Built-in Font
 Some fonts are packaged with Matplotlib; you can choose one of them. My
 suggestion is a STIX font. To use it, add the following lines to the file
-`dandy.mplstyle`.
+`light.mplstyle`.
 ```python
 font.family: STIXGeneral
 mathtext.fontset: stix
@@ -95,7 +95,7 @@ $ python3
 >>> print(matplotlib.get_cachedir())
 ```
 * Delete all font-related cache files in that location.
-* Add the following lines to the file `dandy.mplstyle`.
+* Add the following lines to the file `light.mplstyle`.
 ```python
 font.family: Libre Baskerville
 mathtext.bf: Libre Baskerville:bold
@@ -117,7 +117,7 @@ anything that needs to be redrawn will be redrawn.
 
 ## DPI Settings
 If the plot doesn't look quite right, try playing around with the DPI parameter
-before adjusting anything else. In the file `dandy.mplstyle`, search for
+before adjusting anything else. In the file `light.mplstyle`, search for
 `figure.dpi` and change the value next to it.
 
 In my experience, a value of 120 produces pretty graphs on a 1080p screen,
