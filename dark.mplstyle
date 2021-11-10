@@ -42,7 +42,7 @@ text.antialiased:    True
 ###############################################################################
 # Axes.
 ###############################################################################
-axes.facecolor:     333333
+axes.facecolor:     3C3C3C
 axes.edgecolor:     CCCCCC
 axes.linewidth:     1
 axes.grid:          True
