@@ -415,7 +415,11 @@ Args:
             getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad=10, linespacing=3)
 
     elif ax.name == 'rectilinear':
-        kwargs = {'alpha': 0.6, 'linewidth': mpl.rcParams['axes.linewidth'], 'color': 'gray'}
+        kwargs = {'alpha': 0.6, 'linewidth': mpl.rcParams['axes.linewidth']}
+        if mpl.rcParams['axes.edgecolor'] == '#CCCCCC':
+            kwargs['color'] = '#BBBBBB'
+        else:
+            kwargs['color'] = 'gray'
         ax.axhline(**kwargs)
         ax.axvline(**kwargs)
         ax.set_xlabel(labels[0])
