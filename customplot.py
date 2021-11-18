@@ -381,7 +381,7 @@ Returns:
 
 ###############################################################################
 
-def polish(ax, labels=None, title=None, suptitle=None):
+def polish(ax, labels=None, title=None, suptitle=None, windowtitle=None):
     '''\
 Label the axes of coordinates. Give the plot a title. Add a legend. Draw grid
 lines. Make some minor appearance enhancements.
@@ -391,6 +391,7 @@ Args:
     labels: tuple (strings to label the axes of coordinates)
     title: str (title of the graph plotted in `ax')
     suptitle: str (title of the figure `ax' is in)
+    windowtitle: str (title of the window `figure' is in)
 '''
 
     if labels is None:
@@ -447,7 +448,8 @@ Args:
     fig = ax.figure
     canvas = fig.canvas
     if any(_ax.name == 'polar' for _ax in fig.axes) and fig not in _gid:
-        _gid[fig] = f'cp_{time.time_ns()}_{np.random.randint(100, 999)}'
+        timefmt = '%Y-%m-%d_%H.%M.%S'
+        _gid[fig] = f'cp_{time.strftime(timefmt)}_{np.random.randint(100, 999)}'
 
         # Connect the resize event of the canvas to a callback which
         # illustrates the axes of coordinates of all polar graphs (if any) in
@@ -458,6 +460,8 @@ Args:
         ax.set_title(title)
     if suptitle is not None:
         fig.suptitle(suptitle)
+    if windowtitle is not None:
+        canvas.manager.set_window_title(windowtitle)
 
     if ax.get_legend_handles_labels() != ([], []):
         kwargs = {'loc': 'best'}
