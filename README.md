@@ -78,16 +78,10 @@ cannot render minus signs in normal text.
 
 ### Using a Custom Font
 Let's say you want to use Libre Baskerville.
-* Download the font files for Libre Baskerville. (It is a Google font. So, it
-will probably be freely available as a package containing four or more files
-with the extension `.ttf`, or perhaps `.otf`).
-* Which platform are you on?
-    * If you're using GNU/Linux, create a new directory
-`~/.fonts/LibreBaskerville` and put the above-mentioned font files in that
-directory.
-    * If you're using Windows, right-click on the files and select 'Install'.
-    * If you're using macOS, right-click on the files and select 'Open'. Click
-on 'Install font' in the window that opens.
+* Download and install Libre Baskerville. (It will probably be freely available
+as a package containing multiple font files.) On most operating systems, you
+can simply unzip the package and double-click on each of the font files to
+install it.
 * Find out where Matplotlib stores its cache.
 ```console
 $ python3
