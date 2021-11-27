@@ -67,7 +67,7 @@ entirely.
 ### Using a Built-in Font
 Some fonts are packaged with Matplotlib; you can choose one of them. My
 suggestion is a STIX font. To use it, add the following lines to the file
-`light.mplstyle`.
+`light.mplstyle` (you can find this file in the `styles` directory).
 ```python
 font.family: STIXGeneral
 mathtext.fontset: stix
