@@ -1,37 +1,27 @@
 import fractions
+import io
 import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.projections as mprojections
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-import multiprocessing as mp
 import numpy as np
 import platform
+import string
+import sys
+import threading
 import time
-import tkinter as tk
-import tkinter.font as tkfont
-import tkinter.ttk as ttk
 import weakref
+
+try:
+    import curses
+    has_curses = True
+except ImportError:
+    has_curses = False
 
 ###############################################################################
 
 _gid = weakref.WeakKeyDictionary()
-
-_system = platform.system()
-if _system == 'Darwin':
-    mpl.use('TkAgg')
-
-###############################################################################
-
-def _font_tuple():
-    font_family = mpl.rcParams['font.family'][0]
-    if _system == 'Darwin':
-        font_size = 18
-    else:
-        font_size = 12
-    font_style = tkfont.NORMAL
-
-    return (font_family, font_size, font_style)
 
 ###############################################################################
 
@@ -320,7 +310,7 @@ Returns:
 
         # If the x-axis labels will contain fractions, adjust the tick padding.
         if coordaxis == 'x':
-            if not all(isinstance(t, int) for t in [first, last, step]):
+            if not all(t == int(t) for t in [first, last, step]):
                 if ax.name == 'rectilinear':
                     ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 3.2)
                     for label in labels_getter():
@@ -410,10 +400,8 @@ Args:
         ax.zaxis.set_tick_params(pad=1, **kwargs)
         ax.set_facecolor('white')
 
-        # A new line character is used here because the `labelpad' argument
-        # does not work.
         for label, coordaxis in zip(labels, 'xyz'):
-            getattr(ax, f'set_{coordaxis}label')(f'\n{label}', labelpad=10, linespacing=3)
+            getattr(ax, f'set_{coordaxis}label')(label, labelpad=10)
 
     elif ax.name == 'rectilinear':
         kwargs = {'alpha': 0.6, 'linewidth': mpl.rcParams['axes.linewidth']}
@@ -499,274 +487,309 @@ Args:
 
 ###############################################################################
 
-class _Frame(tk.Frame):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg='#333333', relief=tk.RAISED)
-
-class _Label(tk.Label):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg='#333333', fg='#CCCCCC', font=_font_tuple())
-
-class _Entry(tk.Entry):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg='#333333', fg='#CCCCCC', insertbackground='#CCCCCC',
-                         selectforeground='#333333', selectbackground='#CCCCCC', font=_font_tuple())
-
-class _Checkbutton(tk.Checkbutton):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, bg='#333333', borderwidth=0, highlightthickness=0)
-
-class _Style(ttk.Style):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.theme_create('customplot', parent='alt',
-                          settings={'TNotebook.Tab':
-                                    {'configure': {'background': '#333333',
-                                                   'foreground': '#CCCCCC',
-                                                   'font':       _font_tuple(),
-                                                   'padding':    [10, 5]},
-                                     'map':       {'background': [('selected', '#CCCCCC')],
-                                                   'foreground': [('selected', '#333333')]}},
-                                    'TNotebook':
-                                    {'configure': {'background':  '#333333',
-                                                   'foreground':  '#CCCCCC',
-                                                   'font':        _font_tuple(),
-                                                   'tabposition': tk.NSEW}}})
-
-###############################################################################
-
-class _Interactive(_Frame):
+class _Interactive(threading.Thread):
     '''\
-Interactively adjust some plot elements of a Matplotlib axes instance via a
-GUI window.
+Interactively adjust some plot elements of a Matplotlib axes instance using a
+curses GUI running in a separate thread. This does not work with Tkinter-based
+backends.
 
-Constructor Args:
+Members:
     fig: matplotlib.figure.Figure
-    parent: tkinter.Tk or tkinter.Toplevel
-    queue: multiprocessing.Queue
+    canvas: matplotlib.backends.backend_*.FigureCanvas*
+    manager: matplotlib.backends.backend_*.FigureManager*
+    page_num: int (current Matplotlib axes for which options are displayed)
+    pages: int (number of Matplotlib axes in `fig')
+    data: dict (stores the information entered in the GUI)
+    headers: list
+    coordaxes: list
+    tmp_stderr: io.StringIO (standard error buffer used when the GUI is active)
+    stdscr: curses.window
+    height: int
+    width: int
+    column_width: int
+    dividers: list
+
+Methods:
+    __init__
+    redirect_streams
+    restore_streams
+    run
+    join
+    draw_GUI
+    process_keystroke
+    update
+    main
 '''
 
-    padx, pady = 10, 10
-    headers = ['Symbolic', 'Symbol', 'Value', 'Limits', 'Label']
-
     ###########################################################################
 
-    def __init__(self, fig, parent, queue=None):
-        super().__init__(parent)
+    def __init__(self, fig, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.fig = fig
-        self.queue = queue
-        self.widgets = [{} for _ in range(len(fig.axes))]
+        self.canvas = fig.canvas
+        self.manager = fig.canvas.manager
+        self.page_num = 0
+        self.pages = len(fig.axes)
+        self.data = [{} for _ in fig.axes]
+        self.headers = ['Symbolic', 'Symbol', 'Value', 'Limits', 'Label']
+        self.coordaxes = ['x', 'y', 'z']
 
-        icon_data = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x14\x00\x00\x00\x14\x08\x06\x00\x00\x00\x8d\x89\x1d\r\x00\x00\x00IIDATx\x9cc\xfc\xff\xff?\x039`\xd6\xad\xd7X52\x91e\x1a\x1e@u\x03Y\xde\xc9\xaabu\xba\xd0\xe3\xdb\x8c\xe4\x188\xf8\xbd<\xf8\rd\xc1'\xa9\xbc\xc9\x17k\x84\xdd\xf5\xdb\x8c3\xc2\x06\xbf\x97G\r\x1c5pX\x1a\x08\x00\xdfj\x0e\x87\x02\xbc\xb5L\x00\x00\x00\x00IEND\xaeB`\x82"
-        parent.iconphoto(True, tk.PhotoImage(data=icon_data))
-        parent.resizable(False, False)
-        parent.title(f'Options for {fig.canvas.manager.get_window_title()} at 0x{id(self.fig):X}')
-
-        style = _Style(parent)
-        style.theme_use('customplot')
-
-        self.notebook = ttk.Notebook(self)
-
-        # Create one notebook page for each Matplotlib axes in the figure.
-        for i, ax in enumerate(self.fig.axes):
-            frame = _Frame(self.notebook)
-            frame.grid_columnconfigure(0, weight=1)
-
-            # Upper part of the page. Allows the user to manipulate the axes of
-            # coordinates.
-            upper = _Frame(frame, borderwidth=3)
-
-            # Header labels for the same.
-            for j, header in enumerate(self.headers, 1):
-                row_header = _Label(upper, text=header)
-                row_header.grid(row=j, column=0, padx=self.padx, pady=self.pady)
-            for j, coordaxis in enumerate('xyz', 1):
-                column_header = _Label(upper, text=f'{coordaxis}-axis')
-                column_header.grid(row=0, column=j, padx=self.padx, pady=self.pady)
-
-            # Widgets organised according to above headers.
-            for j, coordaxis in enumerate('xyz', 1):
-                check_variable = tk.BooleanVar()
-                check_button = _Checkbutton(upper, variable=check_variable, offvalue=False, onvalue=True)
-                check_button.configure(command=self.put_axes_data)
-                check_button.grid(row=1, column=j, padx=self.padx, pady=self.pady)
-                self.widgets[i][f'{coordaxis},Symbolic'] = check_variable
-
-                for k, header in enumerate(self.headers[1 :], 2):
-                    entry = _Entry(upper)
-                    entry.bind('<Return>', self.focus_out)
-                    entry.bind('<FocusOut>', self.put_axes_data)
-                    entry.grid(row=k, column=j, padx=self.padx, pady=self.pady)
-                    self.widgets[i][f'{coordaxis},{header}'] = entry
-
-            # Set defaults for some of the above entries.
-            for coordaxis in 'xyz':
+        # Initialise the contents with some useful defaults.
+        for i in range(self.pages):
+            for coordaxis in self.coordaxes:
+                self.data[i][f'Symbolic,{coordaxis}'] = ''
+                self.data[i][f'Symbol,{coordaxis}'] = r'\pi'
+                self.data[i][f'Value,{coordaxis}'] = f'{np.pi}'
+                self.data[i][f'Limits,{coordaxis}'] = ''
                 try:
-                    self.widgets[i][f'{coordaxis},Label'].insert(0, getattr(ax, f'get_{coordaxis}label')())
-                    self.widgets[i][f'{coordaxis},Symbol'].insert(0, r'\pi')
-                    self.widgets[i][f'{coordaxis},Value'].insert(0, f'{np.pi}')
+                    self.data[i][f'Label,{coordaxis}'] = getattr(self.fig.axes[i], f'get_{coordaxis}label')()
                 except AttributeError:
-                    pass
+                    self.data[i][f'Label,{coordaxis}'] = ''
 
-            upper.grid(row=0, sticky=tk.NSEW)
-            upper.grid_columnconfigure(0, weight=1)
-            upper.grid_columnconfigure(1, weight=1)
-            upper.grid_columnconfigure(2, weight=1)
-            upper.grid_columnconfigure(3, weight=1)
-
-            # Lower part of the page. Allows the user to place Matplotlib text
-            # objects. This will not be provided for three-dimensional plots,
-            # because the `set_position' method of `Text3D' objects does not
-            # work as expected
-            if ax.texts and ax.name != '3d':
-                lower = _Frame(frame, borderwidth=3)
-
-                # Header labels and entries.
-                for j, text in enumerate(ax.texts):
-                    prompt = _Label(lower, text=f'Location of {text.get_text()}')
-                    prompt.grid(row=j, column=0, padx=self.padx, pady=self.pady)
-                    response = _Entry(lower, name=f'{j}')
-                    response.insert(0, ' '.join(f'{coord}' for coord in text.get_position()))
-                    response.bind('<Return>', self.focus_out)
-                    response.bind('<FocusOut>', self.put_text_data)
-                    response.grid(row=j, column=1, padx=self.padx, pady=self.pady)
-
-                    lower.grid_rowconfigure(j, weight=1)
-
-                lower.grid(row=1, sticky=tk.NSEW)
-                lower.grid_columnconfigure(0, weight=1)
-                lower.grid_columnconfigure(1, weight=1)
-
-            frame.grid_columnconfigure(0, weight=1)
-            frame.grid_rowconfigure(1, weight=1)
-            self.notebook.add(frame, text='')
-
-        self.notebook.pack()
-        self.pack()
-        self.update()
-
-        titles = [None] * len(fig.axes)
-        for i, ax in enumerate(fig.axes):
-            title = ax.get_title()
-            if not title or title.isspace():
-                titles[i] = '<untitled>'
-            else:
-                titles[i] = title
-
-        # The width of a notebook tab will be 24 pixels more than the width of
-        # the text in the tab. (10 pixels of padding, 1 pixel for some obscure
-        # reason I don't know, and 1 pixel for the tab border. Times two,
-        # because this space is present on both sides of the tab text.) Find
-        # out the maximum width the text is allowed to have if the width of the
-        # notebook must remain the same.
-        width = self.winfo_width() - 24 * len(fig.axes)
-
-        # During each iteration of the below loop, truncate the widest title.
-        # Keep doing this until the condition described above is satisfied.
-        # If that is not possible, do not put any text in the notebook tabs.
-        measurer = lambda title: tkfont.Font(font=_font_tuple()).measure(title)
-        measures = list(map(measurer, titles))
-        while sum(measures) > width:
-            i = measures.index(max(measures))
-            halfway = len(titles[i]) // 2
-            if halfway <= 2:
-                break
-            titles[i] = f'{titles[i][: halfway - 1]}…{titles[i][halfway + 2 :]}'
-            measures = list(map(measurer, titles))
-        else:
-            for i in range(len(fig.axes)):
-                self.notebook.tab(i, text=titles[i])
-        self.update()
+        self.redirect_streams()
 
     ###########################################################################
 
-    def focus_out(self, event):
-        self.notebook.focus_set()
+    def redirect_streams(self):
+        sys.stderr = self.tmp_stderr = io.StringIO()
 
     ###########################################################################
 
-    def put_axes_data(self, event=None):
-        i = self.notebook.index('current')
-        data = {key: val.get() for key, val in self.widgets[i].items()}
-        data['index'] = i
-
-        if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
-            _set_axes_data(self.fig, data)
-        else:
-            self.queue.put(data)
+    def restore_streams(self):
+        value = self.tmp_stderr.getvalue()
+        self.tmp_stderr.close()
+        sys.stderr = sys.__stderr__
+        sys.stderr.write(value)
 
     ###########################################################################
 
-    def put_text_data(self, event):
-        entry = event.widget
-        coords = entry.get()
-        j = int(entry.winfo_name())
-        i = self.notebook.index('current')
-        data = (i, j, coords)
-
-        if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
-            _set_text_data(self.fig, data)
-        else:
-            self.queue.put(data)
-
-###############################################################################
-
-class _InteractiveWrapper(mp.Process):
-    def __init__(self, fig, queue):
-        super().__init__()
-        self.fig = fig
-        self.queue = queue
     def run(self):
-        root = tk.Tk()
-        _Interactive(self.fig, root, self.queue)
-        root.mainloop()
+        curses.wrapper(self.main)
 
-###############################################################################
+    ###########################################################################
 
-def _set_axes_data(fig, data):
-    ax = fig.axes[data['index']]
+    def join(self, *args):
+        super().join(*args)
+        self.restore_streams()
 
-    for coordaxis in 'xyz':
-        try:
-            getattr(ax, f'set_{coordaxis}label')(data[f'{coordaxis},Label'])
-        except AttributeError:
-            pass
+    ###########################################################################
 
-        # Disable symbolic labelling if the symbol value is not specified.
-        symbolic = data[f'{coordaxis},Symbolic']
-        try:
-            v = float(eval(data[f'{coordaxis},Value']))
-        except (NameError, SyntaxError, ValueError):
-            symbolic = False
-            v = 0
+    def draw_GUI(self):
+        row = 0
 
-        # Disable symbolic labelling if no symbol is specified.
-        s = data[f'{coordaxis},Symbol']
-        if s == '':
-            symbolic = False
+        # Title identifying the figure.
+        title = f'Options for {self.manager.get_window_title()} at 0x{id(self.fig):X}'
+        self.stdscr.addstr(row, 0, title.center(self.width), curses.A_BOLD)
+        row += 1
 
-        try:
-            first, last, step = [float(eval(i)) for i in data[f'{coordaxis},Limits'].split()]
+        # Subtitle identifying the axes.
+        subtitle = f'Axes {self.page_num + 1}/{self.pages}: {self.fig.axes[self.page_num].get_title()}'
+        self.stdscr.addstr(row, 0, subtitle.center(self.width), curses.A_BOLD)
+        row += 2
+
+        # Calculations for drawing the margins.
+        header_column_width = 10
+        while (self.width - header_column_width) % 3:
+            header_column_width += 1
+        self.column_width = (self.width - header_column_width - 3) // 3
+        self.dividers = [header_column_width + i * (self.column_width + 1) for i in range(3)]
+
+        # Margins.
+        self.stdscr.addstr(row, 0, '-' * self.width)
+        self.stdscr.addstr(row + 2, 0, '-' * self.width)
+        row += 1
+        for i in range(7):
+            for d in self.dividers:
+                self.stdscr.addstr(row + i, d, '|')
+        self.stdscr.addstr(row + i + 1, 0, '-' * self.width)
+
+        # Headers.
+        for d, coordaxis in zip(self.dividers, self.coordaxes):
+            self.stdscr.addstr(row, d + 1, f'{coordaxis} axis'.center(self.column_width), curses.A_BOLD)
+        row += 2
+        self.start_row = row
+        for i, header in enumerate(self.headers):
+            self.stdscr.addstr(row + i, 0, header.center(header_column_width), curses.A_BOLD)
+
+        # Write the current contents to the GUI.
+        for i, header in enumerate(self.headers):
+            for d, coordaxis in zip(self.dividers, self.coordaxes):
+                content = self.data[self.page_num][f'{header},{coordaxis}']
+                self.stdscr.addstr(self.start_row + i, d + 1, content.center(self.column_width))
+
+        # Usage instructions.
+        self.stdscr.addstr(self.height - 5, 0, 'Page Down  ', curses.A_BOLD)
+        self.stdscr.addstr('Next Axes')
+        self.stdscr.addstr(self.height - 4, 0, 'Page Up    ', curses.A_BOLD)
+        self.stdscr.addstr('Previous Axes')
+        self.stdscr.addstr(self.height - 3, 0, 'Arrow Keys ', curses.A_BOLD)
+        self.stdscr.addstr('Move Cursor')
+        self.stdscr.addstr(self.height - 2, 0, 'Enter      ', curses.A_BOLD)
+        self.stdscr.addstr('Update Plot')
+        self.stdscr.addstr(self.height - 1, 0, 'Escape     ', curses.A_BOLD)
+        self.stdscr.addstr('Quit')
+        self.stdscr.move(self.start_row, self.dividers[0] + 1)
+
+    ###########################################################################
+
+    def process_keystroke(self, k):
+        '''\
+Whenever a valid key is pressed, perform the appropriate action.
+
+Args:
+    k: int (code of the key which was pressed)
+'''
+
+        if k is None:
+            return
+
+        (cursor_y, cursor_x) = self.stdscr.getyx()
+
+        # Arrow keys.
+        if k in {curses.KEY_UP, curses.KEY_DOWN, curses.KEY_LEFT, curses.KEY_RIGHT}:
+            if k == curses.KEY_UP and cursor_y > 0:
+                cursor_y -= 1
+            elif k == curses.KEY_DOWN and cursor_y < self.height - 1:
+                cursor_y += 1
+            elif k == curses.KEY_LEFT and cursor_x > 0:
+                cursor_x -= 1
+            elif k == curses.KEY_RIGHT and cursor_x < self.width - 1:
+                cursor_x += 1
+            self.stdscr.move(cursor_y, cursor_x)
+            return
+
+        # Home and End keys.
+        if k == curses.KEY_HOME:
+            self.stdscr.move(cursor_y, 0)
+            return
+        if k == curses.KEY_END:
+            self.stdscr.move(cursor_y, self.width - 1)
+            return
+
+        # Page Up and Page Down keys.
+        if k in {curses.KEY_NPAGE, curses.KEY_PPAGE}:
+            if k == curses.KEY_NPAGE:
+                self.page_num = (self.page_num + 1) % self.pages
+            else:
+                self.page_num = (self.page_num - 1) % self.pages
+            self.draw_GUI()
+            self.stdscr.move(cursor_y, cursor_x)
+            return
+
+        # Backspace key.
+        if (k == curses.KEY_BACKSPACE
+                and self.start_row <= cursor_y < self.start_row + 5
+                and cursor_x > self.dividers[0] + 1
+                and cursor_x != self.dividers[1] + 1
+                and cursor_x != self.dividers[2] + 1):
+            self.stdscr.addstr(cursor_y, cursor_x, '\b \b')
+            return
+
+        # A subset of the set of printable characters.
+        c = chr(k)
+        if (c in (string.ascii_letters + string.digits + ' \\/$.-{}')
+                and self.start_row <= cursor_y < self.start_row + 5
+                and cursor_x > self.dividers[0]
+                and cursor_x != self.dividers[1]
+                and cursor_x != self.dividers[2]
+                and cursor_x < self.width - 1):
+            self.stdscr.addstr(cursor_y, cursor_x, c)
+            return
+
+        # Enter key. Write the data in the GUI to the dictionary and update the
+        # plot.
+        if k in {curses.KEY_ENTER, ord('\n'), ord('\r')}:
+            for i, header in enumerate(self.headers):
+               for d, coordaxis in zip(self.dividers, self.coordaxes):
+                   self.data[self.page_num][f'{header},{coordaxis}'] = self.stdscr.instr(
+                                                                           self.start_row + i,
+                                                                           d + 1,
+                                                                           self.column_width).decode().strip()
+            self.stdscr.move(cursor_y, cursor_x)
+            self.update()
+            return
+
+    ###########################################################################
+
+    def update(self):
+        '''\
+Update the Matplotlib axes using the information entered in the GUI.
+'''
+
+        for coordaxis in self.coordaxes:
+            ax = self.fig.axes[self.page_num]
+
+            # Read the label.
+            lbl = self.data[self.page_num][f'Label,{coordaxis}']
+            try:
+                getattr(ax, f'set_{coordaxis}label')(lbl)
+            except AttributeError:
+                pass
+
+            # Read the limits and symbols.
+            try:
+                (first, last, step) = map(float, self.data[self.page_num][f'Limits,{coordaxis}'].split())
+            except ValueError:
+                continue
+            symbolic = bool(self.data[self.page_num][f'Symbolic,{coordaxis}'])
+            s = self.data[self.page_num][f'Symbol,{coordaxis}']
+            if not s:
+                symbolic = False
+            try:
+                v = float(self.data[self.page_num][f'Value,{coordaxis}'])
+            except ValueError:
+                v = 0
+                symbolic = False
             limit(ax, coordaxis, symbolic, s, v, first, last, step)
-        except (NameError, SyntaxError, ValueError, ZeroDivisionError):
-            pass
 
-    if fig.stale:
-        fig.canvas.draw()
+        self.canvas.draw_idle()
+
+    ###########################################################################
+
+    def main(self, stdscr):
+        '''\
+Implement the main GUI loop.
+'''
+
+        self.stdscr = stdscr
+        (self.height, self.width) = stdscr.getmaxyx()
+        stdscr.clear()
+        stdscr.refresh()
+        self.draw_GUI()
+
+        k = None
+        while True:
+            self.process_keystroke(k)
+            stdscr.refresh()
+
+            # Exit if the Escape key is pressed.
+            k = stdscr.getch()
+            if k == 27:
+                return
 
 ###############################################################################
 
-def _set_text_data(fig, data):
-    i, j, coords = data
+def _maximise(fig):
+    '''\
+Maximise a figure window. (This is not the same as going full-screen.)
 
-    try:
-        coords = tuple(float(eval(coord)) for coord in coords.split())
-        fig.axes[i].texts[j].set_position(coords)
-    except (IndexError, NameError, SyntaxError, ValueError):
-        pass
+Args:
+    fig: matplotlib.figure.Figure
+'''
 
-    if fig.stale:
-        fig.canvas.draw()
+    backend = mpl.get_backend()
+    if backend in {'TkAgg', 'TkCairo'}:
+        if platform.system() in {'Darwin', 'Windows'}:
+            fig.canvas.manager.window.state('zoomed')
+        else: # 'Linux'
+            fig.canvas.manager.window.attributes('-zoomed', True)
+    elif backend in {'GTK3Agg', 'GTK3Cairo'}:
+        fig.canvas.manager.window.maximize()
+    elif backend in {'WXAgg', 'WXCairo'}:
+        fig.show()
+        fig.canvas.manager.frame.Maximize(True)
+    elif backend in {'Qt5Agg', 'Qt5Cairo'}:
+        fig.canvas.manager.window.showMaximized()
 
 ###############################################################################
 
@@ -775,12 +798,14 @@ def show(fig=None):
 Display one or more figures.
 
 If this function is called without arguments, it is similar to calling
-`matplotlib.pyplot.show': all figures will be displayed. The difference is that
-these figures will all be maximised.
+`matplotlib.pyplot.show': all figures will be displayed.
 
 If this function is called with an existing figure as an argument, that figure
 will be displayed, along with an interactive GUI, which can be used to
-manipulate some plot elements of all axes in said figure.
+manipulate some plot elements of all axes in said figure. This GUI will be
+emulated in the terminal, so ensure that you don't write anything to standard
+output while the GUI is active. Using this feature requires that curses be
+installed.
 
 Args:
     fig: matplotlib.figure.Figure
@@ -790,66 +815,27 @@ Args:
         figs = map(plt.figure, plt.get_fignums())
     else:
         figs = [fig]
-
-    # Maximise the figure or figures. (This is not the same as going
-    # fullscreen.)
-    backend = mpl.get_backend()
-    if backend in {'TkAgg', 'TkCairo'}:
-        if _system in {'Darwin', 'Windows'}:
-            for _fig in figs:
-                _fig.canvas.manager.window.state('zoomed')
-        else:
-            for _fig in figs:
-                _fig.canvas.manager.window.attributes('-zoomed', True)
-    elif backend in {'GTK3Agg', 'GTK3Cairo'}:
-        for _fig in figs:
-            _fig.canvas.manager.window.maximize()
-    elif backend in {'WXAgg', 'WXCairo'}:
-        for _fig in figs:
-            _fig.show()
-            _fig.canvas.manager.frame.Maximize(True)
-    elif backend in {'Qt5Agg', 'Qt5Cairo'}:
-        for _fig in figs:
-            _fig.canvas.manager.window.showMaximized()
+    for _fig in figs:
+        _maximise(_fig)
 
     if fig is None:
         plt.show()
         return
 
-    canvas = fig.canvas
-    fig.show()
+    if not has_curses:
+        message = ('The curses module could not be imported, so the '
+                   'interactive plotting feature is unavailable.')
+        raise RuntimeWarning(message)
+        return
 
-    # If Matplotlib is using a Tkinter-based backend, make the interactive GUI
-    # a child window of the figure.
-    if backend in {'TkAgg', 'TkCairo'}:
-        toplevel = tk.Toplevel(canvas.get_tk_widget())
-        interactive = _Interactive(fig, toplevel)
-        interactive.after(2000, toplevel.lift)
-        plt.show()
+    if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
+        message = ('Matplotlib is using a Tkinter-based backend, so the '
+                   'interactive plotting feature is unavailable.')
+        raise RuntimeWarning(message)
+        return
 
-    # If Matplotlib is not using a Tkinter-based backend, run the interactive
-    # GUI in a separate process. It will communicate with this process via a
-    # queue.
-    else:
-        queue = mp.Queue()
-        interactive_wrapper = _InteractiveWrapper(fig, queue)
-        interactive_wrapper.start()
-
-        while plt.fignum_exists(fig.number):
-            canvas.start_event_loop(0.1)
-            if queue.empty():
-                continue
-
-            data = queue.get()
-            if isinstance(data, tuple):
-                _set_text_data(fig, data)
-            else:
-                _set_axes_data(fig, data)
-
-    # Once the figure is closed, the interactive GUI should be closed
-    # automatically.
-    try:
-        interactive_wrapper.terminate()
-    except NameError:
-        pass
+    interactive = _Interactive(fig)
+    interactive.start()
+    plt.show()
+    interactive.join()
 

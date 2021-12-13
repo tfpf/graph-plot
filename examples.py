@@ -54,8 +54,7 @@ Example of a two-dimensional Cartesian plot.
     # distorted).
     customplot.aspect(ax, 1)
 
-    # Use either `plt.show' or `customplot.show'. The latter will maximise the
-    # figure window; the former won't.
+    # Use either `plt.show' or `customplot.show'.
     customplot.show()
 
 ###############################################################################
@@ -98,8 +97,7 @@ Example of a two-dimensional Cartesian plot of a discontinuous function.
     # distorted).
     customplot.aspect(ax, 1)
 
-    # Use either `plt.show' or `customplot.show'. The latter will maximise the
-    # figure window; the former won't.
+    # Use either `plt.show' or `customplot.show'.
     customplot.show()
 
 ###############################################################################
@@ -168,17 +166,6 @@ Said labels contain the symbols for pi (π) and the Euler–Mascheroni constant
 def interactive():
     '''\
 Example of an interactive plot.
-
-Note that an interactive plot should be created only inside a function (like it
-has been done here). At the very least, it should be done in a function called
-`main', and
-    if __name__ == '__main__':
-        main()
-should be used. If this is not done, Python may complain about problems with
-starting a process.
-
-This won't work on macOS unless a Tkinter-based backend is used. However, this
-is handled automatically, so there should be no problems.
 '''
 
     fig, ax = plt.subplots()
@@ -188,8 +175,8 @@ is handled automatically, so there should be no problems.
     x = np.linspace(-8, 8, 10000)
     y = np.sin(x)
     ax.plot(x, y, label=r'$y=\sin x$')
-    ax.text(0, 0, r'$(0,0)$', size='large')
-    ax.text(np.pi, 0, r'$(\pi,0)$', size='large')
+    # ax.text(0, 0, r'$(0,0)$', size='large')
+    # ax.text(np.pi, 0, r'$(\pi,0)$', size='large')
 
     customplot.polish(ax, title='This is an interactive plot!')
     customplot.aspect(ax, 1)
@@ -197,25 +184,26 @@ is handled automatically, so there should be no problems.
     # Call `customplot.show' with the figure instance as an argument.
     customplot.show(fig)
 
-    # After doing this, two windows will open: the plot window and an
-    # interactive GUI. This GUI has three parts.
+    # After doing this, the plot window will open, and a GUI will be emulated
+    # in the terminal. This GUI has several parts.
 
-    # The upper part is a ribbon where you can select one of the Matplotlib
-    # axes present in the figure.
+    # The upper part displays information about the figure and the current
+    # Matplotlib axes selected. Pressing Page Up and Page Down will switch
+    # between axes.
 
-    # The middle part contains twelve entries and three checkboxes which can be
-    # used to manipulate the axes of coordinates. 'Symbolic' is a checkbox
-    # indicating whether the markings on the axis should be at multiples of the
-    # number entered in 'Value'. 'Symbol' is a string which represents said
-    # value. 'Limits' shall contain three space-separated numbers, which are
-    # used as the arguments `first', `last' and `step' for the function
-    # `customplot.limit'. 'Label' is used to label the axis of coordinates.
-    # After you're done typing into any entry, press Enter. The plot will get
-    # updated.
-
-    # The lower part contains as many entries as there are text objects in the
-    # plot. Specify the coordinates (again, space-separated) at which these
-    # text objects must be placed, and press Enter. The plot will get updated.
+    # The main part contains some entries which can be typed into. These map to
+    # the arguments of `customplot.limit'.'Symbolic'
+    # 'Symbolic': `symbolic' argument of `customplot.limit'. Leaving it blank
+    # causes `symbolic=False' to be passed to the function, while typing
+    # anything causes `symbolic=True' to be passed.
+    # 'Symbol': `s' argument of `customplot.limit'.
+    # 'Value': `v' argument of `customplot.limit'.
+    # 'Limits': `first', `last' and `step' arguments of `customplot.limit'.
+    # Type in three space-separated numbers, which will be used as the
+    # aforementioned arguments.
+    # 'Label': the label of an axis of coordinates.
+    # After you're done typing, press Enter. The plot will get updated. To
+    # quit, press Escape.
 
 ###############################################################################
 

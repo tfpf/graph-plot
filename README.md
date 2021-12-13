@@ -9,12 +9,12 @@ can be used for many other things, too. (Take a gander at the
 [gallery](#gallery).)
 
 # Requirements
-| Name       | Version  |
-| :--------: | :------: |
-| Python     | 3.8      |
-| Matplotlib | 3.3.4    |
-| NumPy      | 1.17     |
-| Tkinter    | 8.6      |
+| Name       | Version  | Comment  |
+| :--------: | :------: | :------: |
+| Python     | 3.8      | Required |
+| Matplotlib | 3.3.4    | Required |
+| NumPy      | 1.17     | Required |
+| curses     | 2.2      | Optional |
 
 These requirements are not strict. Slightly older versions should also be okay.
 
@@ -34,27 +34,22 @@ in `examples.py` to another file, make modifications to that file, and run it.
 
 ## General
 Customplot cannot replace Matplotlib or Pyplot. It just does a few things which
-make the plot look appealing. For sufficiently complicated plots, you may have
-to use functions of Matplotlib or Pyplot directly.
+make the plot look pretty (to my eyes, at least). For sufficiently complicated
+plots, you may have to use functions of Matplotlib or Pyplot directly.
 
 Only `rectilinear`, `polar` and `3d` projections of Matplotlib axes are
 supported. Other projections can also be used, but their beautification may not
 happen automatically.
 
-Except interactive plotting (see below), everything should work out of the box
-with any Matplotlib backend on any platform.
-
 ## Interactive Plots
 As seen in the image above, you can interactively adjust some plot elements of
-all Matplotlib axes in a figure. To do so, just use `customplot.show(fig)`
-(`fig` being the Matplotlib figure instance) instead of `plt.show()`. More
-details can be found in `examples.py`.
+all Matplotlib axes in a figure (provided that the curses module is installed
+and available). To do so, just use `customplot.show(fig)` (`fig` being the
+Matplotlib figure instance) instead of `plt.show()`. More details can be found
+in `examples.py`.
 
-Interactive plots should work well with not only the `TkAgg` and `TkCairo`
-backends, but also some others, like `GTK3Agg`, `GTK3Cairo`, `WXAgg`,
-`WXCairo`, `Qt5Agg` and `Qt5Cairo` on GNU/Linux and Windows. On macOS, they
-currently work only with `TkAgg` and `TkCairo`. Hence, Customplot will
-automatically select `TkAgg` if this program is run on macOS.
+Interactive plots do not work with the `TkAgg` and `TkCairo` backends; this is
+due to a limitation of Tkinter.
 
 ## Fonts
 Using a good font can significantly improve the appearance of your plot. (Check
@@ -64,7 +59,7 @@ out the [gallery](#gallery). The font used in those plots is
 In case you want nothing to do with fonts, you can ignore this section
 entirely.
 
-### Using a Built-in Font
+### Using a Packaged Font
 Some fonts are packaged with Matplotlib; you can choose one of them. My
 suggestion is a STIX font. To use it, add the following lines to the file
 `light.mplstyle` (you can find this file in the `styles` directory).
