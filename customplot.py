@@ -503,8 +503,7 @@ Args:
 class _Interactive(threading.Thread):
     '''\
 Interactively adjust some plot elements of a Matplotlib axes instance using a
-curses GUI running in a separate thread. This does not work with Tkinter-based
-backends.
+curses GUI running in a separate thread.
 
 Members:
     fig: matplotlib.figure.Figure
@@ -700,7 +699,7 @@ Args:
 
         # A subset of the set of printable characters.
         c = chr(k)
-        if (c in 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' '0123456789' ' \\/$.-{}'
+        if (c in 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' '0123456789' ' \\$.+-*/{}'
                 and self.start_row <= cursor_y < self.start_row + 5
                 and cursor_x > self.dividers[0]
                 and cursor_x != self.dividers[1]
@@ -729,28 +728,27 @@ Args:
 Update the Matplotlib axes using the information entered in the GUI.
 '''
 
-        for coordaxis in self.coordaxes:
-            ax = self.fig.axes[self.page_num]
+        ax = self.fig.axes[self.page_num]
 
-            # Read the label.
+        for coordaxis in self.coordaxes:
             lbl = self.data[self.page_num][f'Label,{coordaxis}']
             try:
                 getattr(ax, f'set_{coordaxis}label')(lbl)
             except AttributeError:
                 pass
 
-            # Read the limits and symbols.
             try:
-                (first, last, step) = map(float, self.data[self.page_num][f'Limits,{coordaxis}'].split())
-            except ValueError:
+                (first, last, step) = (float(eval(t, {'__builtins__': None}))
+                                           for t in self.data[self.page_num][f'Limits,{coordaxis}'].split())
+            except (TypeError, ValueError, ZeroDivisionError):
                 continue
             symbolic = bool(self.data[self.page_num][f'Symbolic,{coordaxis}'])
             s = self.data[self.page_num][f'Symbol,{coordaxis}']
             if not s:
                 symbolic = False
             try:
-                v = float(self.data[self.page_num][f'Value,{coordaxis}'])
-            except ValueError:
+                v = float(eval(self.data[self.page_num][f'Value,{coordaxis}'], {'__builtins__': None}))
+            except (TypeError, ValueError, ZeroDivisionError):
                 v = 0
                 symbolic = False
             limit(ax, coordaxis, symbolic, s, v, first, last, step)
@@ -783,7 +781,6 @@ Implement the main GUI loop.
             if self.fig.number not in plt.get_fignums():
                 message = ('Cannot update a figure which has been closed.')
                 raise RuntimeWarning(message)
-                return
 
 ###############################################################################
 
@@ -842,9 +839,7 @@ Args:
         return
 
     if not has_curses:
-        message = ('The curses module could not be imported, so the '
-                   'interactive plotting feature is unavailable.')
-        raise RuntimeWarning(message)
+        print('The curses module could not be imported, so the interactive plotting feature is unavailable.')
         plt.show()
         return
 
