@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 import platform
-import string
 import sys
 import threading
 import time
@@ -687,7 +686,7 @@ Args:
 
         # A subset of the set of printable characters.
         c = chr(k)
-        if (c in (string.ascii_letters + string.digits + ' \\/$.-{}')
+        if (c in 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' '0123456789' ' \\/$.-{}'
                 and self.start_row <= cursor_y < self.start_row + 5
                 and cursor_x > self.dividers[0]
                 and cursor_x != self.dividers[1]
@@ -778,18 +777,19 @@ Args:
 '''
 
     backend = mpl.get_backend()
+    manager = fig.canvas.manager
     if backend in {'TkAgg', 'TkCairo'}:
         if platform.system() in {'Darwin', 'Windows'}:
-            fig.canvas.manager.window.state('zoomed')
+            manager.window.state('zoomed')
         else: # 'Linux'
-            fig.canvas.manager.window.attributes('-zoomed', True)
+            manager.window.attributes('-zoomed', True)
     elif backend in {'GTK3Agg', 'GTK3Cairo'}:
-        fig.canvas.manager.window.maximize()
+        manager.window.maximize()
     elif backend in {'WXAgg', 'WXCairo'}:
         fig.show()
-        fig.canvas.manager.frame.Maximize(True)
+        manager.frame.Maximize(True)
     elif backend in {'Qt5Agg', 'Qt5Cairo'}:
-        fig.canvas.manager.window.showMaximized()
+        manager.window.showMaximized()
 
 ###############################################################################
 
