@@ -140,6 +140,24 @@ def _get_axes_size_in_inches(ax):
 
 ###############################################################################
 
+def _schedule_draw_polar_patches(event):
+    '''\
+Set the flag in the global weak key dictionary indicating that the polar
+patches in one or more polar axes in this figure have to be updated.
+
+This function is triggered when the canvas is resized. It is not possible to
+actually redraw the polar patches here, because doing so requires that the
+resize operation has been completed.
+
+Args:
+    event: Matplotlib event (the event which triggered this function)
+'''
+
+    fig = event.canvas.figure
+    _gid[fig][1] = True
+
+###############################################################################
+
 def _draw_polar_patches(event):
     '''\
 Draw arrow patches to show the angular and radial axes of coordinates of all
@@ -156,14 +174,11 @@ Args:
 
     canvas = event.canvas
     fig = canvas.figure
+    [gid, needs_redraw] = _gid[fig]
+    if not needs_redraw:
+        return
 
-    # Stop the event loop (if it is already running). If this is not done, a
-    # RuntimeError may be raised when `plt.pause' is called.
-    canvas.stop_event_loop()
-
-    # When the canvas is resized, Matplotlib axes are also resized. Delay for
-    # some time to allow this to happen.
-    plt.pause(0.1)
+    _gid[fig][1] = False
 
     for ax in fig.axes:
         if ax.name != 'polar':
@@ -172,13 +187,10 @@ Args:
         # Remove the previously added arrow patches (if any). Do not remove any
         # other patches. Since the original list (namely `ax.patches') gets
         # mutated whenever any patch is removed, make a shallow copy of it.
-        gid = _gid[fig]
         for patch in ax.patches[:]:
             if patch.get_gid() == gid:
                 patch.remove()
 
-        # Obtain the current size of the Matplotlib axes instance. This is used
-        # to calculate the sizes of the arrows.
         ax_width_inches, ax_height_inches = _get_axes_size_in_inches(ax)
 
         # This is the centre of the arrow patches in axes coordinates. (Axes
@@ -218,6 +230,8 @@ Args:
 
         ax.xaxis.label.set_visible(True)
         ax.yaxis.label.set_visible(True)
+
+        canvas.draw_idle()
 
 ###############################################################################
 
@@ -435,13 +449,13 @@ Args:
     fig = ax.figure
     canvas = fig.canvas
     if any(_ax.name == 'polar' for _ax in fig.axes) and fig not in _gid:
-        timefmt = '%Y-%m-%d_%H.%M.%S'
-        _gid[fig] = f'cp_{time.strftime(timefmt)}_{np.random.randint(100, 999)}'
-
-        # Connect the resize event of the canvas to a callback which
-        # illustrates the axes of coordinates of all polar graphs (if any) in
-        # this figure.
-        canvas.mpl_connect('resize_event', _draw_polar_patches)
+        timefmt = '%Y-%m-%d_%H-%M-%S'
+        _gid[fig] = [f'cp_{time.strftime(timefmt)}_{np.random.randint(100, 999)}', True]
+        canvas.mpl_connect('resize_event', _schedule_draw_polar_patches)
+        canvas.mpl_connect('axes_enter_event', _draw_polar_patches)
+        canvas.mpl_connect('axes_leave_event', _draw_polar_patches)
+        canvas.mpl_connect('figure_enter_event', _draw_polar_patches)
+        canvas.mpl_connect('figure_leave_event', _draw_polar_patches)
 
     if title is not None:
         ax.set_title(title)
@@ -766,6 +780,11 @@ Implement the main GUI loop.
             if k == 27:
                 return
 
+            if self.fig.number not in plt.get_fignums():
+                message = ('Cannot update a figure which has been closed.')
+                raise RuntimeWarning(message)
+                return
+
 ###############################################################################
 
 def _maximise(fig):
@@ -826,12 +845,7 @@ Args:
         message = ('The curses module could not be imported, so the '
                    'interactive plotting feature is unavailable.')
         raise RuntimeWarning(message)
-        return
-
-    if mpl.get_backend() in {'TkAgg', 'TkCairo'}:
-        message = ('Matplotlib is using a Tkinter-based backend, so the '
-                   'interactive plotting feature is unavailable.')
-        raise RuntimeWarning(message)
+        plt.show()
         return
 
     interactive = _Interactive(fig)

@@ -48,9 +48,6 @@ and available). To do so, just use `customplot.show(fig)` (`fig` being the
 Matplotlib figure instance) instead of `plt.show()`. More details can be found
 in `examples.py`.
 
-Interactive plots do not work with the `TkAgg` and `TkCairo` backends; this is
-due to a limitation of Tkinter.
-
 ## Fonts
 Using a good font can significantly improve the appearance of your plot. (Check
 out the [gallery](#gallery). The font used in those plots is
