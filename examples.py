@@ -192,7 +192,7 @@ Example of an interactive plot.
     # between axes.
 
     # The main part contains some entries which can be typed into. These map to
-    # the arguments of `customplot.limit'.'Symbolic'
+    # the arguments of `customplot.limit'.
     # 'Symbolic': `symbolic' argument of `customplot.limit'. Leaving it blank
     # causes `symbolic=False' to be passed to the function, while typing
     # anything causes `symbolic=True' to be passed.
