@@ -587,6 +587,9 @@ Methods:
     ###########################################################################
 
     def draw_GUI(self):
+        self.stdscr.erase()
+
+        (self.height, self.width) = self.stdscr.getmaxyx()
         row = 0
 
         # Title identifying the figure.
@@ -655,6 +658,11 @@ Args:
         if k is None:
             return
 
+        # Resize event.
+        if k == curses.KEY_RESIZE:
+            self.draw_GUI()
+            return
+
         (cursor_y, cursor_x) = self.stdscr.getyx()
 
         # Arrow keys.
@@ -699,7 +707,7 @@ Args:
 
         # A subset of the set of printable characters.
         c = chr(k)
-        if (c in 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' '0123456789' ' \\$.+-*/{}'
+        if (c in 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' '0123456789' ' \\$.+-*/=(){}_^'
                 and self.start_row <= cursor_y < self.start_row + 5
                 and cursor_x > self.dividers[0]
                 and cursor_x != self.dividers[1]
@@ -740,7 +748,7 @@ Update the Matplotlib axes using the information entered in the GUI.
             try:
                 (first, last, step) = (float(eval(t, {'__builtins__': None}))
                                            for t in self.data[self.page_num][f'Limits,{coordaxis}'].split())
-            except (TypeError, ValueError, ZeroDivisionError):
+            except (SyntaxError, TypeError, ValueError, ZeroDivisionError):
                 continue
             symbolic = bool(self.data[self.page_num][f'Symbolic,{coordaxis}'])
             s = self.data[self.page_num][f'Symbol,{coordaxis}']
@@ -748,7 +756,7 @@ Update the Matplotlib axes using the information entered in the GUI.
                 symbolic = False
             try:
                 v = float(eval(self.data[self.page_num][f'Value,{coordaxis}'], {'__builtins__': None}))
-            except (TypeError, ValueError, ZeroDivisionError):
+            except (SyntaxError, TypeError, ValueError, ZeroDivisionError):
                 v = 0
                 symbolic = False
             limit(ax, coordaxis, symbolic, s, v, first, last, step)
@@ -763,8 +771,6 @@ Implement the main GUI loop.
 '''
 
         self.stdscr = stdscr
-        (self.height, self.width) = stdscr.getmaxyx()
-        stdscr.clear()
         stdscr.refresh()
         self.draw_GUI()
 
