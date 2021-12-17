@@ -489,7 +489,7 @@ Args:
     ratio: float (ratio of the scale on the x-axis to that on the y-axis)
 '''
 
-    if ratio == 0:
+    if not ratio:
         return
 
     if ax.name == 'rectilinear':
