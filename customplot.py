@@ -97,7 +97,7 @@ Returns:
         den = value.denominator
 
         # Case 1: `coefficient' is zero.
-        if num == 0:
+        if not num:
             labels[i] = '$0$'
             continue
 
@@ -313,9 +313,9 @@ Returns:
             # Remove the last label on the radial axis. Remove the first label
             # if it marks zero.
             elif coordaxis == 'y':
-                if first == 0:
-                    labels[0] = ''
                 labels[-1] = ''
+                if not first:
+                    labels[0] = ''
 
         ticks_setter(ticks)
         labels_setter(labels)
@@ -367,16 +367,16 @@ Returns:
 
             # Just like in case 1. With the difference that `ticks' is used
             # instead of `first' and `last' to check the limits.
-            if coordaxis == 'x' and ticks[0] == 0 and np.isclose(ticks[-1], 2 * np.pi):
+            if coordaxis == 'x' and not ticks[0] and np.isclose(ticks[-1], 2 * np.pi):
                 labels, ticks = labels[: -1], ticks[: -1]
                 ticks_setter(ticks)
                 labels_setter(labels)
 
             # Again, just like case 1.
             elif coordaxis == 'y':
-                if ticks[0] == 0:
-                    labels[0] = ''
                 labels[-1] = ''
+                if not ticks[0]:
+                    labels[0] = ''
                 ticks_setter(ticks)
                 labels_setter(labels)
 
@@ -603,9 +603,7 @@ Methods:
         row += 2
 
         # Calculations for drawing the margins.
-        header_column_width = 10
-        while (self.width - header_column_width) % 3:
-            header_column_width += 1
+        header_column_width = 10 + (self.width - 10) % 3
         self.column_width = (self.width - header_column_width - 3) // 3
         self.dividers = [header_column_width + i * (self.column_width + 1) for i in range(3)]
 
