@@ -167,7 +167,7 @@ legend.columnspacing: 1.25
 figure.titlesize:   x-large  # xx-small, x-small, small, medium, large, x-large, xx-large, larger, smaller
 figure.titleweight: normal   # 100, 200, 300, 400, 500, 600, 700, 800, 900, normal, bold, bolder, lighter
 figure.figsize:     15, 8
-figure.dpi:         192
+figure.dpi:         194
 figure.facecolor:   white
 figure.edgecolor:   white
 figure.frameon:     True
