@@ -325,7 +325,7 @@ Returns:
         if coordaxis == 'x':
             if not all(t == int(t) for t in [first, last, step]):
                 if ax.name == 'rectilinear':
-                    ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 3.4)
+                    ax.tick_params(axis=coordaxis, which='major', pad=mpl.rcParams['xtick.major.pad'] * 3.75)
                     for label in labels_getter():
                         label.set_verticalalignment('baseline')
                 elif ax.name == 'polar':
