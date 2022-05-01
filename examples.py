@@ -134,9 +134,9 @@ Said labels contain the symbol for pi (π).
 
 def cartesian_2d_symbolic_2():
     '''\
-Example of a two-dimensional Cartesian plot with symbolic labels on the x-axis.
-Said labels contain the symbols for pi (π) and the Euler–Mascheroni constant
-(γ).
+Example of a two-dimensional Cartesian plot with symbolic labels on the x-axis
+and y-axis. Said labels contain the symbols for pi (π), the Euler–Mascheroni
+constant (γ) and the reciprocal Fibonacci constant (ψ).
 '''
 
     fig, ax = plt.subplots()
@@ -147,16 +147,17 @@ Said labels contain the symbols for pi (π) and the Euler–Mascheroni constant
     # [-2π/γ, -1.75π/γ, -1.5π/γ, -1.25π/γ, -π/γ, -0.75π/γ, -0.5π/γ, -0.25π/γ, 0, 0.25π/γ, 0.5π/γ, 0.75π/γ, π/γ, 1.25π/γ, 1.5π/γ, 1.75π/γ, 2π/γ]
     customplot.limit(ax, 'x', symbolic=True, s=r'\pi/\gamma', v=np.pi / np.euler_gamma, first=-2, last=2, step=0.25)
 
-    # Set the locations of the grid lines on the y-axis. Grid lines will be
-    # drawn at the following y-coordinates.
-    # [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
-    customplot.limit(ax, 'y', first=-5, last=5, step=1)
+    # Set the locations of the grid lines on the y-axis. Note that `symbolic'
+    # has been set to True, and a value has been provided for `s' and `v'. As a
+    # result, grid lines will be drawn at the following y-coordinates.
+    # [-1.33ψ, -ψ, -0.67ψ, -0.33ψ, 0, 0.33ψ, 0.67ψ, ψ, 1.33ψ]
+    customplot.limit(ax, 'y', symbolic=True, s=r'\psi', v=3.359886, first=-4 / 3, last=4 / 3, step=1 / 3)
 
     x = np.linspace(-12, 12, 10000)
-    y = np.cos(np.euler_gamma * x)
-    ax.plot(x, y, color='green', label=r'$y=\cos\gamma x$')
+    y = 3.359886 * np.cos(np.euler_gamma * x)
+    ax.plot(x, y, color='green', label=r'$y=\psi\,\cos\gamma x$')
 
-    customplot.polish(ax, title='This is a horizontally-scaled trigonometric function!')
+    customplot.polish(ax, title='This is a scaled trigonometric function!')
     customplot.aspect(ax, 1)
 
     customplot.show()
