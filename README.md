@@ -48,6 +48,10 @@ and available). To do so, just use `customplot.show(fig)` (`fig` being the
 Matplotlib figure instance) instead of `plt.show()`. More details can be found
 in `examples.py`.
 
+**Matplotlib is not thread-safe!** Since the curses GUI is run in a separate
+thread, you may occasionally have to trigger additional GUI events (e.g.
+resizing the figure window) to have the desired effect.
+
 ## Fonts
 Using a good font can significantly improve the appearance of your plot. (Check
 out the [gallery](#gallery). The font used in those plots is
