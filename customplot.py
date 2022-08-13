@@ -384,7 +384,7 @@ Returns:
 
 ###############################################################################
 
-def polish(ax, labels=None, title=None, suptitle=None, windowtitle=None):
+def polish(ax, labels=None, axlines=True, title=None, suptitle=None, windowtitle=None):
     '''\
 Label the axes of coordinates. Give the plot a title. Add a legend. Draw grid
 lines. Make some minor appearance enhancements.
@@ -392,6 +392,7 @@ lines. Make some minor appearance enhancements.
 Args:
     ax: matplotlib.axes.Axes
     labels: tuple (strings to label the axes of coordinates)
+    axlines: bool (whether to draw thick lines to represent coordinate axes)
     title: str (title of the graph plotted in `ax')
     suptitle: str (title of the figure `ax' is in)
     windowtitle: str (title of the window `figure' is in)
@@ -417,13 +418,14 @@ Args:
             getattr(ax, f'set_{coordaxis}label')(label, labelpad=10)
 
     elif ax.name == 'rectilinear':
-        kwargs = {'alpha': 0.6, 'linewidth': mpl.rcParams['axes.linewidth']}
-        if mpl.rcParams['axes.edgecolor'] == '#CCCCCC':
-            kwargs['color'] = '#BBBBBB'
-        else:
-            kwargs['color'] = 'gray'
-        ax.axhline(**kwargs)
-        ax.axvline(**kwargs)
+        if axlines:
+            kwargs = {'alpha': 0.6, 'linewidth': mpl.rcParams['axes.linewidth']}
+            if mpl.rcParams['axes.edgecolor'] == '#CCCCCC':
+                kwargs['color'] = '#BBBBBB'
+            else:
+                kwargs['color'] = 'gray'
+            ax.axhline(**kwargs)
+            ax.axvline(**kwargs)
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1], rotation=90)
 
