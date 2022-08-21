@@ -25,17 +25,16 @@ _gid = weakref.WeakKeyDictionary()
 ###############################################################################
 
 def iprint(items, columns=3, align_method='center'):
-    '''\
+    '''
 Display an iterable in neat columns.
 
-Args:
-    items: iterable (each of its elements must have an `__str__' method)
-    columns: int (number of columns to arrange `items' in)
-    align_method: str (string method name: 'ljust', 'center' or 'rjust')
-'''
+:param items: An iterable whose every element can be stringified.
+:param columns: Number of columns to arrange `items` in.
+:param align_method: Method of the `str` class. 'ljust', 'center' or 'rjust'.
+    '''
 
     # Convert the iterable into a two-dimensional list.
-    items = list(map(str, items))
+    items = [*map(str, items)]
     num_items = len(items)
     if num_items % columns:
         items.extend([''] * (columns - num_items % columns))
@@ -46,7 +45,7 @@ Args:
     widths = [max(len(row[i]) for row in items) + 2 for i in range(columns)]
 
     for row in items:
-        for r, width in zip(row, widths):
+        for (r, width) in zip(row, widths):
             print(getattr(r, align_method)(width, ' '), end='')
         print()
 
@@ -66,20 +65,20 @@ from one rational multiple of π (or some other number) to another.
 >>> _labels_and_ticks(2, 4, 1 / 2, symbol=r'\pi/\omega', symval=np.pi / 2)
 (['$\\dfrac{2\\pi}{\\omega}$', '$\\dfrac{5\\pi}{2\\omega}$', '$\\dfrac{3\\pi}{\\omega}$', '$\\dfrac{7\\pi}{2\\omega}$', '$\\dfrac{4\\pi}{\\omega}$'], array([3.14159265, 3.92699082, 4.71238898, 5.49778714, 6.28318531]))
 
-Args:
-    first: float (first item in the returned array shall be `first * symval')
-    last: float (last item in the returned array shall be `last * symval')
-    step: float (array items will increment in steps of `step * symval')
-    symbol: str (LaTeX code or two slash-separated LaTeX codes of the symbol or
-            symbols to use instead of π)
-    symval: float (numerical value represented by `symbol')
+:param first: Float; coefficient of the first element in the list of strings.
+:param last: Float; coefficient of the last element in the list of strings.
+:param step: Float; coefficient of the difference between any two consecutive
+    elements in the list of strings.
+:param symbol: LaTeX code or two slash-separated LaTeX codes of the symbol or
+    symbols to use instead of π.
+:param symval: Float; numerical value represented by `symbol`.
 
-Returns:
-    tuple of a list of labels and a NumPy array of the respective values
-'''
+:return: Tuple of a list of labels and a NumPy array of the respective values.
+:rtype: tuple(list[str], numpy.ndarray)
+    '''
 
     try:
-        s_num, s_den = symbol.split('/')
+        [s_num, s_den] = symbol.split('/')
     except ValueError:
         s_num = symbol
         s_den = '1'
@@ -91,22 +90,22 @@ Returns:
     # repeatedly appended to the list.
     labels = [None] * len(coefficients)
 
-    for i, coefficient in enumerate(coefficients):
+    for (i, coefficient) in enumerate(coefficients):
         value = fractions.Fraction(coefficient).limit_denominator()
         num = value.numerator
         den = value.denominator
 
-        # Case 1: `coefficient' is zero.
+        # Case 1: `coefficient` is zero.
         if not num:
             labels[i] = '$0$'
             continue
 
-        # Build the string which will be the next item in `labels'. Create a
+        # Build the string which will be the next item in `labels`. Create a
         # list to store the different parts of the string, and join those
         # parts.
         builder = ['$']
 
-        # Case 2: `coefficient' is non-zero.
+        # Case 2: `coefficient` is non-zero.
         if num < 0:
             builder.append('-')
             num = abs(num)
@@ -135,31 +134,28 @@ Returns:
 def _get_axes_size_in_inches(ax):
     bbox = ax.get_window_extent()
     transformed = bbox.transformed(ax.figure.dpi_scale_trans.inverted())
-
     return (transformed.width, transformed.height)
 
 ###############################################################################
 
 def _schedule_draw_polar_patches(event):
-    '''\
+    '''
 Set the flag in the global weak key dictionary indicating that the polar
 patches in one or more polar axes in this figure have to be updated.
 
 This function is triggered when the canvas is resized. It is not possible to
-actually redraw the polar patches here, because doing so requires that the
+actually update the polar patches here, because that can only be done after the
 resize operation has been completed.
 
-Args:
-    event: Matplotlib event (the event which triggered this function)
-'''
+:param event: Matplotlib event (the event which triggered this function).
+	'''
 
-    fig = event.canvas.figure
-    _gid[fig][1] = True
+    _gid[event.canvas.figure][1] = True
 
 ###############################################################################
 
 def _draw_polar_patches(event):
-    '''\
+    '''
 Draw arrow patches to show the angular and radial axes of coordinates of all
 polar plots in the figure. The sizes of these arrow patches must be independent
 of the size of the figure. Hence, this function is connected to the resize
@@ -168,9 +164,8 @@ can be redrawn when the canvas is resized.
 
 Finally, labels on the axes of coordinates are made visible.
 
-Args:
-    event: Matplotlib event (the event which triggered this function)
-'''
+:param event: Matplotlib event (the event which triggered this function).
+	'''
 
     canvas = event.canvas
     fig = canvas.figure
@@ -185,13 +180,13 @@ Args:
             continue
 
         # Remove the previously added arrow patches (if any). Do not remove any
-        # other patches. Since the original list (namely `ax.patches') gets
+        # other patches. Since the original list (namely `ax.patches`) gets
         # mutated whenever any patch is removed, make a shallow copy of it.
         for patch in ax.patches[:]:
             if patch.get_gid() == gid:
                 patch.remove()
 
-        ax_width_inches, ax_height_inches = _get_axes_size_in_inches(ax)
+        (ax_width_inches, ax_height_inches) = _get_axes_size_in_inches(ax)
 
         # This is the centre of the arrow patches in axes coordinates. (Axes
         # coordinates: [0, 0] is the lower left corner of the Matplotlib axes,
@@ -236,31 +231,29 @@ Args:
 ###############################################################################
 
 def sanitise(y, maximum_diff=5):
-    '''\
+    '''
 At a point of essential or jump discontinuity, Matplotlib draws a vertical line
 automatically. This vertical line joins the two points around the
 discontinuity. Traditionally, in maths, such lines are not drawn. Hence, they
 must removed from the plot. This is achieved by setting the function values at
 the points of discontinuity to NaN.
 
-Args:
-    y: iterable (values of the discontinuous function)
-    maximum_diff: float (the maximum permissible derivative of `y')
+:param y: Iterable; values of the discontinuous function.
+:param maximum_diff: Maximum permissible derivative of `y`.
 
-Returns:
-    NumPy array with NaN at the points of discontinuity
-'''
+:return: NumPy array with NaN at the points of discontinuity.
+:rtype: numpy.ndarray
+	'''
 
     y = np.array(y)
     points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > maximum_diff
     y[points_of_discontinuity] = np.nan
-
     return y
 
 ###############################################################################
 
 def limit(ax, coordaxis=None, symbolic=False, s=r'\pi', v=np.pi, first=None, last=None, step=None):
-    '''\
+    '''
 Limit the specified axis of coordinates to the range given. Draw grid lines as
 indicated.
 
@@ -270,20 +263,19 @@ relevant code can be found in the `_get_coord_info' method of
 mpl_toolkits/mplot3d/axis3d.py as of version 3.3.4 of Matplotlib). If you don't
 like this, you must modify the source code.
 
-Args:
-    ax: matplotlib.axes.Axes
-    coordaxis: str (which axis of coordinates to limit: 'x', 'y' or 'z')
-    symbolic: bool (whether ticks are at rational multiples of `v')
-    s: str (LaTeX code or two slash-separated LaTeX codes of the symbol or
-       symbols to use instead of π)
-    v: float (numerical value represented by `s')
-    first: float (tick start point)
-    last: float (tick end point)
-    step: float (tick spacing)
+:param ax: Matplotlib axes.
+:param coordaxis: Which axis of coordinates to limit: 'x', 'y' or 'z'.
+:param symbolic: Whether ticks are at rational multiples of `v`.
+:param s: LaTeX code or two slash-separated LaTeX codes of the symbol or
+    symbols to use instead of π.
+:param v: Numerical value represented by `s`.
+:param first: Float; tick start point.
+:param last: Float; tick end point.
+:param step: Float; tick spacing.
 
-Returns:
-    bool, indicating whether this function did something or returned early
-'''
+:return: Flag whether this function did something or returned early.
+:rtype: bool
+	'''
 
     if coordaxis == 'z' and ax.name != '3d':
         return False
@@ -365,8 +357,8 @@ Returns:
             ticks = ticks_getter()
             labels = [label.get_text() for label in labels_getter()]
 
-            # Just like in case 1. With the difference that `ticks' is used
-            # instead of `first' and `last' to check the limits.
+            # Just like in case 1. With the difference that `ticks` is used
+            # instead of `first` and `last` to check the limits.
             if coordaxis == 'x' and not ticks[0] and np.isclose(ticks[-1], 2 * np.pi):
                 labels, ticks = labels[: -1], ticks[: -1]
                 ticks_setter(ticks)
@@ -385,18 +377,18 @@ Returns:
 ###############################################################################
 
 def polish(ax, labels=None, axlines=True, title=None, suptitle=None, windowtitle=None):
-    '''\
+    '''
 Label the axes of coordinates. Give the plot a title. Add a legend. Draw grid
 lines. Make some minor appearance enhancements.
 
-Args:
-    ax: matplotlib.axes.Axes
-    labels: tuple (strings to label the axes of coordinates)
-    axlines: bool (whether to draw thick lines to represent coordinate axes)
-    title: str (title of the graph plotted in `ax')
-    suptitle: str (title of the figure `ax' is in)
-    windowtitle: str (title of the window `figure' is in)
-'''
+:param ax: Matplotlib axes.
+:param labels: Tuple of strings to label the axes of coordinates.
+:param axlines: Whether to draw thick lines to represent the axes of
+    coordinates.
+:param title: Title of `ax`.
+:param suptitle: Title of the figure `ax` is in.
+:param windowtitle: Title of the window `ax` is in.
+	'''
 
     if labels is None:
         if ax.name in {'rectilinear', '3d'}:
@@ -476,20 +468,19 @@ Args:
 ###############################################################################
 
 def aspect(ax, ratio=0):
-    '''\
-Set the aspect ratio. If `ax' is being used for two-dimensional Cartesian
-plots, the ratio of the scales on the x-axis and y-axis will be set to `ratio'
-(if it is non-zero). If `ax' is being used for two-dimensional polar plots,
+    '''
+Set the aspect ratio. If `ax` is being used for two-dimensional Cartesian
+plots, the ratio of the scales on the x-axis and y-axis will be set to `ratio`
+(if it is non-zero). If `ax` is being used for two-dimensional polar plots,
 nothing happens.
 
 For three-dimensional plots, an aspect ratio does not make sense, because there
 are three axes of coordinates. Hence, in this case, the scales on those axes
-will be made equal if `ratio' is any non-zero number.
+will be made equal if `ratio` is any non-zero number.
 
-Args:
-    ax: matplotlib.axes.Axes
-    ratio: float (ratio of the scale on the x-axis to that on the y-axis)
-'''
+:param ax: Matplotlib axes.
+:param ratio: Ratio of the scale on the x-axis to that on the y-axis.
+	'''
 
     if not ratio:
         return
@@ -503,37 +494,10 @@ Args:
 ###############################################################################
 
 class _Interactive(threading.Thread):
-    '''\
+    '''
 Interactively adjust some plot elements of a Matplotlib axes instance using a
 curses GUI running in a separate thread.
-
-Members:
-    fig: matplotlib.figure.Figure
-    canvas: matplotlib.backends.backend_*.FigureCanvas*
-    manager: matplotlib.backends.backend_*.FigureManager*
-    page_num: int (current Matplotlib axes for which options are displayed)
-    pages: int (number of Matplotlib axes in `fig')
-    data: dict (stores the information entered in the GUI)
-    headers: list
-    coordaxes: list
-    tmp_stderr: io.StringIO (standard error buffer used when the GUI is active)
-    stdscr: curses.window
-    height: int
-    width: int
-    column_width: int
-    dividers: list
-
-Methods:
-    __init__
-    redirect_streams
-    restore_streams
-    run
-    join
-    draw_GUI
-    process_keystroke
-    update
-    main
-'''
+	'''
 
     ###########################################################################
 
@@ -648,12 +612,11 @@ Methods:
     ###########################################################################
 
     def process_keystroke(self, k):
-        '''\
+        '''
 Whenever a valid key is pressed, perform the appropriate action.
 
-Args:
-    k: int (code of the key which was pressed)
-'''
+:param k: Code of the key which was pressed.
+	    '''
 
         if k is None:
             return
@@ -732,9 +695,9 @@ Args:
     ###########################################################################
 
     def update(self):
-        '''\
+        '''
 Update the Matplotlib axes using the information entered in the GUI.
-'''
+	    '''
 
         ax = self.fig.axes[self.page_num]
 
@@ -766,9 +729,9 @@ Update the Matplotlib axes using the information entered in the GUI.
     ###########################################################################
 
     def main(self, stdscr):
-        '''\
+        '''
 Implement the main GUI loop.
-'''
+	    '''
 
         self.stdscr = stdscr
         stdscr.refresh()
@@ -791,19 +754,18 @@ Implement the main GUI loop.
 ###############################################################################
 
 def _maximise(fig):
-    '''\
+    '''
 Maximise a figure window. (This is not the same as going full-screen.)
 
-Args:
-    fig: matplotlib.figure.Figure
-'''
+:param fig: Matplotlib figure.
+	'''
 
     backend = mpl.get_backend()
     manager = fig.canvas.manager
     if backend in {'TkAgg', 'TkCairo'}:
         if platform.system() in {'Darwin', 'Windows'}:
             manager.window.state('zoomed')
-        else: # 'Linux'
+        else:  # 'Linux'
             manager.window.attributes('-zoomed', True)
     elif backend in {'GTK3Agg', 'GTK3Cairo'}:
         manager.window.maximize()
@@ -816,11 +778,11 @@ Args:
 ###############################################################################
 
 def show(fig=None):
-    '''\
+    '''
 Display one or more figures.
 
 If this function is called without arguments, it is similar to calling
-`matplotlib.pyplot.show': all figures will be displayed.
+`matplotlib.pyplot.show`: all figures will be displayed.
 
 If this function is called with an existing figure as an argument, that figure
 will be displayed, along with an interactive GUI, which can be used to
@@ -829,9 +791,8 @@ emulated in the terminal, so ensure that you don't write anything to standard
 output while the GUI is active. Using this feature requires that curses be
 installed.
 
-Args:
-    fig: matplotlib.figure.Figure
-'''
+:param fig: Matplotlib figure.
+	'''
 
     if fig is None:
         figs = map(plt.figure, plt.get_fignums())
@@ -853,4 +814,3 @@ Args:
     interactive.start()
     plt.show()
     interactive.join()
-
