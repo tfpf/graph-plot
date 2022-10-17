@@ -149,7 +149,7 @@ actually update the polar patches here, because that can only be done after the
 resize operation has been completed.
 
 :param event: Matplotlib event (the event which triggered this function).
-	'''
+    '''
 
     _gid[event.canvas.figure][1] = True
 
@@ -166,7 +166,7 @@ can be redrawn when the canvas is resized.
 Finally, labels on the axes of coordinates are made visible.
 
 :param event: Matplotlib event (the event which triggered this function).
-	'''
+    '''
 
     canvas = event.canvas
     fig = canvas.figure
@@ -244,7 +244,7 @@ the points of discontinuity to NaN.
 
 :return: NumPy array with NaN at the points of discontinuity.
 :rtype: numpy.ndarray
-	'''
+    '''
 
     y = np.array(y)
     points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > maximum_diff
@@ -276,7 +276,7 @@ like this, you must modify the source code.
 
 :return: Flag whether this function did something or returned early.
 :rtype: bool
-	'''
+    '''
 
     if coordaxis == 'z' and ax.name != '3d':
         return False
@@ -389,7 +389,7 @@ lines. Make some minor appearance enhancements.
 :param title: Title of `ax`.
 :param suptitle: Title of the figure `ax` is in.
 :param windowtitle: Title of the window `ax` is in.
-	'''
+    '''
 
     if labels is None:
         if ax.name in {'rectilinear', '3d'}:
@@ -481,7 +481,7 @@ will be made equal if `ratio` is any non-zero number.
 
 :param ax: Matplotlib axes.
 :param ratio: Ratio of the scale on the x-axis to that on the y-axis.
-	'''
+    '''
 
     if not ratio:
         return
@@ -498,7 +498,7 @@ class _Interactive(threading.Thread):
     '''
 Interactively adjust some plot elements of a Matplotlib axes instance using a
 curses GUI running in a separate thread.
-	'''
+    '''
 
     ###########################################################################
 
@@ -618,7 +618,7 @@ curses GUI running in a separate thread.
 Whenever a valid key is pressed, perform the appropriate action.
 
 :param k: Code of the key which was pressed.
-	    '''
+        '''
 
         if k is None:
             return
@@ -699,7 +699,7 @@ Whenever a valid key is pressed, perform the appropriate action.
     def update(self):
         '''
 Update the Matplotlib axes using the information entered in the GUI.
-	    '''
+        '''
 
         ax = self.fig.axes[self.page_num]
 
@@ -733,7 +733,7 @@ Update the Matplotlib axes using the information entered in the GUI.
     def main(self, stdscr):
         '''
 Implement the main GUI loop.
-	    '''
+        '''
 
         self.stdscr = stdscr
         stdscr.refresh()
@@ -760,7 +760,7 @@ def _maximise(fig):
 Maximise a figure window. (This is not the same as going full-screen.)
 
 :param fig: Matplotlib figure.
-	'''
+    '''
 
     backend = mpl.get_backend()
     manager = fig.canvas.manager
@@ -794,7 +794,7 @@ output while the GUI is active. Using this feature requires that curses be
 installed.
 
 :param fig: Matplotlib figure.
-	'''
+    '''
 
     if fig is None:
         figs = map(plt.figure, plt.get_fignums())
