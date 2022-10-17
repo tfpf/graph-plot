@@ -1,3 +1,4 @@
+import collections
 import fractions
 import io
 import matplotlib as mpl
@@ -574,13 +575,14 @@ curses GUI running in a separate thread.
         self.dividers = [header_column_width + i * (self.column_width + 1) for i in range(3)]
 
         # Margins.
-        self.stdscr.addstr(row, 0, '-' * self.width)
-        self.stdscr.addstr(row + 2, 0, '-' * self.width)
-        row += 1
-        for i in range(7):
+        self.stdscr.addstr(row, 0, '─' * self.width)
+        self.stdscr.addstr(row + 2, 0, '─' * self.width)
+        self.stdscr.addstr(row + 8, 0, '─' * self.width)
+        box_chars = collections.defaultdict(lambda: '│', {0: '┬', 2: '┼', 8: '┴'})
+        for i in range(9):
             for d in self.dividers:
-                self.stdscr.addstr(row + i, d, '|')
-        self.stdscr.addstr(row + i + 1, 0, '-' * self.width)
+                self.stdscr.addstr(row + i, d, box_chars[i])
+        row += 1
 
         # Headers.
         for d, coordaxis in zip(self.dividers, self.coordaxes):
@@ -630,11 +632,11 @@ Whenever a valid key is pressed, perform the appropriate action.
 
         # Arrow keys.
         if k in {curses.KEY_UP, curses.KEY_DOWN, curses.KEY_LEFT, curses.KEY_RIGHT}:
-            if k == curses.KEY_UP and cursor_y > 0:
+            if k == curses.KEY_UP and cursor_y > self.start_row:
                 cursor_y -= 1
-            elif k == curses.KEY_DOWN and cursor_y < self.height - 1:
+            elif k == curses.KEY_DOWN and cursor_y < self.start_row + 4:
                 cursor_y += 1
-            elif k == curses.KEY_LEFT and cursor_x > 0:
+            elif k == curses.KEY_LEFT and cursor_x > self.dividers[0] + 1:
                 cursor_x -= 1
             elif k == curses.KEY_RIGHT and cursor_x < self.width - 1:
                 cursor_x += 1
