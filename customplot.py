@@ -645,7 +645,7 @@ Whenever a valid key is pressed, perform the appropriate action.
 
         # Home and End keys.
         if k == curses.KEY_HOME:
-            self.stdscr.move(cursor_y, 0)
+            self.stdscr.move(cursor_y, self.dividers[0] + 1)
             return
         if k == curses.KEY_END:
             self.stdscr.move(cursor_y, self.width - 1)
