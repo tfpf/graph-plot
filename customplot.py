@@ -645,10 +645,20 @@ Whenever a valid key is pressed, perform the appropriate action.
 
         # Home and End keys.
         if k == curses.KEY_HOME:
-            self.stdscr.move(cursor_y, self.dividers[0] + 1)
+            if cursor_x > self.dividers[2] + 1:
+                self.stdscr.move(cursor_y, self.dividers[2] + 1)
+            elif cursor_x > self.dividers[1] + 1:
+                self.stdscr.move(cursor_y, self.dividers[1] + 1)
+            else:
+                self.stdscr.move(cursor_y, self.dividers[0] + 1)
             return
         if k == curses.KEY_END:
-            self.stdscr.move(cursor_y, self.width - 1)
+            if cursor_x < self.dividers[1]:
+                self.stdscr.move(cursor_y, self.dividers[1])
+            elif cursor_x < self.dividers[2]:
+                self.stdscr.move(cursor_y, self.dividers[2])
+            else:
+                self.stdscr.move(cursor_y, self.width - 1)
             return
 
         # Page Up and Page Down keys.
