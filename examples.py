@@ -9,9 +9,9 @@ plt.style.use('styles/light.mplstyle')
 ###############################################################################
 
 def cartesian_2d_minimal():
-    '''\
+    '''
 Example of a minimal two-dimensional Cartesian plot.
-'''
+    '''
 
     fig, ax = plt.subplots()
 
@@ -26,9 +26,9 @@ Example of a minimal two-dimensional Cartesian plot.
 ###############################################################################
 
 def cartesian_2d():
-    '''\
+    '''
 Example of a two-dimensional Cartesian plot.
-'''
+    '''
 
     # Create Matplotlib figure and axes instances.
     fig, ax = plt.subplots()
@@ -54,15 +54,15 @@ Example of a two-dimensional Cartesian plot.
     # distorted).
     customplot.aspect(ax, 1)
 
-    # Use either `plt.show' or `customplot.show'.
+    # Use either `plt.show` or `customplot.show`.
     customplot.show()
 
 ###############################################################################
 
 def cartesian_2d_discontinuous():
-    '''\
+    '''
 Example of a two-dimensional Cartesian plot of a discontinuous function.
-'''
+    '''
 
     # Create Matplotlib figure and axes instances.
     fig, ax = plt.subplots()
@@ -97,20 +97,20 @@ Example of a two-dimensional Cartesian plot of a discontinuous function.
     # distorted).
     customplot.aspect(ax, 1)
 
-    # Use either `plt.show' or `customplot.show'.
+    # Use either `plt.show` or `customplot.show`.
     customplot.show()
 
 ###############################################################################
 
 def cartesian_2d_symbolic_1():
-    '''\
+    '''
 Example of a two-dimensional Cartesian plot with symbolic labels on the x-axis.
 Said labels contain the symbol for pi (π).
-'''
+    '''
 
     fig, ax = plt.subplots()
 
-    # Set the locations of the grid lines on the x-axis. Note that `symbolic'
+    # Set the locations of the grid lines on the x-axis. Note that `symbolic`
     # has been set to True. As a result, grid lines will be drawn at the
     # following x-coordinates.
     # [-2π, -1.75π, -1.5π, -1.25π, -π, -0.75π, -0.5π, -0.25π, 0, 0.25π, 0.5π, 0.75π, π, 1.25π, 1.5π, 1.75π, 2π]
@@ -133,22 +133,22 @@ Said labels contain the symbol for pi (π).
 ###############################################################################
 
 def cartesian_2d_symbolic_2():
-    '''\
+    '''
 Example of a two-dimensional Cartesian plot with symbolic labels on the x-axis
 and y-axis. Said labels contain the symbols for pi (π), the Euler–Mascheroni
 constant (γ) and the reciprocal Fibonacci constant (ψ).
-'''
+    '''
 
     fig, ax = plt.subplots()
 
-    # Set the locations of the grid lines on the x-axis. Note that `symbolic'
-    # has been set to True, and a value has been provided for `s' and `v'. As a
+    # Set the locations of the grid lines on the x-axis. Note that `symbolic`
+    # has been set to True, and a value has been provided for `s` and `v`. As a
     # result, grid lines will be drawn at the following x-coordinates.
     # [-2π/γ, -1.75π/γ, -1.5π/γ, -1.25π/γ, -π/γ, -0.75π/γ, -0.5π/γ, -0.25π/γ, 0, 0.25π/γ, 0.5π/γ, 0.75π/γ, π/γ, 1.25π/γ, 1.5π/γ, 1.75π/γ, 2π/γ]
     customplot.limit(ax, 'x', symbolic=True, s=r'\pi/\gamma', v=np.pi / np.euler_gamma, first=-2, last=2, step=0.25)
 
-    # Set the locations of the grid lines on the y-axis. Note that `symbolic'
-    # has been set to True, and a value has been provided for `s' and `v'. As a
+    # Set the locations of the grid lines on the y-axis. Note that `symbolic`
+    # has been set to True, and a value has been provided for `s` and `v`. As a
     # result, grid lines will be drawn at the following y-coordinates.
     # [-1.33ψ, -ψ, -0.67ψ, -0.33ψ, 0, 0.33ψ, 0.67ψ, ψ, 1.33ψ]
     customplot.limit(ax, 'y', symbolic=True, s=r'\psi', v=3.359886, first=-4 / 3, last=4 / 3, step=1 / 3)
@@ -165,9 +165,9 @@ constant (γ) and the reciprocal Fibonacci constant (ψ).
 ###############################################################################
 
 def interactive():
-    '''\
+    '''
 Example of an interactive plot.
-'''
+    '''
 
     fig, ax = plt.subplots()
     customplot.limit(ax, 'x', first=-6, last=6, step=1)
@@ -182,7 +182,7 @@ Example of an interactive plot.
     customplot.polish(ax, title='This is an interactive plot!')
     customplot.aspect(ax, 1)
 
-    # Call `customplot.show' with the figure instance as an argument.
+    # Call `customplot.show` with the figure instance as an argument.
     customplot.show(fig)
 
     # After doing this, the plot window will open, and a GUI will be emulated
@@ -193,13 +193,13 @@ Example of an interactive plot.
     # between axes.
 
     # The main part contains some entries which can be typed into. These map to
-    # the arguments of `customplot.limit'.
-    # 'Symbolic': `symbolic' argument of `customplot.limit'. Leaving it blank
-    # causes `symbolic=False' to be passed to the function, while typing
-    # anything causes `symbolic=True' to be passed.
-    # 'Symbol': `s' argument of `customplot.limit'.
-    # 'Value': `v' argument of `customplot.limit'.
-    # 'Limits': `first', `last' and `step' arguments of `customplot.limit'.
+    # the arguments of `customplot.limit`.
+    # 'Symbolic': `symbolic` argument of `customplot.limit`. Leaving it blank
+    # causes `symbolic=False` to be passed to the function, while typing
+    # anything causes `symbolic=True` to be passed.
+    # 'Symbol': `s` argument of `customplot.limit`.
+    # 'Value': `v` argument of `customplot.limit`.
+    # 'Limits': `first`, `last` and `step` arguments of `customplot.limit`.
     # Type in three space-separated numbers, which will be used as the
     # aforementioned arguments.
     # 'Label': the label of an axis of coordinates.
@@ -209,9 +209,9 @@ Example of an interactive plot.
 ###############################################################################
 
 def cartesian_2d_ellipse():
-    '''\
+    '''
 Example of a two-dimensional Cartesian plot of an ellipse.
-'''
+    '''
 
     fig, ax = plt.subplots()
     customplot.limit(ax, 'x', first=-3, last=5, step=1)
@@ -230,9 +230,9 @@ Example of a two-dimensional Cartesian plot of an ellipse.
 ###############################################################################
 
 def polar():
-    '''\
+    '''
 Example of a polar plot.
-'''
+    '''
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='polar')
@@ -254,7 +254,7 @@ Example of a polar plot.
     # rendered the way mathematical expressions would be rendered.
     customplot.polish(ax, labels=('$t$', '$r$'), title='This is a cardioid!')
 
-    # An aspect ratio is meaningless in polar plots. Hence, `customplot.aspect'
+    # An aspect ratio is meaningless in polar plots. Hence, `customplot.aspect`
     # is not called.
 
     customplot.show()
@@ -262,16 +262,16 @@ Example of a polar plot.
 ###############################################################################
 
 def polar_symbolic():
-    '''\
+    '''
 Example of a polar plot with symbolic labels on the angular axis. Said labels
 contain the symbol for pi (π).
-'''
+    '''
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='polar')
 
     # In a polar plot, the x-axis is actually the angular axis. Note that
-    # `symbolic' has been set to True. As a result, grid lines will be drawn at
+    # `symbolic` has been set to True. As a result, grid lines will be drawn at
     # the following t-coordinates.
     # [0, 0.25π, 0.5π, 0.75π, π, 1.25π, 1.5π, 1.75π]
     # No grid line is drawn at 2π because a t-coordinate of 2π is the same as a
@@ -287,8 +287,8 @@ contain the symbol for pi (π).
     customplot.limit(ax, 'y', first=0, last=2, step=0.5)
 
     # This is not a trigonometric function, so the range of values the
-    # independent variable `t' may take is not restricted. Here, the upper
-    # limit on `t' has been chosen in such a way that the visible portion of
+    # independent variable `t` may take is not restricted. Here, the upper
+    # limit on `t` has been chosen in such a way that the visible portion of
     # the graph does not end abruptly.
     t = np.linspace(0, 25, 10000)
     r = np.sqrt(t / np.pi / 2)
@@ -299,7 +299,7 @@ contain the symbol for pi (π).
     # rendered the way mathematical expressions would be rendered.
     customplot.polish(ax, labels=('$t$', '$r$'), title='This is a spiral!')
 
-    # An aspect ratio is meaningless in polar plots. Hence, `customplot.aspect'
+    # An aspect ratio is meaningless in polar plots. Hence, `customplot.aspect`
     # is not called.
 
     customplot.show()
@@ -307,9 +307,9 @@ contain the symbol for pi (π).
 ###############################################################################
 
 def subplots():
-    '''\
+    '''
 Example of subplots.
-'''
+    '''
 
     fig = plt.figure()
     axs = [None] * 3
@@ -345,9 +345,9 @@ Example of subplots.
 ###############################################################################
 
 def cartesian_3d_curve():
-    '''\
+    '''
 Example of a three-dimensional Cartesian plot of a curve.
-'''
+    '''
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
@@ -364,7 +364,7 @@ Example of a three-dimensional Cartesian plot of a curve.
 
     # An aspect ratio is meaningless in three-dimensional plots, because there
     # are three axes of coordinates. Hence, if the second argument of
-    # `customplot.aspect' is any non-zero number, the scales on the x-axis,
+    # `customplot.aspect` is any non-zero number, the scales on the x-axis,
     # y-axis and z-axis will be made equal.
     customplot.aspect(ax, 1)
 
@@ -373,10 +373,10 @@ Example of a three-dimensional Cartesian plot of a curve.
 ###############################################################################
 
 def cartesian_3d_curve_symbolic():
-    '''\
+    '''
 Example of a three-dimensional Cartesian plot of a curve with symbolic labels
 on the x-axis. Said labels contain the symbol for pi (π).
-'''
+    '''
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
@@ -393,7 +393,7 @@ on the x-axis. Said labels contain the symbol for pi (π).
 
     # An aspect ratio is meaningless in three-dimensional plots, because there
     # are three axes of coordinates. Hence, if the second argument of
-    # `customplot.aspect' is any non-zero number, the scales on the x-axis,
+    # `customplot.aspect` is any non-zero number, the scales on the x-axis,
     # y-axis and z-axis will be made equal.
     customplot.aspect(ax, 1)
 
@@ -402,10 +402,10 @@ on the x-axis. Said labels contain the symbol for pi (π).
 ###############################################################################
 
 def cartesian_3d_surface_symbolic():
-    '''\
+    '''
 Example of a three-dimensional Cartesian plot of a surface with symbolic labels
 on the x-axis and the y-axis. Said labels contain the symbol for pi (π).
-'''
+    '''
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
@@ -446,4 +446,3 @@ if __name__ == '__main__':
     cartesian_3d_curve()
     cartesian_3d_curve_symbolic()
     cartesian_3d_surface_symbolic()
-
