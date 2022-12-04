@@ -432,11 +432,11 @@ lines. Make some minor appearance enhancements.
 
     # Minor grid lines don't look good in three-dimensional plots.
     if ax.name in {'rectilinear', 'polar'}:
-        ax.grid(b=True, which='major', linewidth=0.5, linestyle=':')
-        ax.grid(b=True, which='minor', linewidth=0.0625, linestyle='-')
+        ax.grid(True, which='major', linewidth=0.5, linestyle=':')
+        ax.grid(True, which='minor', linewidth=0.0625, linestyle='-')
         ax.minorticks_on()
     elif ax.name == '3d':
-        ax.grid(b=True, which='major', linewidth=mpl.rcParams['grid.linewidth'], linestyle='-')
+        ax.grid(True, which='major', linewidth=mpl.rcParams['grid.linewidth'], linestyle='-')
 
     # Key a unique ID with the figure instance in the global weak key
     # dictionary. Doing so ensures that the following operations are performed
