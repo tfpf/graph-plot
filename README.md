@@ -81,8 +81,8 @@ install it.
 * Find out where Matplotlib stores its cache.
 ```console
 $ python3
->>> import matplotlib
->>> print(matplotlib.get_cachedir())
+>>> import matplotlib as mpl
+>>> mpl.get_cachedir()
 ```
 * Delete all font-related cache files in that location.
 * Add the following lines to the file `light.mplstyle`.
