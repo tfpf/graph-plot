@@ -67,7 +67,7 @@
       this Licence, each Contributor hereby grants to You a perpetual,
       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
       copyright licence to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
+      publicly display, publicly perform, sublicence, and distribute the
       Work and such Derivative Works in Source or Object form.
 
    3. Grant of Patent Licence. Subject to the terms and conditions of
@@ -175,20 +175,9 @@
 
    END OF TERMS AND CONDITIONS
 
-   APPENDIX: How to apply the Apache Licence to your work.
-
-      To apply the Apache Licence to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "[]"
-      replaced with your own identifying information. (Don't include
-      the brackets!)  The text should be enclosed in the appropriate
-      comment syntax for the file format. We also recommend that a
-      file or class name and description of purpose be included on the
-      same "printed page" as the copyright notice for easier
-      identification within third-party archives.
-
    Copyright 2021 Vishal Chandratreya
 
-   Licensed under the Apache Licence, Version 2.0 (the "Licence");
+   Licenced under the Apache Licence, Version 2.0 (the "Licence");
    you may not use this file except in compliance with the Licence.
    You may obtain a copy of the Licence at
 
