@@ -110,9 +110,11 @@ If the plot doesn't look quite right, try playing around with the DPI parameter
 before adjusting anything else. In the file `light.mplstyle`, search for
 `figure.dpi` and change the value next to it.
 
-In my experience, a value of 192 produces pretty graphs on a 1080p screen,
-while a 768p screen may require setting it to 135 or so. On a 720p screen, 128
-should work well.
+What the best value is depends on the resolution of your screen as well as its
+scaling factor. In my experience, when the scaling factor is 1, a value of 192
+produces pretty graphs on a 1080p screen, while a 768p screen may require
+setting it to 135 or so. On a 720p screen, 128 should work well. (Reducing the
+DPI will also reduce the quality of the image. Proceed with caution.)
 
 ## Essential and Jump Discontinuities
 There are two types of discontinuities most graph plotters struggle with:
