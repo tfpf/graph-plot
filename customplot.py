@@ -19,38 +19,39 @@ try:
 except ImportError:
     has_curses = False
 
-###############################################################################
-
 _gid = weakref.WeakKeyDictionary()
 
-###############################################################################
 
-def iprint(items, columns=3, align_method='center'):
+def iprint(items, columns=3, method=str.center):
     '''
 Display an iterable in neat columns.
 
 :param items: An iterable whose every element can be stringified.
 :param columns: Number of columns to arrange `items` in.
-:param align_method: Method of the `str` class. 'ljust', 'center' or 'rjust'.
+:param method: One of `str.ljust`, `str.center` and `str.rjust`. Align text
+    left, centre and right respectively.
     '''
+    if method not in {str.ljust, str.center, str.rjust}:
+        raise ValueError('Argument `method` must be one of `str.ljust`, `str.center` and `str.rjust`.')
 
     # Convert the iterable into a two-dimensional list.
     items = [*map(str, items)]
-    num_items = len(items)
-    if num_items % columns:
-        items.extend([''] * (columns - num_items % columns))
-    items = [items[i : i + columns] for i in range(0, len(items), columns)]
+    len_items = len(items)
+    required = columns - len_items % columns
+    if required < columns:
+        items.extend([''] * required)
+        len_items += required
+    rows = len_items // columns
+    items = [items[i :: rows] for i in range(rows)]
 
     # The required width of a column is the width of the longest string in that
     # column plus some extra spaces for padding.
     widths = [max(len(row[i]) for row in items) + 2 for i in range(columns)]
-
     for row in items:
         for (r, width) in zip(row, widths):
-            print(getattr(r, align_method)(width, ' '), end='')
+            print(method(r, width, ' '), end='')
         print()
 
-###############################################################################
 
 def _labels_and_ticks(first, last, step, symbol=r'\pi', symval=np.pi):
     r'''
@@ -75,22 +76,18 @@ from one rational multiple of π (or some other number) to another.
 :param symval: Float; numerical value represented by `symbol`.
 
 :return: Tuple of a list of labels and a NumPy array of the respective values.
-:rtype: tuple(list[str], numpy.ndarray)
     '''
-
     try:
         [s_num, s_den] = symbol.split('/')
     except ValueError:
         s_num = symbol
         s_den = '1'
-
     coefficients = np.arange(first, last + step / 2, step)
 
     # Pre-allocate space for the list because its length is known. As a result,
     # this loop will run approximately twice as fast as it would if items were
     # repeatedly appended to the list.
     labels = [None] * len(coefficients)
-
     for (i, coefficient) in enumerate(coefficients):
         value = fractions.Fraction(coefficient).limit_denominator()
         num = value.numerator
@@ -101,12 +98,10 @@ from one rational multiple of π (or some other number) to another.
             labels[i] = '$0$'
             continue
 
-        # Build the string which will be the next item in `labels`. Create a
-        # list to store the different parts of the string, and join those
-        # parts.
+        # Case 2: `coefficient` is non-zero. Build the string which will be the
+        # next item in `labels`. Create a list to store the different parts of
+        # the string, and join those parts.
         builder = ['$']
-
-        # Case 2: `coefficient` is non-zero.
         if num < 0:
             builder.append('-')
             num = abs(num)
@@ -130,14 +125,12 @@ from one rational multiple of π (or some other number) to another.
 
     return (labels, symval * coefficients)
 
-###############################################################################
 
 def _get_axes_size_in_inches(ax):
     bbox = ax.get_window_extent()
     transformed = bbox.transformed(ax.figure.dpi_scale_trans.inverted())
     return (transformed.width, transformed.height)
 
-###############################################################################
 
 def _schedule_draw_polar_patches(event):
     '''
@@ -150,10 +143,8 @@ resize operation has been completed.
 
 :param event: Matplotlib event (the event which triggered this function).
     '''
-
     _gid[event.canvas.figure][1] = True
 
-###############################################################################
 
 def _draw_polar_patches(event):
     '''
@@ -167,7 +158,6 @@ Finally, labels on the axes of coordinates are made visible.
 
 :param event: Matplotlib event (the event which triggered this function).
     '''
-
     canvas = event.canvas
     fig = canvas.figure
     [gid, needs_redraw] = _gid[fig]
@@ -229,7 +219,6 @@ Finally, labels on the axes of coordinates are made visible.
 
         canvas.draw_idle()
 
-###############################################################################
 
 def sanitise(y, maximum_diff=5):
     '''
@@ -243,15 +232,12 @@ the points of discontinuity to NaN.
 :param maximum_diff: Maximum permissible derivative of `y`.
 
 :return: NumPy array with NaN at the points of discontinuity.
-:rtype: numpy.ndarray
     '''
-
     y = np.array(y)
     points_of_discontinuity = np.abs(np.r_[[0], np.diff(y)]) > maximum_diff
     y[points_of_discontinuity] = np.nan
     return y
 
-###############################################################################
 
 def limit(ax, coordaxis=None, symbolic=False, s=r'\pi', v=np.pi, first=None, last=None, step=None):
     '''
@@ -275,9 +261,7 @@ like this, you must modify the source code.
 :param step: Float; tick spacing.
 
 :return: Flag whether this function did something or returned early.
-:rtype: bool
     '''
-
     if coordaxis == 'z' and ax.name != '3d':
         return False
 
@@ -293,7 +277,7 @@ like this, you must modify the source code.
         if any(arg is None for arg in [first, last, step]):
             raise ValueError('If argument "symbolic" is True, arguments "first", "last" and "step" must not be None.')
 
-        labels, ticks = _labels_and_ticks(first, last, step, s, v)
+        (labels, ticks) = _labels_and_ticks(first, last, step, s, v)
 
         if ax.name == 'polar':
 
@@ -301,7 +285,7 @@ like this, you must modify the source code.
             # tick and label (i.e. the ones for 2π). Otherwise, they will
             # overlap with the first tick and label (i.e. the ones for 0).
             if coordaxis == 'x' and first == 0 and np.isclose(last * v, 2 * np.pi):
-                labels, ticks = labels[: -1], ticks[: -1]
+                (labels, ticks) = (labels[: -1], ticks[: -1])
 
             # Remove the last label on the radial axis. Remove the first label
             # if it marks zero.
@@ -375,7 +359,6 @@ like this, you must modify the source code.
 
     return True
 
-###############################################################################
 
 def polish(ax, labels=None, axlines=True, title=None, suptitle=None, windowtitle=None):
     '''
@@ -390,7 +373,6 @@ lines. Make some minor appearance enhancements.
 :param suptitle: Title of the figure `ax` is in.
 :param windowtitle: Title of the window `ax` is in.
     '''
-
     if labels is None:
         if ax.name in {'rectilinear', '3d'}:
             labels = ('$x$', '$y$', '$z$')
@@ -466,7 +448,6 @@ lines. Make some minor appearance enhancements.
             kwargs['bbox_to_anchor'] = (1, 1)
         ax.legend(**kwargs)
 
-###############################################################################
 
 def aspect(ax, ratio=0):
     '''
@@ -482,7 +463,6 @@ will be made equal if `ratio` is any non-zero number.
 :param ax: Matplotlib axes.
 :param ratio: Ratio of the scale on the x-axis to that on the y-axis.
     '''
-
     if not ratio:
         return
 
@@ -492,15 +472,12 @@ will be made equal if `ratio` is any non-zero number.
         limits = np.array([getattr(ax, f'get_{coordaxis}lim')() for coordaxis in 'xyz'])
         ax.set_box_aspect(np.ptp(limits, axis=1))
 
-###############################################################################
 
 class _Interactive(threading.Thread):
     '''
 Interactively adjust some plot elements of a Matplotlib axes instance using a
 curses GUI running in a separate thread.
     '''
-
-    ###########################################################################
 
     def __init__(self, fig, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -527,12 +504,8 @@ curses GUI running in a separate thread.
 
         self.redirect_streams()
 
-    ###########################################################################
-
     def redirect_streams(self):
         sys.stderr = self.tmp_stderr = io.StringIO()
-
-    ###########################################################################
 
     def restore_streams(self):
         value = self.tmp_stderr.getvalue()
@@ -540,18 +513,12 @@ curses GUI running in a separate thread.
         sys.stderr = sys.__stderr__
         sys.stderr.write(value)
 
-    ###########################################################################
-
     def run(self):
         curses.wrapper(self.main)
-
-    ###########################################################################
 
     def join(self, *args):
         super().join(*args)
         self.restore_streams()
-
-    ###########################################################################
 
     def draw_GUI(self):
         self.stdscr.erase()
@@ -610,8 +577,6 @@ curses GUI running in a separate thread.
         self.stdscr.addstr(self.height - 1, 0, 'Escape     ', curses.A_BOLD)
         self.stdscr.addstr('Quit')
         self.stdscr.move(self.start_row, self.dividers[0] + 1)
-
-    ###########################################################################
 
     def process_keystroke(self, k):
         '''
@@ -704,8 +669,6 @@ Whenever a valid key is pressed, perform the appropriate action.
             self.update()
             return
 
-    ###########################################################################
-
     def update(self):
         '''
 Update the Matplotlib axes using the information entered in the GUI.
@@ -738,8 +701,6 @@ Update the Matplotlib axes using the information entered in the GUI.
 
         self.canvas.draw_idle()
 
-    ###########################################################################
-
     def main(self, stdscr):
         '''
 Implement the main GUI loop.
@@ -763,7 +724,6 @@ Implement the main GUI loop.
                 message = ('Cannot update a figure which has been closed.')
                 raise RuntimeWarning(message)
 
-###############################################################################
 
 def _maximise(fig):
     '''
@@ -771,7 +731,6 @@ Maximise a figure window. (This is not the same as going full-screen.)
 
 :param fig: Matplotlib figure.
     '''
-
     backend = mpl.get_backend()
     manager = fig.canvas.manager
     if backend in {'TkAgg', 'TkCairo'}:
@@ -787,7 +746,6 @@ Maximise a figure window. (This is not the same as going full-screen.)
     elif backend in {'Qt5Agg', 'Qt5Cairo'}:
         manager.window.showMaximized()
 
-###############################################################################
 
 def show(fig=None):
     '''
@@ -805,7 +763,6 @@ installed.
 
 :param fig: Matplotlib figure.
     '''
-
     if fig is None:
         figs = map(plt.figure, plt.get_fignums())
     else:
