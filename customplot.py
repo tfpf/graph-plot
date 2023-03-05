@@ -371,7 +371,8 @@ lines. Make some minor appearance enhancements.
     coordinates.
 :param title: Title of `ax`.
 :param suptitle: Title of the figure `ax` is in.
-:param windowtitle: Title of the window `ax` is in.
+:param windowtitle: Title of the window `ax` is in. If this is 0, the title
+    will be set to a string generated using the Unix time.
     '''
     if labels is None:
         if ax.name in {'rectilinear', '3d'}:
@@ -425,7 +426,7 @@ lines. Make some minor appearance enhancements.
     # only once.
     fig = ax.figure
     canvas = fig.canvas
-    if any(_ax.name == 'polar' for _ax in fig.axes) and fig not in _gid:
+    if fig not in _gid:
         timefmt = '%Y-%m-%d_%H-%M-%S'
         _gid[fig] = [f'cp_{time.strftime(timefmt)}_{np.random.randint(100, 999)}', True]
         canvas.mpl_connect('resize_event', _schedule_draw_polar_patches)
@@ -438,7 +439,9 @@ lines. Make some minor appearance enhancements.
         ax.set_title(title)
     if suptitle is not None:
         fig.suptitle(suptitle)
-    if windowtitle is not None:
+    if windowtitle == 0:
+        canvas.manager.set_window_title(_gid[fig][0])
+    elif windowtitle is not None:
         canvas.manager.set_window_title(windowtitle)
 
     if ax.get_legend_handles_labels() != ([], []):
